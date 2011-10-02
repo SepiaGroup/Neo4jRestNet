@@ -1,0 +1,11 @@
+C:\SepiaGroup\Cuttlefish\Neo4jRestNetExamples\Example\Example\bin\Debug\Example.exe.config
+C:\SepiaGroup\Cuttlefish\Neo4jRestNetExamples\Example\Example\bin\Debug\Example.exe
+C:\SepiaGroup\Cuttlefish\Neo4jRestNetExamples\Example\Example\bin\Debug\Example.pdb
+C:\SepiaGroup\Cuttlefish\Neo4jRestNetExamples\Example\Example\bin\Debug\Neo4Net.dll
+C:\SepiaGroup\Cuttlefish\Neo4jRestNetExamples\Example\Example\bin\Debug\Newtonsoft.Json.dll
+C:\SepiaGroup\Cuttlefish\Neo4jRestNetExamples\Example\Example\bin\Debug\Neo4Net.pdb
+C:\SepiaGroup\Cuttlefish\Neo4jRestNetExamples\Example\Example\bin\Debug\Newtonsoft.Json.pdb
+C:\SepiaGroup\Cuttlefish\Neo4jRestNetExamples\Example\Example\bin\Debug\Newtonsoft.Json.xml
+C:\SepiaGroup\Cuttlefish\Neo4jRestNetExamples\Example\Example\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\SepiaGroup\Cuttlefish\Neo4jRestNetExamples\Example\Example\obj\x86\Debug\Example.exe
+C:\SepiaGroup\Cuttlefish\Neo4jRestNetExamples\Example\Example\obj\x86\Debug\Example.pdb
