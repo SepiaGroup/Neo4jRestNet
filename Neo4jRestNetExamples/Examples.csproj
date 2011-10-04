@@ -54,7 +54,7 @@
     <Compile Include="RelationshipType.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Neo4jRestNet.csproj">
+    <ProjectReference Include="..\Neo4jRestNet\Neo4jRestNet.csproj">
       <Project>{D3704E7B-3783-4173-8114-D3E2647CBD8A}</Project>
       <Name>Neo4jRestNet</Name>
     </ProjectReference>

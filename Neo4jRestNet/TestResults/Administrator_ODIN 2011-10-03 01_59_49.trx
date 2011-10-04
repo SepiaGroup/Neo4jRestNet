@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<TestRun id="454e3738-f181-49be-9b6c-a2a4dc16b665" name="Administrator@ODIN 2011-10-03 01:59:49" runUser="ODIN\Administrator" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <TestSettings name="Local" id="d72f0989-4de8-4c9f-a65d-36824bfe8de3">
+    <Description>These are default test settings for a local test run.</Description>
+    <Deployment enabled="false" runDeploymentRoot="Administrator_ODIN 2011-10-03 01_59_49">
+      <DeploymentItem filename="C:\SepiaGroup\Neo4j\Neo4jRestNet\bin\Debug\Neo4Net.dll" />
+    </Deployment>
+    <Execution>
+      <TestTypeSpecific />
+      <AgentRule name="Execution Agents">
+      </AgentRule>
+    </Execution>
+  </TestSettings>
+  <Times creation="2011-10-03T01:59:49.7844932-04:00" queuing="2011-10-03T01:59:49.8254973-04:00" start="2011-10-03T01:59:49.8314979-04:00" finish="2011-10-03T01:59:50.0325180-04:00" />
+  <ResultSummary outcome="Failed">
+    <Counters total="1" executed="1" error="0" failed="1" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" passed="0" completed="0" inProgress="0" pending="0" />
+  </ResultSummary>
+  <TestDefinitions>
+    <UnitTest name="GEIDImplicitStringToGEID" storage="c:\sepiagroup\neo4j\neo4jrestnet\neo4jrestnet.test\bin\debug\neo4jrestnet.test.dll" id="d0b76b0f-8a0b-38d1-3c25-d7978293e5db">
+      <Execution id="898f64c5-7465-4d1b-9b12-6e0dc57396ed" />
+      <TestMethod codeBase="C:/SepiaGroup/Neo4j/Neo4jRestNet/Neo4jRestNet.Test/bin/Debug/Neo4jRestNet.Test.DLL" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Neo4jRestNet.Test.GEIDTest, Neo4jRestNet.Test, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" name="GEIDImplicitStringToGEID" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <TestEntries>
+    <TestEntry testId="d0b76b0f-8a0b-38d1-3c25-d7978293e5db" executionId="898f64c5-7465-4d1b-9b12-6e0dc57396ed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <Results>
+    <UnitTestResult executionId="898f64c5-7465-4d1b-9b12-6e0dc57396ed" testId="d0b76b0f-8a0b-38d1-3c25-d7978293e5db" testName="GEIDImplicitStringToGEID" computerName="ODIN" duration="00:00:00.0278696" startTime="2011-10-03T01:59:49.8344982-04:00" endTime="2011-10-03T01:59:50.0205168-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="898f64c5-7465-4d1b-9b12-6e0dc57396ed">
+      <Output>
+        <ErrorInfo>
+          <Message>Test method Neo4jRestNet.Test.GEIDTest.GEIDImplicitStringToGEID threw exception: 
+System.TypeInitializationException: The type initializer for 'Encryption' threw an exception. ---&gt; System.NullReferenceException: Object reference not set to an instance of an object.</Message>
+          <StackTrace>    at Neo4jRestNet.Core.GEID.Encryption..cctor() in C:\SepiaGroup\Neo4j\Neo4jRestNet\Core\GEID.cs:line 18
+ --- End of inner exception stack trace ---
+    at Neo4jRestNet.Core.GEID.Encryption.Encrypt(String TextToBeEncrypted)
+   at Neo4jRestNet.Core.GEID.ToString() in C:\SepiaGroup\Neo4j\Neo4jRestNet\Core\GEID.cs:line 158
+   at Neo4jRestNet.Core.GEID.op_Implicit(GEID geid) in C:\SepiaGroup\Neo4j\Neo4jRestNet\Core\GEID.cs:line 142
+   at Neo4jRestNet.Test.GEIDTest.GEIDImplicitStringToGEID() in C:\SepiaGroup\Neo4j\Neo4jRestNet\Neo4jRestNet.Test\UnitTest1.cs:line 75
+</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+  </Results>
+</TestRun>

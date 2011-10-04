@@ -1,0 +1,70 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<TestRun id="ea28ea5a-10ed-462d-9ef8-f92f28dac1cd" name="Administrator@ODIN 2011-10-03 02:18:12" runUser="ODIN\Administrator" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <TestSettings name="Local" id="d72f0989-4de8-4c9f-a65d-36824bfe8de3">
+    <Description>These are default test settings for a local test run.</Description>
+    <Deployment enabled="false" runDeploymentRoot="Administrator_ODIN 2011-10-03 02_18_12">
+      <DeploymentItem filename="C:\SepiaGroup\Neo4j\Neo4jRestNet\bin\Debug\Neo4Net.dll" />
+    </Deployment>
+    <Execution>
+      <TestTypeSpecific />
+      <AgentRule name="Execution Agents">
+      </AgentRule>
+    </Execution>
+  </TestSettings>
+  <Times creation="2011-10-03T02:18:12.4877537-04:00" queuing="2011-10-03T02:18:12.5957645-04:00" start="2011-10-03T02:18:12.6017651-04:00" finish="2011-10-03T02:18:12.8037853-04:00" />
+  <ResultSummary outcome="Completed">
+    <Counters total="6" executed="6" passed="6" error="0" failed="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+  </ResultSummary>
+  <TestDefinitions>
+    <UnitTest name="TryParseValid" storage="c:\sepiagroup\neo4j\neo4jrestnet\neo4jrestnet.test\bin\debug\neo4jrestnet.test.dll" id="3dfb80d2-e756-74fc-948a-51dbed2d6434">
+      <Execution id="550247cd-b22c-4f34-8d0d-08e08a10541a" />
+      <TestMethod codeBase="C:/SepiaGroup/Neo4j/Neo4jRestNet/Neo4jRestNet.Test/bin/Debug/Neo4jRestNet.Test.DLL" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Neo4jRestNet.Test.GEIDTest, Neo4jRestNet.Test, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" name="TryParseValid" />
+    </UnitTest>
+    <UnitTest name="Equality" storage="c:\sepiagroup\neo4j\neo4jrestnet\neo4jrestnet.test\bin\debug\neo4jrestnet.test.dll" id="174df904-103b-89e2-6665-31f4ea449501">
+      <Execution id="55d8383f-6489-499e-a000-00d13f25db72" />
+      <TestMethod codeBase="C:/SepiaGroup/Neo4j/Neo4jRestNet/Neo4jRestNet.Test/bin/Debug/Neo4jRestNet.Test.DLL" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Neo4jRestNet.Test.GEIDTest, Neo4jRestNet.Test, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" name="Equality" />
+    </UnitTest>
+    <UnitTest name="Inequality" storage="c:\sepiagroup\neo4j\neo4jrestnet\neo4jrestnet.test\bin\debug\neo4jrestnet.test.dll" id="d4c7900f-b7be-763c-d6fa-58cc489d1f22">
+      <Execution id="1e9c5236-20ca-4ebe-94a7-56b39c94e18f" />
+      <TestMethod codeBase="C:/SepiaGroup/Neo4j/Neo4jRestNet/Neo4jRestNet.Test/bin/Debug/Neo4jRestNet.Test.DLL" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Neo4jRestNet.Test.GEIDTest, Neo4jRestNet.Test, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" name="Inequality" />
+    </UnitTest>
+    <UnitTest name="NewGEIDFromLong" storage="c:\sepiagroup\neo4j\neo4jrestnet\neo4jrestnet.test\bin\debug\neo4jrestnet.test.dll" id="4026935a-c677-921c-4b27-cb5d5dcf5f59">
+      <Execution id="6332c518-c7a5-4c04-9ebe-bdf1e09e49ee" />
+      <TestMethod codeBase="C:/SepiaGroup/Neo4j/Neo4jRestNet/Neo4jRestNet.Test/bin/Debug/Neo4jRestNet.Test.DLL" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Neo4jRestNet.Test.GEIDTest, Neo4jRestNet.Test, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" name="NewGEIDFromLong" />
+    </UnitTest>
+    <UnitTest name="TryParseNotValid" storage="c:\sepiagroup\neo4j\neo4jrestnet\neo4jrestnet.test\bin\debug\neo4jrestnet.test.dll" id="3a4d78fe-2cb6-9f66-db94-18579ae49165">
+      <Execution id="b7401cb3-28fc-4781-8755-fb0662f49dda" />
+      <TestMethod codeBase="C:/SepiaGroup/Neo4j/Neo4jRestNet/Neo4jRestNet.Test/bin/Debug/Neo4jRestNet.Test.DLL" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Neo4jRestNet.Test.GEIDTest, Neo4jRestNet.Test, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" name="TryParseNotValid" />
+    </UnitTest>
+    <UnitTest name="NewGEIDFromString" storage="c:\sepiagroup\neo4j\neo4jrestnet\neo4jrestnet.test\bin\debug\neo4jrestnet.test.dll" id="3a3f72a1-9d68-9bc8-e539-001285b08ed7">
+      <Execution id="66260843-d040-440b-89ce-183ab68ca0e3" />
+      <TestMethod codeBase="C:/SepiaGroup/Neo4j/Neo4jRestNet/Neo4jRestNet.Test/bin/Debug/Neo4jRestNet.Test.DLL" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Neo4jRestNet.Test.GEIDTest, Neo4jRestNet.Test, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" name="NewGEIDFromString" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <TestEntries>
+    <TestEntry testId="174df904-103b-89e2-6665-31f4ea449501" executionId="55d8383f-6489-499e-a000-00d13f25db72" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="3a3f72a1-9d68-9bc8-e539-001285b08ed7" executionId="66260843-d040-440b-89ce-183ab68ca0e3" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="3a4d78fe-2cb6-9f66-db94-18579ae49165" executionId="b7401cb3-28fc-4781-8755-fb0662f49dda" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="3dfb80d2-e756-74fc-948a-51dbed2d6434" executionId="550247cd-b22c-4f34-8d0d-08e08a10541a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="4026935a-c677-921c-4b27-cb5d5dcf5f59" executionId="6332c518-c7a5-4c04-9ebe-bdf1e09e49ee" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="d4c7900f-b7be-763c-d6fa-58cc489d1f22" executionId="1e9c5236-20ca-4ebe-94a7-56b39c94e18f" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <Results>
+    <UnitTestResult executionId="55d8383f-6489-499e-a000-00d13f25db72" testId="174df904-103b-89e2-6665-31f4ea449501" testName="Equality" computerName="ODIN" duration="00:00:00.0114470" startTime="2011-10-03T02:18:12.6037653-04:00" endTime="2011-10-03T02:18:12.7637813-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="55d8383f-6489-499e-a000-00d13f25db72">
+    </UnitTestResult>
+    <UnitTestResult executionId="66260843-d040-440b-89ce-183ab68ca0e3" testId="3a3f72a1-9d68-9bc8-e539-001285b08ed7" testName="NewGEIDFromString" computerName="ODIN" duration="00:00:00.0002845" startTime="2011-10-03T02:18:12.7657815-04:00" endTime="2011-10-03T02:18:12.7677817-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="66260843-d040-440b-89ce-183ab68ca0e3">
+    </UnitTestResult>
+    <UnitTestResult executionId="b7401cb3-28fc-4781-8755-fb0662f49dda" testId="3a4d78fe-2cb6-9f66-db94-18579ae49165" testName="TryParseNotValid" computerName="ODIN" duration="00:00:00.0012109" startTime="2011-10-03T02:18:12.7707820-04:00" endTime="2011-10-03T02:18:12.7737823-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="b7401cb3-28fc-4781-8755-fb0662f49dda">
+    </UnitTestResult>
+    <UnitTestResult executionId="550247cd-b22c-4f34-8d0d-08e08a10541a" testId="3dfb80d2-e756-74fc-948a-51dbed2d6434" testName="TryParseValid" computerName="ODIN" duration="00:00:00.0004055" startTime="2011-10-03T02:18:12.7757825-04:00" endTime="2011-10-03T02:18:12.7777827-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="550247cd-b22c-4f34-8d0d-08e08a10541a">
+    </UnitTestResult>
+    <UnitTestResult executionId="6332c518-c7a5-4c04-9ebe-bdf1e09e49ee" testId="4026935a-c677-921c-4b27-cb5d5dcf5f59" testName="NewGEIDFromLong" computerName="ODIN" duration="00:00:00.0009144" startTime="2011-10-03T02:18:12.7797829-04:00" endTime="2011-10-03T02:18:12.7827832-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="6332c518-c7a5-4c04-9ebe-bdf1e09e49ee">
+    </UnitTestResult>
+    <UnitTestResult executionId="1e9c5236-20ca-4ebe-94a7-56b39c94e18f" testId="d4c7900f-b7be-763c-d6fa-58cc489d1f22" testName="Inequality" computerName="ODIN" duration="00:00:00.0004989" startTime="2011-10-03T02:18:12.7847834-04:00" endTime="2011-10-03T02:18:12.7877837-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="1e9c5236-20ca-4ebe-94a7-56b39c94e18f">
+    </UnitTestResult>
+  </Results>
+</TestRun>

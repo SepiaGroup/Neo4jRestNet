@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<TestRun id="e87484ee-f48c-4418-8888-885d244f9882" name="Administrator@ODIN 2011-10-03 02:20:48" runUser="ODIN\Administrator" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <TestSettings name="Local" id="d72f0989-4de8-4c9f-a65d-36824bfe8de3">
+    <Description>These are default test settings for a local test run.</Description>
+    <Deployment enabled="false" runDeploymentRoot="Administrator_ODIN 2011-10-03 02_20_48">
+      <DeploymentItem filename="C:\SepiaGroup\Neo4j\Neo4jRestNet\bin\Debug\Neo4Net.dll" />
+    </Deployment>
+    <Execution>
+      <TestTypeSpecific />
+      <AgentRule name="Execution Agents">
+      </AgentRule>
+    </Execution>
+  </TestSettings>
+  <Times creation="2011-10-03T02:20:48.9213961-04:00" queuing="2011-10-03T02:20:48.9734013-04:00" start="2011-10-03T02:20:48.9794019-04:00" finish="2011-10-03T02:20:49.1644204-04:00" />
+  <ResultSummary outcome="Failed">
+    <Counters total="1" executed="1" error="0" failed="1" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" passed="0" completed="0" inProgress="0" pending="0" />
+  </ResultSummary>
+  <TestDefinitions>
+    <UnitTest name="NullValue" storage="c:\sepiagroup\neo4j\neo4jrestnet\neo4jrestnet.test\bin\debug\neo4jrestnet.test.dll" id="3f9e18b8-b70f-4578-1c38-fba1e2395482">
+      <Execution id="76872915-f359-45d2-b72f-397ee4ec37bc" />
+      <TestMethod codeBase="C:/SepiaGroup/Neo4j/Neo4jRestNet/Neo4jRestNet.Test/bin/Debug/Neo4jRestNet.Test.DLL" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Neo4jRestNet.Test.GEIDTest, Neo4jRestNet.Test, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" name="NullValue" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <TestEntries>
+    <TestEntry testId="3f9e18b8-b70f-4578-1c38-fba1e2395482" executionId="76872915-f359-45d2-b72f-397ee4ec37bc" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <Results>
+    <UnitTestResult executionId="76872915-f359-45d2-b72f-397ee4ec37bc" testId="3f9e18b8-b70f-4578-1c38-fba1e2395482" testName="NullValue" computerName="ODIN" duration="00:00:00.0255890" startTime="2011-10-03T02:20:48.9814021-04:00" endTime="2011-10-03T02:20:49.1524192-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="76872915-f359-45d2-b72f-397ee4ec37bc">
+      <Output>
+        <ErrorInfo>
+          <Message>Assert.IsTrue failed. </Message>
+          <StackTrace>   at Neo4jRestNet.Test.GEIDTest.NullValue() in C:\SepiaGroup\Neo4j\Neo4jRestNet\Neo4jRestNet.Test\GEIDTest.cs:line 98
+</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+  </Results>
+</TestRun>

@@ -37,14 +37,6 @@ namespace Example
 			// Get Root Node from graphDB
 			Node RootNode = Node.GetRootNode();
 
-			// Get RootNode Id
-			long Id = (long)RootNode.NodeId;	//  ** NOTE: All Graph Element ID's are GEID
-			string geid = RootNode.NodeId;		//  ** you must cast them to long to get their numeric value
-												//  ** the string value from a GEID is encrypted 
-												//  ** this is done so that you can pass the ID to 
-												//  ** a web page without worring about it being hijacked.
-												//  ** GEID implements IEquatable
-
 			// Create a User Node with no Properties 
 			Node nodeUser = Node.CreateNode(NodeType.User);
 
@@ -65,6 +57,16 @@ namespace Example
 			RelProp.SetProperty("CustomRelProp", "CustomPropValue");
 
 			nodeUserWithName.CreateRelationshipTo(nodeUser, RelationshipType.Knows, RelProp);
+
+			// Get Id From Node
+			long Id = (long)RootNode.NodeId;	//  ** NOTE: All Graph Element ID's are GEID
+			string geid = RootNode.NodeId;		//  ** you must cast them to long to get their numeric value
+												//  ** the string value from a GEID is encrypted 
+												//  ** this is done so that you can pass the ID to 
+												//  ** a web page without worring about it being hijacked.
+												//  ** GEID implements IEquatable
+
+
 
 			// Gremlin 
 
