@@ -6,7 +6,5 @@ C:\SepiaGroup\Neo4j\Neo4jRestNet\Neo4jRestNetExamples\bin\Debug\ConsoleApplicati
 C:\SepiaGroup\Neo4j\Neo4jRestNet\Neo4jRestNetExamples\bin\Debug\Neo4Net.dll
 C:\SepiaGroup\Neo4j\Neo4jRestNet\Neo4jRestNetExamples\bin\Debug\Newtonsoft.Json.dll
 C:\SepiaGroup\Neo4j\Neo4jRestNet\Neo4jRestNetExamples\bin\Debug\Neo4Net.pdb
-C:\SepiaGroup\Neo4j\Neo4jRestNet\Neo4jRestNetExamples\bin\Debug\Newtonsoft.Json.pdb
-C:\SepiaGroup\Neo4j\Neo4jRestNet\Neo4jRestNetExamples\bin\Debug\Newtonsoft.Json.xml
 C:\SepiaGroup\Neo4j\Neo4jRestNet\Neo4jRestNetExamples\obj\x86\Debug\ConsoleApplication.exe
 C:\SepiaGroup\Neo4j\Neo4jRestNet\Neo4jRestNetExamples\obj\x86\Debug\ConsoleApplication.pdb

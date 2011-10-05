@@ -91,7 +91,7 @@ namespace Example
 				.gV(RootNode.NodeId)   
 				.Out(RelationshipType.Likes)
 				.As("Like")
-				.Table("t", new List<string>{ "Like" })
+				.Table("t", "Like")
 				.Append(" >> -1; t;");
 
 			DataTable dt = Gremlin.GetTable(tblScript.ToString());

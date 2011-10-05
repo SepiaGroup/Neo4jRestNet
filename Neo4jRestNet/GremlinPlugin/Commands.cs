@@ -39,9 +39,10 @@ namespace Neo4jRestNet.GremlinPlugin
 			return query.Append(".in()");
 		}
 
-		public static GremlinScript In(this GremlinScript query, string RelationshipName)
+		public static GremlinScript In(this GremlinScript query, params string[] RelationshipName)
 		{
-			return query.Append(string.Format(".in('{0}')", RelationshipName));
+			string relationships = string.Join(",", RelationshipName.Select(r => string.Concat("'", r, "'")));
+			return query.Append(string.Format(".in({0})", relationships));
 		}
 
 		#endregion
@@ -53,9 +54,10 @@ namespace Neo4jRestNet.GremlinPlugin
 			return query.Append(".inE()");
 		}
 
-		public static GremlinScript InE(this GremlinScript query, string RelationshipName)
+		public static GremlinScript InE(this GremlinScript query, params string[] RelationshipName)
 		{
-			return query.Append(string.Format(".inE('{0}')", RelationshipName));
+			string relationships = string.Join(",", RelationshipName.Select(r => string.Concat("'", r, "'")));
+			return query.Append(string.Format(".inE({0})", relationships));
 		}
 
 		#endregion
@@ -67,9 +69,10 @@ namespace Neo4jRestNet.GremlinPlugin
 			return query.Append(".inV()");
 		}
 
-		public static GremlinScript InV(this GremlinScript query, string RelationshipName)
+		public static GremlinScript InV(this GremlinScript query, params string[] RelationshipName)
 		{
-			return query.Append(string.Format(".inV('{0}')", RelationshipName));
+			string relationships = string.Join(",", RelationshipName.Select(r => string.Concat("'", r, "'")));
+			return query.Append(string.Format(".inV({0})", relationships));
 		}
 
 		#endregion
@@ -81,9 +84,10 @@ namespace Neo4jRestNet.GremlinPlugin
 			return query.Append(".out()");
 		}
 
-		public static GremlinScript Out(this GremlinScript query, string RelationshipName)
+		public static GremlinScript Out(this GremlinScript query, params string[] RelationshipName)
 		{
-			return query.Append(string.Format(".out('{0}')", RelationshipName));
+			string relationships = string.Join(",", RelationshipName.Select(r => string.Concat("'", r, "'")));
+			return query.Append(string.Format(".out({0})", relationships));
 		}
 
 		#endregion
@@ -95,9 +99,10 @@ namespace Neo4jRestNet.GremlinPlugin
 			return query.Append(".outE()");
 		}
 
-		public static GremlinScript OutE(this GremlinScript query, string RelationshipName)
+		public static GremlinScript OutE(this GremlinScript query, params string[] RelationshipName)
 		{
-			return query.Append(string.Format(".outE('{0}')", RelationshipName));
+			string relationships = string.Join(",", RelationshipName.Select(r => string.Concat("'", r, "'")));
+			return query.Append(string.Format(".outE({0})", relationships));
 		}
 
 		#endregion
@@ -109,9 +114,10 @@ namespace Neo4jRestNet.GremlinPlugin
 			return query.Append(".outV()");
 		}
 
-		public static GremlinScript OutV(this GremlinScript query, string RelationshipName)
+		public static GremlinScript OutV(this GremlinScript query, params string[] RelationshipName)
 		{
-			return query.Append(string.Format(".outV('{0}')", RelationshipName));
+			string relationships = string.Join(",", RelationshipName.Select(r => string.Concat("'", r, "'")));
+			return query.Append(string.Format(".outV({0})", relationships));
 		}
 
 		#endregion
@@ -123,9 +129,10 @@ namespace Neo4jRestNet.GremlinPlugin
 			return query.Append(".bothE()");
 		}
 
-		public static GremlinScript BothE(this GremlinScript query, string RelationshipName)
+		public static GremlinScript BothE(this GremlinScript query, params string[] RelationshipName)
 		{
-			return query.Append(string.Format(".bothE('{0}')", RelationshipName));
+			string relationships = string.Join(",", RelationshipName.Select(r => string.Concat("'", r, "'")));
+			return query.Append(string.Format(".bothE({0})", relationships));
 		}
 
 		#endregion
@@ -137,9 +144,10 @@ namespace Neo4jRestNet.GremlinPlugin
 			return query.Append(".bothV()");
 		}
 
-		public static GremlinScript BothV(this GremlinScript query, string RelationshipName)
+		public static GremlinScript BothV(this GremlinScript query, params string[] RelationshipName)
 		{
-			return query.Append(string.Format(".bothV('{0}')", RelationshipName));
+			string relationships = string.Join(",", RelationshipName.Select(r => string.Concat("'", r, "'")));
+			return query.Append(string.Format(".bothV({0})", relationships));
 		}
 
 		#endregion
@@ -207,14 +215,9 @@ namespace Neo4jRestNet.GremlinPlugin
 			return query.Append(string.Format(".table({0})", Name));
 		}
 
-		public static GremlinScript Table(this GremlinScript query, string Name, IEnumerable<string> ColumnNames)
+		public static GremlinScript Table(this GremlinScript query, string Name, params string[] ColumnNames)
 		{
-			StringBuilder names = new StringBuilder();
-			foreach (string name in ColumnNames)
-			{
-				names.AppendFormat("{0}'{1}'", names.Length == 0 ? string.Empty : ", ", name);
-			}
-
+			string names = string.Join(",", ColumnNames.Select(r => string.Concat("'", r, "'")));
 			return query.Append(string.Format(".table({0}, [{1}])", Name, names));
 		}
 
