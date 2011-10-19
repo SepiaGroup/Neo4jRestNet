@@ -8,8 +8,8 @@
         </connectionStrings>
 
         <appSettings>
-            <add key="GEIDKey" value="KeyForEncrypting"/>
-            <add key="GEIDIV" value="IVForEncrypting1"/>
+            <add key="EncryptIdKey" value="KeyForEncrypting"/>
+            <add key="EncryptIdIV" value="IVForEncrypting1"/>
         </appSettings>
     </configuration>
 
