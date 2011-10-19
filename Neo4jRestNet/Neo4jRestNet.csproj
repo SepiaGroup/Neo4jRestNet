@@ -82,21 +82,25 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Core\GEID.cs" />
-    <Compile Include="Core\NodePropertyBase.cs" />
-    <Compile Include="Core\NodeTypeBase.cs" />
+    <Compile Include="Core\EncryptId.cs" />
     <Compile Include="Core\Path.cs" />
     <Compile Include="Core\Properties.cs" />
     <Compile Include="Core\IGraphObject.cs" />
-    <Compile Include="Core\PropertyBase.cs" />
     <Compile Include="Core\RelationshipDirection.cs" />
-    <Compile Include="Core\RelationshipPropertyBase.cs" />
-    <Compile Include="Core\RelationshipTypeBase.cs" />
-    <Compile Include="GremlinPlugin\Commands.cs" />
+    <Compile Include="GremlinPlugin\GremlinScriptCommands.cs" />
+    <Compile Include="GremlinPlugin\JavaIntCommands.cs" />
+    <Compile Include="GremlinPlugin\JavaInt.cs" />
     <Compile Include="GremlinPlugin\Gremlin.cs" />
     <Compile Include="Core\Node.cs" />
     <Compile Include="GremlinPlugin\GremlinScript.cs" />
-    <Compile Include="Core\NodeType.cs" />
+    <Compile Include="GremlinPlugin\IJavaObject.cs" />
+    <Compile Include="GremlinPlugin\JavaBoolean.cs" />
+    <Compile Include="GremlinPlugin\JavaBooleanCommands.cs" />
+    <Compile Include="GremlinPlugin\JavaObject.cs" />
+    <Compile Include="GremlinPlugin\JavaObjectCommands.cs" />
+    <Compile Include="GremlinPlugin\JavaString.cs" />
+    <Compile Include="GremlinPlugin\JavaStringCommands.cs" />
+    <Compile Include="GremlinPlugin\ParseJavaLambda.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Core\Relationship.cs" />
     <Compile Include="Rest\Neo4jRestApi.cs" />

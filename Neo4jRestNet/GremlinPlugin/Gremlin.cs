@@ -17,8 +17,36 @@ namespace Neo4jRestNet.GremlinPlugin
 		private static readonly string DefaultDbUrl = ConfigurationManager.ConnectionStrings["neo4j"].ConnectionString.TrimEnd('/');
 		private static readonly string DefaultGremlinExtensionPath = ConfigurationManager.ConnectionStrings["neo4jGremlinExtension"].ConnectionString.TrimEnd('/');
 
+		public static HttpStatusCode Post(GremlinScript script)
+		{
+			return Post(string.Concat(DefaultDbUrl, DefaultGremlinExtensionPath), script.ToString());
+		}
+	
+		public static HttpStatusCode Post(string script)
+		{
+			 return Post(string.Concat(DefaultDbUrl, DefaultGremlinExtensionPath), script);
+		}
 
-		public static IEnumerable<T> Post<T>(GEID StartNodeId, string script) where T : IGraphObject
+		public static HttpStatusCode Post(string gremlinUrl, GremlinScript script)
+		{
+			return Post(gremlinUrl, script.ToString());
+		}
+
+		public static HttpStatusCode Post(string gremlinUrl, string script)
+		{
+			// Remove trailing /
+			gremlinUrl = gremlinUrl.TrimEnd('/');
+
+			JObject jo = new JObject();
+			jo.Add("script", script);
+
+			string Response;
+			HttpStatusCode status = Rest.HttpRest.Post(gremlinUrl, jo.ToString(Formatting.None), out Response);
+
+			return status;
+		}
+
+		public static IEnumerable<T> Post<T>(EncryptId StartNodeId, string script) where T : IGraphObject
 		{
 			return Post<T>(string.Concat(DefaultDbUrl, DefaultGremlinExtensionPath), string.Format("g.v({0}).{1}", (long)StartNodeId, script)); 
 		}
@@ -70,6 +98,16 @@ namespace Neo4jRestNet.GremlinPlugin
 		public static DataTable GetTable(string script)
 		{
 			return GetTable(string.Concat(DefaultDbUrl, DefaultGremlinExtensionPath), script);
+		}
+
+		public static DataTable GetTable(GremlinScript script)
+		{
+			return GetTable(string.Concat(DefaultDbUrl, DefaultGremlinExtensionPath), script.ToString());
+		}
+
+		public static DataTable GetTable(string gremlinUrl, GremlinScript script)
+		{
+			return GetTable(gremlinUrl, script.ToString());
 		}
 
 		public static DataTable GetTable(string gremlinUrl, string script) 

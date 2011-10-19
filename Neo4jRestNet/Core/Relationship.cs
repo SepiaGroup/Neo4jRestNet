@@ -19,19 +19,20 @@ namespace Neo4jRestNet.Core
 		public Node EndNode { get; private set; }
 		public string Name { get; private set; }
 		private Properties _Properties;
-		public long RelationshipId { get; private set; }
+		public long Id { get; private set; }
+		public EncryptId EncryptedId { get; private set; }
 		public string OriginalRelationshipJson { get; private set; }
 
 		private Relationship() { }
 
 		#region GetRelationship
 
-		public static IEnumerable<Relationship> GetRelationship(string IndexName, RelationshipPropertyBase Key, object Value)
+		public static IEnumerable<Relationship> GetRelationship(string IndexName, string Key, object Value)
 		{
 			return GetRelationship(DefaultDbUrl, IndexName, Key, Value);
 		}
 
-		public static IEnumerable<Relationship> GetRelationship(string dbUrl, string IndexName, RelationshipPropertyBase Key, object Value)
+		public static IEnumerable<Relationship> GetRelationship(string dbUrl, string IndexName, string Key, object Value)
 		{
 			string Response;
 			HttpStatusCode status = Neo4jRestApi.GetRelationship(dbUrl, IndexName, Key, Value, out Response);
@@ -202,7 +203,7 @@ namespace Neo4jRestNet.Core
 
 				_dbUrl = self.Substring(0, self.LastIndexOf("/relationship"));
 				_Self = self;
-				this.RelationshipId = RelationshipId;
+				this.Id = RelationshipId;
 			}
 		}
 
@@ -223,10 +224,10 @@ namespace Neo4jRestNet.Core
 			}
 
 			string Response;
-			HttpStatusCode status = Neo4jRestApi.GetPropertiesOnRelationship(_dbUrl, RelationshipId, out Response);
+			HttpStatusCode status = Neo4jRestApi.GetPropertiesOnRelationship(_dbUrl, Id, out Response);
 			if (status != HttpStatusCode.OK)
 			{
-				throw new Exception(string.Format("Error retrieving properties on relationship (relationship id:{0} http response:{1})", RelationshipId, status));
+				throw new Exception(string.Format("Error retrieving properties on relationship (relationship id:{0} http response:{1})", Id, status));
 			}
 
 			this._Properties = Properties.ParseJson(Response);
@@ -248,10 +249,10 @@ namespace Neo4jRestNet.Core
 
 		public void SaveProperties(Properties properties)
 		{
-			HttpStatusCode status = Neo4jRestApi.SetPropertiesOnRelationship(_dbUrl, RelationshipId, properties.ToString());
+			HttpStatusCode status = Neo4jRestApi.SetPropertiesOnRelationship(_dbUrl, Id, properties.ToString());
 			if (status != HttpStatusCode.NoContent)
 			{
-				throw new Exception(string.Format("Error setting properties on relationship (relationship id:{0} http response:{1})", RelationshipId, status));
+				throw new Exception(string.Format("Error setting properties on relationship (relationship id:{0} http response:{1})", Id, status));
 			}
 
 			LoadProperties(true);
@@ -261,12 +262,12 @@ namespace Neo4jRestNet.Core
 
 		#region Index
 
-		public static Relationship AddToIndex(long RelationshipId, string IndexName, RelationshipPropertyBase Key, object Value)
+		public static Relationship AddToIndex(long RelationshipId, string IndexName, string Key, object Value)
 		{
 			return AddToIndex(DefaultDbUrl, RelationshipId, IndexName, Key, Value);
 		}
 
-		public static Relationship AddToIndex(string dbUrl, long RelationshipId, string IndexName, RelationshipPropertyBase Key, object Value)
+		public static Relationship AddToIndex(string dbUrl, long RelationshipId, string IndexName, string Key, object Value)
 		{
 			string Response;
 			HttpStatusCode status = Neo4jRestApi.AddRelationshipToIndex(dbUrl, RelationshipId, IndexName, Key, Value, out Response);
@@ -294,12 +295,12 @@ namespace Neo4jRestNet.Core
 			return status;
 		}
 
-		public HttpStatusCode RemoveFromIndex(long RelationshipId, string IndexName, RelationshipPropertyBase Key)
+		public HttpStatusCode RemoveFromIndex(long RelationshipId, string IndexName, string Key)
 		{
 			return RemoveFromIndex(DefaultDbUrl, RelationshipId, IndexName, Key);
 		}
 
-		public HttpStatusCode RemoveFromIndex(string dbUrl, long RelationshipId, string IndexName, RelationshipPropertyBase Key)
+		public HttpStatusCode RemoveFromIndex(string dbUrl, long RelationshipId, string IndexName, string Key)
 		{
 			HttpStatusCode status = Neo4jRestApi.RemoveRelationshipFromIndex(dbUrl, RelationshipId, IndexName, Key);
 			if (status != HttpStatusCode.NoContent)
@@ -310,12 +311,12 @@ namespace Neo4jRestNet.Core
 			return status;
 		}
 
-		public HttpStatusCode RemoveFromIndex(long RelationshipId, string IndexName, RelationshipPropertyBase Key, object Value)
+		public HttpStatusCode RemoveFromIndex(long RelationshipId, string IndexName, string Key, object Value)
 		{
 			return RemoveFromIndex(DefaultDbUrl, RelationshipId, IndexName, Key, Value);
 		}
 
-		public HttpStatusCode RemoveFromIndex(string dbUrl, long RelationshipId, string IndexName, RelationshipPropertyBase Key, object Value)
+		public HttpStatusCode RemoveFromIndex(string dbUrl, long RelationshipId, string IndexName, string Key, object Value)
 		{
 			HttpStatusCode status = Neo4jRestApi.RemoveRelationshipFromIndex(dbUrl, RelationshipId, IndexName, Key, Value);
 			if (status != HttpStatusCode.NoContent)
@@ -327,16 +328,20 @@ namespace Neo4jRestNet.Core
 		}
 		#endregion
 
+		#region Delete
+
 		public HttpStatusCode Delete()
 		{
-			HttpStatusCode status = Neo4jRestApi.DeleteRelationship(this._dbUrl, this.RelationshipId);
+			HttpStatusCode status = Neo4jRestApi.DeleteRelationship(this._dbUrl, this.Id);
 			if (status != HttpStatusCode.NoContent)
 			{
-				throw new Exception(string.Format("Error deleteing relationship (relationship id:{0} http response:{1})", RelationshipId, status));
+				throw new Exception(string.Format("Error deleteing relationship (relationship id:{0} http response:{1})", Id, status));
 			}
 
 			return status;
 		}
+
+		#endregion
 
 		#region ParseJson
 

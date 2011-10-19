@@ -5,6 +5,7 @@ using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Neo4jRestNet.Core;
 using System.Security.Cryptography;
+using Neo4jRestNet.GremlinPlugin;
 
 namespace Neo4jRestNet.Test
 {
@@ -12,13 +13,13 @@ namespace Neo4jRestNet.Test
 	/// Summary description for UnitTest1
 	/// </summary>
 	[TestClass]
-	public class GEIDTest
+	public class EncryptedIDTest
 	{
 
 		[TestMethod]
 		public void NewGEIDFromLong()
 		{
-			GEID geid = new GEID(123);
+			EncryptId geid = new EncryptId(123);
 
 			Assert.AreEqual(123, (long)geid);
 		}
@@ -26,10 +27,10 @@ namespace Neo4jRestNet.Test
 		[TestMethod]
 		public void NewGEIDFromString()
 		{
-			GEID geid = new GEID(123);
+			EncryptId geid = new EncryptId(123);
 			string strGEID = geid.ToString();
 
-			GEID impGEID = new GEID(strGEID);
+			EncryptId impGEID = new EncryptId(strGEID);
 
 			Assert.AreEqual(strGEID, impGEID.ToString());
 			Assert.AreEqual(strGEID, impGEID.ToString());
@@ -38,11 +39,11 @@ namespace Neo4jRestNet.Test
 		[TestMethod]
 		public void TryParseValid()
 		{
-			GEID geid = new GEID(123);
+			EncryptId geid = new EncryptId(123);
 			string strGEID = geid.ToString();
 
-			GEID tryGEID;
-			Assert.IsTrue(GEID.TryParse(strGEID, out tryGEID));
+			EncryptId tryGEID;
+			Assert.IsTrue(EncryptId.TryParse(strGEID, out tryGEID));
 			Assert.AreEqual(geid, tryGEID);
 		}
 
@@ -51,23 +52,23 @@ namespace Neo4jRestNet.Test
 		{
 			string strGEID = "SomeBadValue";
 
-			GEID tryGEID;
-			Assert.IsFalse(GEID.TryParse(strGEID, out tryGEID));
+			EncryptId tryGEID;
+			Assert.IsFalse(EncryptId.TryParse(strGEID, out tryGEID));
 		}
 
 		[TestMethod]
 		[ExpectedException(typeof(CryptographicException), "Length of the data to decrypt is invalid")]
 		public void ImplicitBadStringValue()
 		{
-			GEID geid = "SomeBadValue";
+			EncryptId geid = "SomeBadValue";
 		}
 
 		[TestMethod]
 		public void Equality()
 		{
-			GEID geid1 = new GEID(123);
-			GEID geid2 = new GEID(123);
-			GEID geid3 = new GEID(321);
+			EncryptId geid1 = new EncryptId(123);
+			EncryptId geid2 = new EncryptId(123);
+			EncryptId geid3 = new EncryptId(321);
 
 			Assert.IsTrue(geid1 == geid2);
 			Assert.IsTrue(geid1.ToString() == geid2.ToString());
@@ -83,9 +84,9 @@ namespace Neo4jRestNet.Test
 		[TestMethod]
 		public void Inequality()
 		{
-			GEID geid1 = new GEID(123);
-			GEID geid2 = new GEID(321);
-			GEID geid3 = new GEID(123);
+			EncryptId geid1 = new EncryptId(123);
+			EncryptId geid2 = new EncryptId(321);
+			EncryptId geid3 = new EncryptId(123);
 
 			Assert.IsTrue(geid1 != geid2);
 			Assert.IsTrue(geid1.ToString() != geid2.ToString());
@@ -101,15 +102,14 @@ namespace Neo4jRestNet.Test
 		[TestMethod]
 		public void NullValue()
 		{
-			GEID geidNull = GEID.Null ;
-			GEID geid = new GEID(123);
+			EncryptId geidNull = EncryptId.Null;
+			EncryptId geid = new EncryptId(123);
 
-			Assert.IsTrue(geidNull == GEID.Null);
-			Assert.IsFalse(geidNull != GEID.Null);
+			Assert.IsTrue(geidNull == EncryptId.Null);
+			Assert.IsFalse(geidNull != EncryptId.Null);
 
-			Assert.IsFalse(geid == GEID.Null);
-			Assert.IsTrue(geid != GEID.Null);
+			Assert.IsFalse(geid == EncryptId.Null);
+			Assert.IsTrue(geid != EncryptId.Null);
 		}
-
 	}
 }

@@ -6,41 +6,91 @@ using Neo4jRestNet.Core;
 
 namespace Neo4jRestNet.GremlinPlugin
 {
-	public class GremlinScript
+	public class GremlinScript : IJavaObject
 	{
-		private StringBuilder _query = new StringBuilder();
-		 
+		private StringBuilder _sb = new StringBuilder();
+
 		public GremlinScript()
 		{
 		}
 
 		public GremlinScript(Node node)
 		{
-			_query.AppendFormat("g.v({0})", (long)node.NodeId);
+			_sb.AppendFormat("g.v({0})", node.Id);
 		}
-		
+
 		public GremlinScript(Relationship relationship)
 		{
-			_query.AppendFormat("g.e({0})", (long)relationship.RelationshipId);
+			_sb.AppendFormat("g.e({0})", relationship.Id);
 		}
-		
+
+		public GremlinScript(IJavaObject javaObject)
+		{
+			_sb.Append(javaObject.ToString());
+		}
+	
 		public GremlinScript Append(string query)
 		{
-			_query.Append(query);
+			if (_sb.Length == 0 && !string.IsNullOrWhiteSpace(query) && query.StartsWith("."))
+			{
+				_sb.Append("it");
+			}
 
-			return this;
+			_sb.Append(query);
+
+			return this; 
 		}
 
 		public GremlinScript Append(string Format, params object[] args)
 		{
-			_query.Append(string.Format(Format, args));
+			_sb.Append(string.Format(Format, args));
 
 			return this;
 		}
 
 		public override string ToString()
 		{
-			return _query.ToString();
+			return _sb.ToString();
+		}
+
+		public static bool operator ==(GremlinScript gs, object other)
+		{
+			return false;
+		}
+
+		public static bool operator ==(object other, GremlinScript gs)
+		{
+			return false;
+		}
+
+		public static bool operator !=(GremlinScript gs, object other)
+		{
+			return false;
+		}
+
+		public static bool operator !=(object other, GremlinScript gs)
+		{
+			return false;
+		}
+
+		public static bool operator !(GremlinScript gs)
+		{
+			return false;
+		}
+
+		public static implicit operator bool(GremlinScript gs)
+		{
+			return true;
+		}
+		
+		public override bool Equals(object obj)
+		{
+			return base.Equals(obj);
+		}
+
+		public override int GetHashCode()
+		{
+			return base.GetHashCode();
 		}
 	}
 }

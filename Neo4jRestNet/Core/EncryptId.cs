@@ -9,14 +9,14 @@ using System.Configuration;
 
 namespace Neo4jRestNet.Core
 {
-	public class GEID : IEquatable<GEID>
+	public class EncryptId : IEquatable<EncryptId>
 	{
 		#region Encryption class
 
 		private static class Encryption
 		{
-			private static readonly byte[] SecretKey = System.Text.Encoding.ASCII.GetBytes(ConfigurationManager.AppSettings["GEIDKey"].ToString()); 
-			private static readonly byte[] SecretIV =  System.Text.Encoding.ASCII.GetBytes(ConfigurationManager.AppSettings["GEIDIV"].ToString()); 
+			private static readonly byte[] SecretKey = System.Text.Encoding.ASCII.GetBytes(ConfigurationManager.AppSettings["EncryptIdKey"].ToString());
+			private static readonly byte[] SecretIV = System.Text.Encoding.ASCII.GetBytes(ConfigurationManager.AppSettings["EncryptIdIV"].ToString()); 
 
 
 			//Creates a symmetric RijndaelCipher encryptor object. 
@@ -79,95 +79,95 @@ namespace Neo4jRestNet.Core
 		}
 		#endregion
 
-		long? _geid = null;
+		long? _id = null;
 
-		public static readonly GEID Null = new GEID((long?)null, true);
+		public static readonly EncryptId Null = new EncryptId((long?)null, true);
 
-		private GEID(long? geid, bool init)
+		private EncryptId(long? id, bool init)
 		{
-			this._geid = geid;
+			this._id = id;
 		}
 
-		public GEID(long geid)
+		public EncryptId(long id)
 		{
-			this._geid = geid;
+			this._id = id;
 		}
 
-		public GEID(string geid)
+		public EncryptId(string encryptedId)
 		{
-			if (geid == null || geid.Trim() == string.Empty)
-				this._geid = null;
+			if (encryptedId == null || encryptedId.Trim() == string.Empty)
+				this._id = null;
 			else
-				this._geid = long.Parse(Encryption.Decrypt(geid));
+				this._id = long.Parse(Encryption.Decrypt(encryptedId));
 		}
 
-		public static bool TryParse(string strGEID, out GEID outGEID)
+		public static bool TryParse(string InEncryptedId, out EncryptId OutEncryptedId)
 		{
-			if (string.IsNullOrWhiteSpace(strGEID))
+			if (string.IsNullOrWhiteSpace(InEncryptedId)) 
 			{
-				outGEID = null;
+				OutEncryptedId = null;
 				return false;
 			}
 
 			try
 			{
-				outGEID = strGEID;
+				OutEncryptedId = InEncryptedId;
 				return true;
 			}
 			catch
 			{
-				outGEID = null;
+				OutEncryptedId = null;
 				return false;
 			}
 		}
 
-		public static implicit operator GEID(long geid)
+		public static implicit operator EncryptId(long id)
 		{
-			return new GEID(geid);
+			return new EncryptId(id);
 		}
 
-		public static implicit operator GEID(string geid)
+		public static implicit operator EncryptId(string encryptedId)
 		{
-			return new GEID(geid);
+			return new EncryptId(encryptedId);
 		}
 
-		public static implicit operator string(GEID geid)
+		public static implicit operator string(EncryptId encryptedId)
 		{
-			if (geid == null)
+			if (encryptedId == null)
 				return null;
 
-			return geid.ToString();
+			return encryptedId.ToString();
 		}
 
-		public static explicit operator long?(GEID geid)
+		public static explicit operator long?(EncryptId encryptedId)
 		{
-			if (geid == null)
+			if (encryptedId == null)
 				return null;
 
-			return geid._geid;
+			return encryptedId._id;
 		}
 
 		public override string ToString()
 		{
-			if (_geid == null)
+			if (_id == null)
 				return null;
 
-			return Encryption.Encrypt(_geid.ToString());
+			return Encryption.Encrypt(_id.ToString());
 		}
 
-		#region IEquatable<GEID> Members
+		#region IEquatable<EncryptId> Members
 
-		public bool Equals(GEID other)
+		public bool Equals(EncryptId other)
 		{
 			if (ReferenceEquals(other, null))
 				return false;
 			else if (ReferenceEquals(this, other))
 				return true;
-			else if (this._geid == null && other._geid == null)
+			else if (this._id == null && other._id == null)
 				return true;
-			else if (this._geid == null || other._geid == null)
+			else if (this._id == null || other._id == null)
 				return false;
-			else if (this._geid.Value == other._geid.Value)
+			else if (this._id.Value == other._id.Value)
 				return true;
 
 			return false;
@@ -177,31 +177,31 @@ namespace Neo4jRestNet.Core
 		{
 			if (obj == null) return base.Equals(obj);
 
-			if (!(obj is GEID))
-				throw new InvalidCastException("The 'obj' argument is not a GEID object.");
+			if (!(obj is EncryptId))
+				throw new InvalidCastException("The 'obj' argument is not a EncryptId object.");
 			else
-				return Equals(obj as GEID);
+				return Equals(obj as EncryptId);
 		}
 
 		public override int GetHashCode()
 		{
-			return this._geid.GetHashCode();
+			return this._id.GetHashCode();
 		}
 
-		public static bool operator ==(GEID geid1, GEID geid2)
+		public static bool operator ==(EncryptId id1, EncryptId id2)
 		{
-			if (ReferenceEquals(geid1, null) && ReferenceEquals(geid2, null))
+			if (ReferenceEquals(id1, null) && ReferenceEquals(id2, null))
 				return true;
 
-			return ReferenceEquals(geid1, null) ? false : geid1.Equals(geid2);
+			return ReferenceEquals(id1, null) ? false : id1.Equals(id2);
 		}
 
-		public static bool operator !=(GEID geid1, GEID geid2)
+		public static bool operator !=(EncryptId id1, EncryptId id2)
 		{
-			if (ReferenceEquals(geid1, null) && ReferenceEquals(geid2, null))
+			if (ReferenceEquals(id1, null) && ReferenceEquals(id2, null))
 				return false;
 
-			return !(ReferenceEquals(geid1, null) ? false : geid1.Equals(geid2));
+			return !(ReferenceEquals(id1, null) ? false : id1.Equals(id2));
 		}
 
 		#endregion
