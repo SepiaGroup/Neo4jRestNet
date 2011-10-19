@@ -37,57 +37,28 @@
 
 ## Gremlin 
 ### Get Like relationships from the Root Node
-    IEnumerable<Node> LikeNodes = Gremlin.Post<Node>(RootNode.NodeId, "out('Likes')");
+    IEnumerable<Node> LikeNodes = Gremlin.Post<Node>(RootNode.Id, "out('Likes')");
 
 ### Same as above
-    IEnumerable<Node> SameLikeNodes = Gremlin.Post<Node>(new GremlinScript(RootNode).Out(RelationshipType.Likes).ToString());
+    IEnumerable<Node> SameLikeNodes = Gremlin.Post<Node>(new GremlinScript(RootNode).Out(RelationshipType.Likes.ToString()));
 
 ### More Gremlin example
     GremlinScript script = new GremlinScript(RootNode);
     script.OutE()
             .InV()
             .OutE()
-            .Filter("it.getProperty('{0}') == '{1}'", RelationshipProperty.Name, "MyRelationship");
+            .Filter(it => it.getProperty(RelationshipProperty.Name.ToString()) == "MyRelationship");
     
-    IEnumerable<Relationship> myRelationship = Gremlin.Post<Relationship>(script.ToString());`
+    IEnumerable<Relationship> myRelationship = Gremlin.Post<Relationship>(script);`
 
 ### Gremlin returning a datatable
     GremlinScript tblScript = new GremlinScript();
     tblScript.NewTable("t")
-                    .gV(RootNode.NodeId)   
-                    .Out(RelationshipType.Likes)
+                    .gV(RootNode)   
+                    .Out(RelationshipType.Likes.ToString())
                     .As("Like")
                     .Table("t", new List<string>{ "Like" })
                     .Append(" >> -1; t;");
     
-    DataTable dt = Gremlin.GetTable(tblScript.ToString());
-
-## GEID
-### What is a GEID
-All Graph Elements (Nodes, Relationships) have their IDs defined as GEID.  A GEID will encrypt a Graph Element ID and return the encrypted string by default.  If you explicitly convert a GEID to a long you will obtain the unencrypted long ID.  This is done so that you can pass the GEID to a webpage without worrying about the ID being hijacked.  The internal representation of a GEID is a long so there is very little overhead using this class.  The keys for the encrypting are set in the configure settings (see above)
-
-#### Get ID from a Node
-    long Id = (long)RootNode.NodeId;  
-    string strId = RootNode.NodeId;  // the encrypted Id
-
-#### Convert a string to GEID
-
-    string myStringGIED == “SOME STRING GEID VALUE”;
-    GEID geid = myStringGEID;
-    
-    // or you can do
-
-    GEID newGEID;
-    If( GEID.TryParse(myStringGEID, out newGEID)
-    {
-        // Valid GEID
-    }
-    
-## Type/Property Classes
-### NodeTypeBase
-### NodePropertyBase
-### RelationshipTypeBase
-### RelationshipPropertyBase
-
-These classes are used as helper classes to reduce the use of string names throughout your code.  You do not need to use these this wrapper but you do need to initialize them once.  See code for examples.   
+    DataTable dt = Gremlin.GetTable(tblScript);
 

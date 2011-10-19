@@ -38,9 +38,6 @@ namespace Neo4jRestNet.Test
 			Knows
 		}
 
-
-
-
 		[TestMethod]
 		public void FilterClause()
 		{
@@ -115,10 +112,6 @@ namespace Neo4jRestNet.Test
 		[TestMethod]
 		public void Table()
 		{
-			//GremlinScript script = new GremlinScript();
-			//script.Append("g.v(0)")
-			//    .Filter(it => it.GetProperty("MyProp").CompareToIgnoreCase(it.GetProperty("CompareProperty").Name()));
-
 			GremlinScript script = new GremlinScript();
 			script.NewTable("t")
 				.NodeIndexLookup(new Dictionary<string, object>() { { NodeProperty.FirstName.ToString() , "Jack" }, { NodeProperty.LastName.ToString(), "Shaw" } })

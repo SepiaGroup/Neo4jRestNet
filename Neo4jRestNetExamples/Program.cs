@@ -41,9 +41,6 @@ namespace Example
 		static void Main(string[] args)
 		{
 
-			// If you were building a Web Application the following Initializations
-			// would go in the Application_Start method in the global.asax
-
 			// Get Root Node from graphDB
 			Node RootNode = Node.GetRootNode();
 
