@@ -5,9 +5,9 @@ using System.Text;
 using System.Linq.Expressions;
 using Neo4jRestNet.ExpressionTreeParser;
 
-namespace Neo4jRestNet.GremlinPlugin
+namespace Neo4jRestNet.CypherPlugin
 {
-	public class ParseJavaLambda
+	public class ParseWhereLambda
 	{
 		ExpressionParser ep = new ExpressionParser();
 
@@ -20,7 +20,14 @@ namespace Neo4jRestNet.GremlinPlugin
 			switch (body.NodeType)
 			{
 				case ExpressionType.Constant:
-					sbFilter.Append(Expression.Lambda(ep.ParseExpression(body)).Compile().DynamicInvoke().ToString());
+					if (body.ToString() == "null")
+					{
+						sbFilter.Append("null");
+					}
+					else
+					{
+						sbFilter.Append(Expression.Lambda(ep.ParseExpression(body)).Compile().DynamicInvoke().ToString());
+					}
 					break;
 
 				case ExpressionType.Call:
@@ -44,7 +51,7 @@ namespace Neo4jRestNet.GremlinPlugin
 					{
 						sbFilter.AppendFormat("{0}", Expression.Lambda(body).Compile().DynamicInvoke().ToString());
 					}
-					break; 
+					break;
 
 				case ExpressionType.Convert:
 					UnaryExpression convert = (UnaryExpression)body;
@@ -53,28 +60,63 @@ namespace Neo4jRestNet.GremlinPlugin
 
 				case ExpressionType.Not:
 					UnaryExpression ue = (UnaryExpression)body;
-					sbFilter.Append("!");
-					sbFilter.Append(Parse(ue.Operand));
+		
+					string statement = Parse(ue.Operand);
+
+					if (statement.StartsWith("("))
+					{
+						sbFilter.AppendFormat("not{0}", statement);
+					}
+					else
+					{
+						sbFilter.AppendFormat("not({0})", statement);
+					}
+
 					break;
 
 				case ExpressionType.Equal:
 					be = (BinaryExpression)body;
-					sbFilter.Append(InvokeExpression(be.Left, "==", be.Right));
+
+					if (be.Right.NodeType == ExpressionType.Constant && be.Right.ToString() == "null")
+					{
+						sbFilter.AppendFormat("{0} is null", Parse(be.Left));
+					}
+					else if (be.Left.NodeType == ExpressionType.Constant && be.Left.ToString() == "null")
+					{
+						sbFilter.AppendFormat("{0} is null", Parse(be.Right));
+					}
+					else
+					{
+						sbFilter.Append(InvokeExpression(be.Left, "=", be.Right));
+					}
+
 					break;
 
 				case ExpressionType.NotEqual:
 					be = (BinaryExpression)body;
-					sbFilter.Append(InvokeExpression(be.Left, "!=", be.Right));
+					if (be.Right.NodeType == ExpressionType.Constant && be.Right.ToString() == "null")
+					{
+						sbFilter.AppendFormat("{0} is not null", Parse(be.Left)); 
+					}
+					else if (be.Left.NodeType == ExpressionType.Constant && be.Left.ToString() == "null")
+					{
+						sbFilter.AppendFormat("{0} is not null", Parse(be.Right));
+					}
+					else
+					{
+						sbFilter.Append(InvokeExpression(be.Left, "!=", be.Right));
+					}
+
 					break;
 
 				case ExpressionType.AndAlso:
 					be = (BinaryExpression)body;
-					sbFilter.Append(InvokeExpression(be.Left, "&&", be.Right));
+					sbFilter.Append(InvokeExpression(be.Left, "and", be.Right));
 					break;
 
 				case ExpressionType.OrElse:
 					be = (BinaryExpression)body;
-					sbFilter.Append(InvokeExpression(be.Left, "||", be.Right));
+					sbFilter.Append(InvokeExpression(be.Left, "or", be.Right));
 					break;
 
 				case ExpressionType.LessThan:
@@ -96,7 +138,7 @@ namespace Neo4jRestNet.GremlinPlugin
 					be = (BinaryExpression)body;
 					sbFilter.Append(InvokeExpression(be.Left, ">=", be.Right));
 					break;
-
+				
 				default:
 					throw new Exception(string.Format("NodeType '{0}' not supported", body.NodeType));
 

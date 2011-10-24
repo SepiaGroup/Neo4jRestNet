@@ -87,6 +87,16 @@
     <Compile Include="Core\Properties.cs" />
     <Compile Include="Core\IGraphObject.cs" />
     <Compile Include="Core\RelationshipDirection.cs" />
+    <Compile Include="CypherPlugin\CypherQuery.cs" />
+    <Compile Include="CypherPlugin\CypherWhere.cs" />
+    <Compile Include="CypherPlugin\CypherReturn.cs" />
+    <Compile Include="CypherPlugin\CypherMatch.cs" />
+    <Compile Include="CypherPlugin\Cypher.cs" />
+    <Compile Include="CypherPlugin\CypherObject.cs" />
+    <Compile Include="CypherPlugin\CypherStart.cs" />
+    <Compile Include="CypherPlugin\ICypherObject.cs" />
+    <Compile Include="CypherPlugin\ParseWhereLambda.cs" />
+    <Compile Include="ExpressionTreeParser\ExpressionParser.cs" />
     <Compile Include="GremlinPlugin\GremlinScriptCommands.cs" />
     <Compile Include="GremlinPlugin\JavaIntCommands.cs" />
     <Compile Include="GremlinPlugin\JavaInt.cs" />
