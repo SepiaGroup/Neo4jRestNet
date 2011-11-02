@@ -12,6 +12,11 @@ namespace Neo4jRestNet.GremlinPlugin
 			return javaObject.Append("getProperty('{0}')", name);
 		}
 
+		public static JavaObject GetColumn(this JavaObject javaObject, string name)
+		{
+			return javaObject.Append("getColumn('{0}')", name);
+		}
+
 		public static JavaString Name(this JavaObject javaObject)
 		{
 			return new JavaString(javaObject).Append("name");

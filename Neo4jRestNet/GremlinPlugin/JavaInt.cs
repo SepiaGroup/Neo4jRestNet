@@ -50,12 +50,12 @@ namespace Neo4jRestNet.GremlinPlugin
 
 		public static bool operator ==(JavaInt ji, object other)
 		{
-			return false;
+			return true;
 		}
 
 		public static bool operator ==(object other, JavaInt ji)
 		{
-			return false;
+			return true;
 		}
 
 		public static bool operator !=(JavaInt ji, object other)

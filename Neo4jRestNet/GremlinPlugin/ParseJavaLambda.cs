@@ -36,14 +36,14 @@ namespace Neo4jRestNet.GremlinPlugin
 					break;
 
 				case ExpressionType.MemberAccess:
-					if (body.Type == typeof(string)) // Quote String values ie. Enums are strings
-					{
-						sbFilter.AppendFormat("'{0}'", Expression.Lambda(body).Compile().DynamicInvoke().ToString());
-					}
-					else
-					{
+					//if (body.Type == typeof(string)) // Quote String values ie. Enums are strings
+					//{
+					//    sbFilter.AppendFormat("'{0}'", Expression.Lambda(body).Compile().DynamicInvoke().ToString());
+					//}
+					//else
+					//{
 						sbFilter.AppendFormat("{0}", Expression.Lambda(body).Compile().DynamicInvoke().ToString());
-					}
+					//}
 					break; 
 
 				case ExpressionType.Convert:

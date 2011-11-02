@@ -62,8 +62,19 @@ namespace Neo4jRestNet.ExpressionTreeParser
 								AssignExpressions.Add(Expression.Call(ParseExpression(mce.Object), mce.Method, ParameterExpressions));
 								break;
 
+							case ExpressionType.MemberAccess:
+								if (mce.Object.Type == typeof(string)) // Quote String values ie. Enums are strings
+								{
+									AssignExpressions.Add(Expression.Constant(String.Format("'{0}'", Expression.Lambda(mce.Object).Compile().DynamicInvoke().ToString())));
+								}
+								else
+								{
+									AssignExpressions.Add(Expression.Constant(Expression.Lambda(mce.Object).Compile().DynamicInvoke().ToString()));
+								}
+								break; 
+
 							default:
-								throw new Exception(string.Format("Instance type expression of type '{0}' not supported", expression.Type));
+								throw new Exception(string.Format("Instance type expression of type '{0}' not supported", mce.Object.NodeType));
 						}
 					}
 

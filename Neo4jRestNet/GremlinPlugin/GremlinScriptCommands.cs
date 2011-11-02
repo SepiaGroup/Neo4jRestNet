@@ -7,23 +7,23 @@ using System.Linq.Expressions;
 
 namespace Neo4jRestNet.GremlinPlugin
 {
-	public static class GremlinScriptCommands 
+	public static class GremlinScriptCommands
 	{
 		#region g()
 
 		public static GremlinScript g(this GremlinScript query, Node node)
 		{
-			return query.Append(string.Format("g.v('{0}')", node.Id));
+			return query.Append(string.Format("g.v({0})", node.Id));
 		}
 
 		public static GremlinScript g(this GremlinScript query, Relationship relationship)
 		{
-			return query.Append(string.Format("g.e('{0}')", relationship.Id));
+			return query.Append(string.Format("g.e({0})", relationship.Id));
 		}
 
 		public static GremlinScript gV(this GremlinScript query, long Id)
 		{
-			return query.Append(string.Format("g.v('{0}')", Id));
+			return query.Append(string.Format("g.v({0})", Id));
 		}
 
 		public static GremlinScript gV(this GremlinScript query, Node node)
@@ -33,7 +33,7 @@ namespace Neo4jRestNet.GremlinPlugin
 
 		public static GremlinScript gE(this GremlinScript query, long Id)
 		{
-			return query.Append(string.Format("g.e('{0}')", Id));
+			return query.Append(string.Format("g.e({0})", Id));
 		}
 
 		public static GremlinScript gE(this GremlinScript query, Relationship relationship)
@@ -144,7 +144,7 @@ namespace Neo4jRestNet.GremlinPlugin
 		{
 			return query.Append(string.Format(".back({0})", steps));
 		}
-	
+
 		#endregion
 
 		#region BothE()
@@ -181,7 +181,7 @@ namespace Neo4jRestNet.GremlinPlugin
 
 		public static GremlinScript Filter(this GremlinScript query, string Filter)
 		{
-			return query.Append(string.Format(".filter{{{0}}}", Filter));
+			return query.Append(string.Format(".filter{{{0}}}", Filter), false);
 		}
 
 		public static GremlinScript Filter(this GremlinScript query, string Filter, params object[] args)
@@ -191,12 +191,12 @@ namespace Neo4jRestNet.GremlinPlugin
 
 		public static GremlinScript Filter(this GremlinScript query, Expression<Func<JavaObject, object>> func)
 		{
-			return query.Append(string.Format(".filter{{{0}}}", new ParseJavaLambda().Parse(func)));
+			return query.Append(string.Format(".filter{{{0}}}", new ParseJavaLambda().Parse(func)), false);
 		}
 
 		public static GremlinScript Filter(this GremlinScript query, Expression<Func<GremlinScript, object>> func)
 		{
-			return query.Append(string.Format(".filter{{{0}}}", new ParseJavaLambda().Parse(func)));
+			return query.Append(string.Format(".filter{{{0}}}", new ParseJavaLambda().Parse(func)), false);
 		}
 
 		#endregion
@@ -205,12 +205,12 @@ namespace Neo4jRestNet.GremlinPlugin
 
 		public static GremlinScript Sort(this GremlinScript query, string Sort, params object[] args)
 		{
-			return query.Append(string.Format(".sort({{{0}}})", string.Format(Sort, args)));
+			return query.Append(string.Format(".sort({{{0}}})", string.Format(Sort, args)), false);
 		}
 
 		public static GremlinScript Sort(this GremlinScript query, Expression<Func<JavaObject, object>> func)
 		{
-			return query.Append(string.Format(".sort{{{0}}}", new ParseJavaLambda().Parse(func)));
+			return query.Append(string.Format(".sort{{{0}}}", new ParseJavaLambda().Parse(func)), false);
 		}
 
 		#endregion
@@ -231,7 +231,7 @@ namespace Neo4jRestNet.GremlinPlugin
 		{
 			return query.Append(".unique()");
 		}
-	
+
 		#endregion
 
 		#region Conversions()

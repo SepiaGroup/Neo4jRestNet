@@ -28,7 +28,19 @@ namespace Neo4jRestNet.GremlinPlugin
 		{
 			_sb.Append(javaObject.ToString());
 		}
-	
+
+		public GremlinScript Append(string query, bool prepend = true)
+		{
+			if (prepend)
+			{
+				return Append(query);
+			}
+
+			_sb.Append(query);
+
+			return this;
+		}
+
 		public GremlinScript Append(string query)
 		{
 			if (_sb.Length == 0 && !string.IsNullOrWhiteSpace(query) && query.StartsWith("."))
