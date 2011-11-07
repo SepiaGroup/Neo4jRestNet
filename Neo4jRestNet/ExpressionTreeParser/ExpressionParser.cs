@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Linq.Expressions;
+using System.Reflection;
 
 namespace Neo4jRestNet.ExpressionTreeParser
 {
@@ -106,6 +107,10 @@ namespace Neo4jRestNet.ExpressionTreeParser
 
 				case ExpressionType.NewArrayInit:
 					return Expression.Assign(parameter, Expression.NewArrayInit(expression.Type.GetElementType(), ((NewArrayExpression)expression).Expressions));
+
+				case ExpressionType.MemberAccess:
+					MemberExpression me = (MemberExpression)expression;
+					return Expression.Assign(parameter, Expression.MakeMemberAccess(me.Expression, me.Member ));
 
 				default:
 					throw new Exception(string.Format("Expression of type '{0}' not supported", expression.Type));

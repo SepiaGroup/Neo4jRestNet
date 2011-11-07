@@ -34,7 +34,7 @@ namespace Neo4jRestNet.CypherPlugin
 		{
 			string comma = _sb.Length == 0 ? string.Empty : ",";
 
-			_sb.AppendFormat("{4} {0}=node:{1}({2}='{3}')", Name, IndexName, ParameterName, Value, comma);
+			_sb.AppendFormat("{4} {0}=node:{1}({2}=\"{3}\")", Name, IndexName, ParameterName, Value, comma);
 
 			return this;
 		}
@@ -43,7 +43,7 @@ namespace Neo4jRestNet.CypherPlugin
 		{
 			string comma = _sb.Length == 0 ? string.Empty : ",";
 
-			_sb.AppendFormat("{3} {0}=node:{1}('{2}')", Name, IndexName, Query, comma);
+			_sb.AppendFormat("{3} {0}=node:{1}({2})", Name, IndexName, Query, comma);
 
 			return this;
 		}

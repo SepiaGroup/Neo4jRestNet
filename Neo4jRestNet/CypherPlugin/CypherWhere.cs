@@ -42,6 +42,24 @@ namespace Neo4jRestNet.CypherPlugin
 
 		#endregion
 
+		#region Boolean Operators
+		
+		public CypherWhere And()
+		{
+			_sb.AppendFormat(" and ");
+
+			return this;
+		}
+
+		public CypherWhere Or()
+		{
+			_sb.AppendFormat(" or ");
+
+			return this;
+		}
+
+		#endregion
+
 		public ICypherObject Append(string value)
 		{
 			_sb.Append(value);

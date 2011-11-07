@@ -61,6 +61,19 @@ namespace Neo4jRestNet.CypherPlugin
 
 		#endregion
 
+		#region Count
+		
+		public CypherReturn Count(string Name)
+		{
+			_sb.AppendFormat("{1} count({0})", Name, _IsStringEmpty ? string.Empty : ",");
+
+			_IsStringEmpty = false;
+
+			return this;
+		}
+		
+		#endregion
+
 		public ICypherObject Append(string value)
 		{
 			_sb.Append(value);

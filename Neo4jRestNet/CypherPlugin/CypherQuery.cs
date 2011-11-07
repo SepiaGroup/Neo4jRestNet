@@ -12,10 +12,10 @@ namespace Neo4jRestNet.CypherPlugin
 		List<Func<CypherMatch, object>> _match = new List<Func<CypherMatch, object>>();
 		List<Expression<Func<CypherWhere, object>>> _where = new List<Expression<Func<CypherWhere,object>>>();
 		List<Func<CypherReturn, object>> _return = new List<Func<CypherReturn,object>>();
+		List<Func<CypherOrderBy, object>> _orderBy = new List<Func<CypherOrderBy, object>>();
 
 		public void Start(Func<CypherStart, object> start)
 		{
-
 			_start.Add(start);
 		}
 
@@ -32,6 +32,11 @@ namespace Neo4jRestNet.CypherPlugin
 		public void Return(Func<CypherReturn, object> cypherReturn)
 		{
 			_return.Add(cypherReturn);
+		}
+
+		public void OrderBy(Func<CypherOrderBy, object> cypherOrderBy)
+		{
+			_orderBy.Add(cypherOrderBy);
 		}
 
 		public override string ToString()
@@ -71,6 +76,16 @@ namespace Neo4jRestNet.CypherPlugin
 				foreach (var r in _return)
 				{
 					sbToString.AppendFormat(" {1}{0}", r.Invoke(new CypherReturn()).ToString(), label);
+					label = ",";
+				}
+			}
+
+			if (_return != null)
+			{
+				label = "ORDER BY";
+				foreach (var o in _orderBy)
+				{
+					sbToString.AppendFormat(" {1}{0}", o.Invoke(new CypherOrderBy()).ToString(), label);
 					label = ",";
 				}
 			}
