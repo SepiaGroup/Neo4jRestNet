@@ -462,12 +462,12 @@ namespace Neo4jRestNet.Core
 			return InitializeFromNodeJson(response);
 		}
 
-		public HttpStatusCode RemoveFromIndex(long nodeId, string indexName)
+        public static HttpStatusCode RemoveFromIndex(long nodeId, string indexName)
 		{
 			return RemoveFromIndex(_defaultDbUrl, nodeId, indexName);
 		}
 
-		public HttpStatusCode RemoveFromIndex(string dbUrl, long nodeId, string indexName)
+        public static HttpStatusCode RemoveFromIndex(string dbUrl, long nodeId, string indexName)
 		{
 			var status = Neo4jRestApi.RemoveNodeFromIndex(dbUrl, nodeId, indexName);
 			if (status != HttpStatusCode.NoContent)
@@ -478,12 +478,12 @@ namespace Neo4jRestNet.Core
 			return status;
 		}
 
-		public HttpStatusCode RemoveFromIndex(long nodeId, string indexName, string key)
+        public static HttpStatusCode RemoveFromIndex(long nodeId, string indexName, string key)
 		{
 			return RemoveFromIndex(_defaultDbUrl, nodeId, indexName, key);
 		}
 
-		public HttpStatusCode RemoveFromIndex(string dbUrl, long nodeId, string indexName, string key)
+        public static HttpStatusCode RemoveFromIndex(string dbUrl, long nodeId, string indexName, string key)
 		{
 			var status = Neo4jRestApi.RemoveNodeFromIndex(dbUrl, nodeId, indexName, key);
 			if (status != HttpStatusCode.NoContent)
@@ -494,12 +494,12 @@ namespace Neo4jRestNet.Core
 			return status;
 		}
 
-		public HttpStatusCode RemoveFromIndex(long nodeId, string indexName, string key, object value)
+        public static HttpStatusCode RemoveFromIndex(long nodeId, string indexName, string key, object value)
 		{
 			return RemoveFromIndex(_defaultDbUrl, nodeId, indexName, key, value);
 		}
 
-		public HttpStatusCode RemoveFromIndex(string dbUrl, long nodeId, string indexName, string key, object value)
+        public static HttpStatusCode RemoveFromIndex(string dbUrl, long nodeId, string indexName, string key, object value)
 		{
 			var status = Neo4jRestApi.RemoveNodeFromIndex(dbUrl, nodeId, indexName, key, value);
 			if (status != HttpStatusCode.NoContent)
