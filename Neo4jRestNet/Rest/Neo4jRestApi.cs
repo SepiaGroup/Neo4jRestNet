@@ -177,7 +177,9 @@ namespace Neo4jRestNet.Rest
 
 		public static HttpStatusCode AddNodeToIndex(string dbUrl, string NodeSelf, string IndexName, string Key, object Value, out string Response)
 		{
-			return HttpRest.Post(string.Concat(dbUrl, "/index/node/", IndexName, "/", Key, "/", JToken.FromObject(Value).ToString(Formatting.None)), NodeSelf, out Response);
+		    var obj = new {value = Value, uri = NodeSelf, key = Key};
+
+			return HttpRest.Post(string.Concat(dbUrl, "/index/node/", IndexName), JToken.FromObject(obj).ToString(Formatting.None), out Response);
 		}
 
 		public static HttpStatusCode AddRelationshipToIndex(string dbUrl, long RelationshipId, string IndexName, string Key, object Value, out string Response)
