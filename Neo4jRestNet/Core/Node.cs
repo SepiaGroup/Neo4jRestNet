@@ -1,8 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using Neo4jRestNet.Core;
-using System.Reflection;
 using System;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
@@ -18,28 +16,29 @@ namespace Neo4jRestNet.Core
 			NodeType
 		}
 
-		private static readonly string DefaultDbUrl = ConfigurationManager.ConnectionStrings["neo4j"].ConnectionString.TrimEnd('/');
+		private static readonly string _defaultDbUrl = ConfigurationManager.ConnectionStrings["neo4j"].ConnectionString.TrimEnd('/');
 
 		private string _dbUrl;
+        private string _self;
+        private Properties _properties;
+
 		public long Id { get; private set; }
 		public EncryptId EncryptedId { get; private set; }
-		private string _Self;
-		private Properties _Properties;
-		public string OriginalNodeJson { get; private set; }
-		
+        public string OriginalNodeJson { get; private set; }
+
 		protected Node() { }
 
 		#region GetRootNode
 
 		public static Node GetRootNode()
 		{
-			return GetRootNode(DefaultDbUrl);
+			return GetRootNode(_defaultDbUrl);
 		}
 
 		public static Node GetRootNode(string dbUrl)
 		{
-			string Response;
-			HttpStatusCode status = Neo4jRestApi.GetRoot(dbUrl, out Response);
+			string response;
+			HttpStatusCode status = Neo4jRestApi.GetRoot(dbUrl, out response);
 			if (status != HttpStatusCode.OK)
 			{
 				throw new Exception(string.Format("Error getting root node (http response:{0})", status));
@@ -48,153 +47,159 @@ namespace Neo4jRestNet.Core
 			JObject jo;
 			try
 			{
-				jo = JObject.Parse(Response);
+				jo = JObject.Parse(response);
 			}
 			catch (Exception e)
 			{
 				throw new Exception("Invalid json", e);
 			}
 
-			JToken ReferenceNode;
-			if (!jo.TryGetValue("reference_node", out ReferenceNode))
+			JToken referenceNode;
+			if (!jo.TryGetValue("reference_node", out referenceNode))
 			{
 				throw new Exception("Invalid json");
 			}
 
-			Node node = new Node();
+			var node = new Node {Self = referenceNode.Value<string>(), _properties = null};
 
-			node.Self = ReferenceNode.Value<string>();
-			node._Properties = null;
-
-			return node;
+		    return node;
 		}
 
 		#endregion
 
 		#region GetNode
 
-		public static Node GetNode(EncryptId NodeId)
+		public static Node GetNode(EncryptId nodeId)
 		{
-			return GetNode(DefaultDbUrl, NodeId);
+			return GetNode(_defaultDbUrl, nodeId);
 		}
 
-		public static Node GetNode(string dbUrl, EncryptId NodeId)
+		public static Node GetNode(string dbUrl, EncryptId nodeId)
 		{
-			string Response;
-			HttpStatusCode status = Neo4jRestApi.GetNode(dbUrl, (long)NodeId, out Response);
+			string response;
+			HttpStatusCode status = Neo4jRestApi.GetNode(dbUrl, (long)nodeId, out response);
 			if (status != HttpStatusCode.OK)
 			{
-				throw new Exception(string.Format("Node not found (node id:{0})", (long)NodeId));
+				throw new Exception(string.Format("Node not found (node id:{0})", (long)nodeId));
 			}
 
-			return Node.InitializeFromNodeJson(Response);
+			return InitializeFromNodeJson(response);
 		}
 
-		public static IEnumerable<Node> GetNode(string IndexName, string Key, object Value)
+		public static IEnumerable<Node> GetNode(string indexName, string key, object value)
 		{
-			return GetNode(DefaultDbUrl, IndexName, Key, Value);
+			return GetNode(_defaultDbUrl, indexName, key, value);
 		}
 
-		public static IEnumerable<Node> GetNode(string dbUrl, string IndexName, string Key, object Value)
+		public static IEnumerable<Node> GetNode(string dbUrl, string indexName, string key, object value)
 		{
-			string Response;
-			HttpStatusCode status = Neo4jRestApi.GetNode(dbUrl, IndexName, Key, Value, out Response);
+			string response;
+			HttpStatusCode status = Neo4jRestApi.GetNode(dbUrl, indexName, key, value, out response);
 			if (status != HttpStatusCode.OK)
 			{
-				throw new Exception(string.Format("Index not found in (index:{0})", IndexName));
+				throw new Exception(string.Format("Index not found in (index:{0})", indexName));
 			}
 
-			return Node.ParseJson(Response);
+			return ParseJson(response);
 		}
 
-		public static IEnumerable<Node> GetNode(string IndexName, string SearchQuery)
+		public static IEnumerable<Node> GetNode(string indexName, string searchQuery)
 		{
-			return GetNode(DefaultDbUrl, IndexName, SearchQuery);
+			return GetNode(_defaultDbUrl, indexName, searchQuery);
 		}
 
-		public static IEnumerable<Node> GetNode(string dbUrl, string IndexName, string SearchQuery)
+		public static IEnumerable<Node> GetNode(string dbUrl, string indexName, string searchQuery)
 		{
-			string Response;
-			HttpStatusCode status = Neo4jRestApi.GetNode(dbUrl, IndexName, SearchQuery, out Response);
+			string response;
+			HttpStatusCode status = Neo4jRestApi.GetNode(dbUrl, indexName, searchQuery, out response);
 			if (status != HttpStatusCode.OK)
 			{
-				throw new Exception(string.Format("Index not found in (index:{0})", IndexName));
+				throw new Exception(string.Format("Index not found in (index:{0})", indexName));
 			}
 
-			return Node.ParseJson(Response);
+			return ParseJson(response);
 		}
 
 		#endregion
 
 		#region CreateNode
 
-		public static Node CreateNode(string NodeType)
+		public static Node CreateNode(string nodeType)
 		{
-			Properties properties = new Properties();
-			properties.SetProperty(NodeProperty.NodeType.ToString(), NodeType.ToString());
-
-			return CreateNodeFromJson(DefaultDbUrl, properties.ToString());
+			var properties = new Properties();
+			properties.SetProperty(NodeProperty.NodeType.ToString(), nodeType);
+			return CreateNodeFromJson(_defaultDbUrl, properties.ToString());
 		}
 
-		public static Node CreateNode(string dbUrl, string NodeType)
+		public static Node CreateNode(string dbUrl, string nodeType)
 		{
-			Properties properties = new Properties();
-			properties.SetProperty(NodeProperty.NodeType.ToString(), NodeType.ToString());
-
+			var properties = new Properties();
+			properties.SetProperty(NodeProperty.NodeType.ToString(), nodeType);
 			return CreateNodeFromJson(dbUrl, properties.ToString());
 		}
 
-		public static Node CreateNode(string NodeType, Properties properties)
+		public static Node CreateNode(string nodeType, Properties properties)
 		{
-			properties.SetProperty(NodeProperty.NodeType.ToString(), NodeType.ToString());
-
-			return CreateNodeFromJson(DefaultDbUrl, properties.ToString());
+			properties.SetProperty(NodeProperty.NodeType.ToString(), nodeType);
+			return CreateNodeFromJson(_defaultDbUrl, properties.ToString());
 		}
 
-		public static Node CreateNode(string dbUrl, string NodeType, Properties properties)
+		public static Node CreateNode(string dbUrl, string nodeType, Properties properties)
 		{
-			properties.SetProperty(NodeProperty.NodeType.ToString(), NodeType.ToString());
-
+			properties.SetProperty(NodeProperty.NodeType.ToString(), nodeType);
 			return CreateNodeFromJson(dbUrl, properties.ToString());
 		}
 
-		public static Node CreateNode(string NodeType, IDictionary<string, object> properties)
+		public static Node CreateNode(string nodeType, IDictionary<string, object> properties)
 		{
-			properties.Add(NodeProperty.NodeType.ToString(), NodeType.ToString());
-
-			return CreateNodeFromJson(DefaultDbUrl, JObject.FromObject(properties).ToString(Formatting.None));
+			properties.Add(NodeProperty.NodeType.ToString(), nodeType);
+			return CreateNodeFromJson(_defaultDbUrl, JObject.FromObject(properties).ToString(Formatting.None));
 		}
 
-		public static Node CreateNode(string dbUrl, string NodeType, IDictionary<string, object> properties)
+		public static Node CreateNode(string dbUrl, string nodeType, IDictionary<string, object> properties)
 		{
-			properties.Add(NodeProperty.NodeType.ToString(), NodeType.ToString());
-
+			properties.Add(NodeProperty.NodeType.ToString(), nodeType);
 			return CreateNodeFromJson(dbUrl, JObject.FromObject(properties).ToString(Formatting.None));
 		}
 
 		private static Node CreateNodeFromJson(string dbUrl, string jsonProperties)
 		{
-			string Response;
-			HttpStatusCode status = Neo4jRestApi.CreateNode(dbUrl, jsonProperties, out Response);
+			string response;
+			HttpStatusCode status = Neo4jRestApi.CreateNode(dbUrl, jsonProperties, out response);
 			if (status != HttpStatusCode.Created)
 			{
 				throw new Exception(string.Format("Error creating node (http response:{0})", status));
 			}
 
-			return Node.InitializeFromNodeJson(Response);
+			return InitializeFromNodeJson(response);
 		}
 
 		#endregion
 
+        #region Delete
+
+        public HttpStatusCode Delete()
+        {
+			HttpStatusCode status = Neo4jRestApi.DeleteNode(_dbUrl, Id);
+            if (status != HttpStatusCode.NoContent)
+            {
+                throw new Exception(string.Format("Error deleting node (node id:{0} http response:{1})", Id, status));
+            }
+
+            return status;
+        }
+
+        #endregion
+
 		#region Initializers
 
-		public static Node InitializeFromNodeJson(string NodeJson)
+		public static Node InitializeFromNodeJson(string nodeJson)
 		{
 			JObject jo;
 
 			try
 			{
-				jo = JObject.Parse(NodeJson);
+				jo = JObject.Parse(nodeJson);
 			}
 			catch (Exception e)
 			{
@@ -204,42 +209,39 @@ namespace Neo4jRestNet.Core
 			return InitializeFromNodeJson(jo);
 		}
 
-		public static Node InitializeFromNodeJson(JObject NodeJson)
+		public static Node InitializeFromNodeJson(JObject nodeJson)
 		{
 			JToken self;
-			if (!NodeJson.TryGetValue("self", out self))
+			if (!nodeJson.TryGetValue("self", out self))
 			{
 				throw new Exception("Invalid node json");
 			}
 
 			JToken properties;
-			if (!NodeJson.TryGetValue("data", out properties))
+			if (!nodeJson.TryGetValue("data", out properties))
 			{
 				throw new Exception("Invalid node json");
 			}
 
-			Node node = new Node();
+			var node = new Node
+			               {
+			                   Self = self.Value<string>(),
+			                   _properties = Properties.ParseJson(properties.ToString(Formatting.None)),
+			                   OriginalNodeJson = nodeJson.ToString(Formatting.None)
+			               };
 
-			node.Self = self.Value<string>();
-			node._Properties = Properties.ParseJson(properties.ToString(Formatting.None));
-			node.OriginalNodeJson = NodeJson.ToString(Formatting.None);
-
-			return node;
+		    return node;
 		}
 
-		public static Node InitializeFromSelf(string Self)
+		public static Node InitializeFromSelf(string self)
 		{
-			Node node = new Node();
-
-			node.Self = Self;
-			node._Properties = null;
-
-			return node;
+			var node = new Node {Self = self, _properties = null};
+		    return node;
 		}
 
-		public static bool IsSelfANode(string Self)
+		public static bool IsSelfANode(string self)
 		{
-			string[] selfArray = Self.Split('/');
+			var selfArray = self.Split('/');
 			return (selfArray.Length > 2 && selfArray[selfArray.Length - 2] == "node") ? true : false;
 		}
 
@@ -251,33 +253,33 @@ namespace Neo4jRestNet.Core
 		{
 			get
 			{
-				return _Self;
+				return _self;
 			}
 
 			private set
 			{
-				if (!Node.IsSelfANode(value))
+				if (!IsSelfANode(value))
 				{
 					throw new Exception(string.Format("Self is not a Node ({0})", Self));
 				}
 
 				// Make sure there is no trailing /
-				string self = value.TrimEnd('/');
+				var self = value.TrimEnd('/');
 
-				string[] SelfArray = self.Split('/');
+				var selfArray = self.Split('/');
 
-				long NodeId;
-				if (!long.TryParse(SelfArray.Last(), out NodeId))
+				long nodeId;
+				if (!long.TryParse(selfArray.Last(), out nodeId))
 				{
 					throw new Exception(string.Format("Invalid Self id ({0})", value));
 				}
 
 				_dbUrl = self.Substring(0, self.LastIndexOf("/node"));
-				_Self = self;
+				_self = self;
 
 				// Set Id & NodeId values
-				this.Id = NodeId;
-				this.EncryptedId = NodeId;
+				Id = nodeId;
+				EncryptedId = nodeId;
 			}
 		}
 
@@ -285,26 +287,26 @@ namespace Neo4jRestNet.Core
 
 		#region Properties
 
-		private void LoadProperties(bool Refresh)
+		private void LoadProperties(bool refresh)
 		{
-			if (Refresh)
+			if (refresh)
 			{
-				this._Properties = null;
+				_properties = null;
 			}
 
-			if (this._Properties != null)
+			if (_properties != null)
 			{
 				return;
 			}
 
-			string Response;
-			HttpStatusCode status = Neo4jRestApi.GetPropertiesOnNode(_dbUrl, (long)EncryptedId, out Response);
+			string response;
+			HttpStatusCode status = Neo4jRestApi.GetPropertiesOnNode(_dbUrl, (long)EncryptedId, out response);
 			if (status != HttpStatusCode.OK)
 			{
 				throw new Exception(string.Format("Error retrieving properties on node (node id:{0} http response:{1})", (long)EncryptedId, status));
 			}
 
-			this._Properties = Properties.ParseJson(Response);
+			_properties = Properties.ParseJson(response);
 		}
 
 		public Properties Properties
@@ -312,7 +314,7 @@ namespace Neo4jRestNet.Core
 			get
 			{
 				LoadProperties(false);
-				return _Properties;
+				return _properties;
 			}
 		}
 
@@ -344,78 +346,78 @@ namespace Neo4jRestNet.Core
 
 		public IEnumerable<Relationship> GetRelationships()
 		{
-			IEnumerable<string> Names = null;
-			return GetRelationships(RelationshipDirection.All, Names);
+			IEnumerable<string> names = null;
+			return GetRelationships(RelationshipDirection.All, names);
 		}
 
-		public IEnumerable<Relationship> GetRelationships(RelationshipDirection Direction)
+		public IEnumerable<Relationship> GetRelationships(RelationshipDirection direction)
 		{
-			IEnumerable<string> Names = null;
-			return GetRelationships(Direction, Names);
+			IEnumerable<string> names = null;
+			return GetRelationships(direction, names);
 		}
 
-		public IEnumerable<Relationship> GetRelationships(RelationshipDirection Direction, Relationship RelationshipType)
+		public IEnumerable<Relationship> GetRelationships(RelationshipDirection direction, Relationship relationshipType)
 		{
-			return GetRelationships(Direction, new List<string>() { RelationshipType.ToString() });
+			return GetRelationships(direction, new List<string> { relationshipType.ToString() });
 		}
 
-		public IEnumerable<Relationship> GetRelationships(string Name)
+		public IEnumerable<Relationship> GetRelationships(string name)
 		{
-			return GetRelationships(RelationshipDirection.All, new List<string>() { Name });
+			return GetRelationships(RelationshipDirection.All, new List<string> { name });
 		}
 
-		public IEnumerable<Relationship> GetRelationships(IEnumerable<string> Names)
+		public IEnumerable<Relationship> GetRelationships(IEnumerable<string> names)
 		{
-			return GetRelationships(RelationshipDirection.All, Names);
+			return GetRelationships(RelationshipDirection.All, names);
 		}
 
-		public IEnumerable<Relationship> GetRelationships(RelationshipDirection Direction, string Name)
+		public IEnumerable<Relationship> GetRelationships(RelationshipDirection direction, string name)
 		{
-			return GetRelationships(Direction, new List<string>() { Name });
+			return GetRelationships(direction, new List<string> { name });
 		}
 
-		public IEnumerable<Relationship> GetRelationships(RelationshipDirection Direction, IEnumerable<string> Names)
+		public IEnumerable<Relationship> GetRelationships(RelationshipDirection direction, IEnumerable<string> names)
 		{
-			string Response;
-			HttpStatusCode status = Neo4jRestApi.GetRelationshipsOnNode(_dbUrl, (long)EncryptedId, Direction, Names, out Response);
+			string response;
+			HttpStatusCode status = Neo4jRestApi.GetRelationshipsOnNode(_dbUrl, (long)EncryptedId, direction, names, out response);
 			if (status != HttpStatusCode.OK)
 			{
 				throw new Exception(string.Format("Error retrieving relationships on node (node id:{0} http response:{1})", (long)EncryptedId, status));
 			}
 
-			return Relationship.ParseJson(Response);
+			return Relationship.ParseJson(response);
 		}
 
-		public Relationship CreateRelationshipTo(Node ToNode, string RelationshipType)
+		public Relationship CreateRelationshipTo(Node toNode, string relationshipType)
 		{
-			return CreateRelationshipTo(ToNode, RelationshipType, null);
+			return CreateRelationshipTo(toNode, relationshipType, null);
 		}
 
-		public Relationship CreateRelationshipTo(Node ToNode, string RelationshipType, Properties RelationshipProperties)
+		public Relationship CreateRelationshipTo(Node toNode, string relationshipType, Properties relationshipProperties)
 		{
-			string Response;
+			string response;
 			HttpStatusCode status = Neo4jRestApi.CreateRelationship(_dbUrl, 
 																	(long)EncryptedId, 
-																	ToNode.Self, 
-																	RelationshipType, 
-																	RelationshipProperties == null ? null : RelationshipProperties.ToString(), 
-																	out Response);
+																	toNode.Self, 
+																	relationshipType, 
+																	relationshipProperties == null ? null : relationshipProperties.ToString(), 
+																	out response);
 			if (status != HttpStatusCode.Created)
 			{
 				throw new Exception(string.Format("Error creationg relationship on node (node id:{0} http response:{1})", (long)EncryptedId, status));
 			}
 
-			return Relationship.ParseJson(Response).First();
+			return Relationship.ParseJson(response).First();
 		}
 
 		#endregion
 
 		#region Traverse
 
-		public IEnumerable<IGraphObject> Traverse(Order order, Uniqueness uniqueness, IEnumerable<TraverseRelationship> relationships, PruneEvaluator pruneEvaluator, ReturnFilter returnFilter, int? MaxDepth, ReturnType returnType)
+		public IEnumerable<IGraphObject> Traverse(Order order, Uniqueness uniqueness, IEnumerable<TraverseRelationship> relationships, PruneEvaluator pruneEvaluator, ReturnFilter returnFilter, int? maxDepth, ReturnType returnType)
 		{
-			string Response;
-			HttpStatusCode status = Neo4jRestApi.Traverse(_dbUrl, (long)EncryptedId, order, uniqueness, relationships, pruneEvaluator, returnFilter, MaxDepth, returnType, out Response);
+			string response;
+			HttpStatusCode status = Neo4jRestApi.Traverse(_dbUrl, (long)EncryptedId, order, uniqueness, relationships, pruneEvaluator, returnFilter, maxDepth, returnType, out response);
 			if (status != HttpStatusCode.OK)
 			{
 				throw new Exception(string.Format("Error traversing nodes (node id:{0} status code:{1})", (long)EncryptedId, status));
@@ -423,84 +425,86 @@ namespace Neo4jRestNet.Core
 
 			if (returnType.ToString() == ReturnType.Node.ToString())
 			{
-				return Node.ParseJson(Response);
-			}
-			else if (returnType.ToString() == ReturnType.Relationship.ToString())
-			{
-				return Relationship.ParseJson(Response);
-			}
-			else if (returnType.ToString() == ReturnType.Path.ToString() || returnType.ToString() == ReturnType.FullPath.ToString())
-			{
-				return Path.ParseJson(Response);
+				return ParseJson(response);
 			}
 
-			throw new Exception(string.Format("Return type not implemented (type:{0})", returnType.ToString()));
+		    if (returnType.ToString() == ReturnType.Relationship.ToString())
+		    {
+		        return Relationship.ParseJson(response);
+		    }
+
+		    if (returnType.ToString() == ReturnType.Path.ToString() || returnType.ToString() == ReturnType.FullPath.ToString())
+		    {
+		        return Path.ParseJson(response);
+		    }
+
+		    throw new Exception(string.Format("Return type not implemented (type:{0})", returnType));
 		}
 
 		#endregion
 
 		#region Index
 
-		public static Node AddToIndex(long NodeId, string IndexName, string Key, object Value)
+		public static Node AddToIndex(long nodeId, string indexName, string key, object value)
 		{
-			return AddToIndex(DefaultDbUrl, NodeId, IndexName, Key, Value);
+			return AddToIndex(_defaultDbUrl, nodeId, indexName, key, value);
 		}
 
-		public static Node AddToIndex(string dbUrl, long NodeId, string IndexName, string Key, object Value)
+		public static Node AddToIndex(string dbUrl, long nodeId, string indexName, string key, object value)
 		{
-			string Response;
-			HttpStatusCode status = Neo4jRestApi.AddNodeToIndex(dbUrl, NodeId, IndexName, Key, Value, out Response);
+			string response;
+			HttpStatusCode status = Neo4jRestApi.AddNodeToIndex(dbUrl, nodeId, indexName, key, value, out response);
 			if (status != HttpStatusCode.Created)
 			{
 				throw new Exception(string.Format("Error creating index for node (http response:{0})", status));
 			}
 
-			return Node.InitializeFromNodeJson(Response);
+			return InitializeFromNodeJson(response);
 		}
 
-		public HttpStatusCode RemoveFromIndex(long NodeId, string IndexName)
+        public static HttpStatusCode RemoveFromIndex(long nodeId, string indexName)
 		{
-			return RemoveFromIndex(DefaultDbUrl, NodeId, IndexName);
+			return RemoveFromIndex(_defaultDbUrl, nodeId, indexName);
 		}
 
-		public HttpStatusCode RemoveFromIndex(string dbUrl, long NodeId, string IndexName)
+        public static HttpStatusCode RemoveFromIndex(string dbUrl, long nodeId, string indexName)
 		{
-			HttpStatusCode status = Neo4jRestApi.RemoveNodeFromIndex(dbUrl, NodeId, IndexName);
+			HttpStatusCode status = Neo4jRestApi.RemoveNodeFromIndex(dbUrl, nodeId, indexName);
 			if (status != HttpStatusCode.NoContent)
 			{
-				throw new Exception(string.Format("Error remove node from index (node id:{0} index name:{1} http response:{2})", NodeId, IndexName, status));
+				throw new Exception(string.Format("Error remove node from index (node id:{0} index name:{1} http response:{2})", nodeId, indexName, status));
 			}
 
 			return status;
 		}
 
-		public HttpStatusCode RemoveFromIndex(long NodeId, string IndexName, string Key)
+        public static HttpStatusCode RemoveFromIndex(long nodeId, string indexName, string key)
 		{
-			return RemoveFromIndex(DefaultDbUrl, NodeId, IndexName, Key);
+			return RemoveFromIndex(_defaultDbUrl, nodeId, indexName, key);
 		}
 
-		public HttpStatusCode RemoveFromIndex(string dbUrl, long NodeId, string IndexName, string Key)
+        public static HttpStatusCode RemoveFromIndex(string dbUrl, long nodeId, string indexName, string key)
 		{
-			HttpStatusCode status = Neo4jRestApi.RemoveNodeFromIndex(dbUrl, NodeId, IndexName, Key);
+			HttpStatusCode status = Neo4jRestApi.RemoveNodeFromIndex(dbUrl, nodeId, indexName, key);
 			if (status != HttpStatusCode.NoContent)
 			{
-				throw new Exception(string.Format("Error remove node from index (node id:{0} index name:{1} http response:{2})", NodeId, IndexName, status));
+				throw new Exception(string.Format("Error remove node from index (node id:{0} index name:{1} http response:{2})", nodeId, indexName, status));
 			}
 
 			return status;
 		}
 
-		public HttpStatusCode RemoveFromIndex(long NodeId, string IndexName, string Key, object Value)
+        public static HttpStatusCode RemoveFromIndex(long nodeId, string indexName, string key, object value)
 		{
-			return RemoveFromIndex(DefaultDbUrl, NodeId, IndexName, Key, Value);
+			return RemoveFromIndex(_defaultDbUrl, nodeId, indexName, key, value);
 		}
 
-		public HttpStatusCode RemoveFromIndex(string dbUrl, long NodeId, string IndexName, string Key, object Value)
+        public static HttpStatusCode RemoveFromIndex(string dbUrl, long nodeId, string indexName, string key, object value)
 		{
-			HttpStatusCode status = Neo4jRestApi.RemoveNodeFromIndex(dbUrl, NodeId, IndexName, Key, Value);
+			HttpStatusCode status = Neo4jRestApi.RemoveNodeFromIndex(dbUrl, nodeId, indexName, key, value);
 			if (status != HttpStatusCode.NoContent)
 			{
-				throw new Exception(string.Format("Error remove node from index (node id:{0} index name:{1} http response:{2})", NodeId, IndexName, status));
+				throw new Exception(string.Format("Error remove node from index (node id:{0} index name:{1} http response:{2})", nodeId, indexName, status));
 			}
 
 			return status;
@@ -513,12 +517,7 @@ namespace Neo4jRestNet.Core
 		{
 			get
 			{
-				if(_Properties == null)
-				{
-					return null;
-				}
-
-				return _Properties.GetProperty<string>(NodeProperty.NodeType.ToString());
+			    return _properties == null ? null : _properties.GetProperty<string>(NodeProperty.NodeType.ToString());
 			}
 		}
 
@@ -526,36 +525,33 @@ namespace Neo4jRestNet.Core
 
 		#region ParseJson
 
-		public static IEnumerable<Node> ParseJson(string JsonNodes)
+		public static IEnumerable<Node> ParseJson(string jsonNodes)
 		{
-			if (String.IsNullOrEmpty(JsonNodes))
-				return null;
-			else
+			if (String.IsNullOrEmpty(jsonNodes))
 			{
-				List<Node> Nodes = new List<Node>();
-
-				// The Json passed in can be a JObject or JArray - this is to test for that.
-				JObject jo = JObject.Parse(string.Concat("{\"root\":", JsonNodes, "}"));
-
-				switch (jo["root"].Type)
-				{
-					case JTokenType.Object:
-						Nodes.Add(Node.InitializeFromNodeJson(jo["root"].ToString(Formatting.None)));
-						break;
-
-					case JTokenType.Array:
-						foreach (JObject JsonNode in jo["root"])
-						{
-							Nodes.Add(Node.InitializeFromNodeJson(JsonNode));
-						}
-						break;
-
-					default:
-						throw new Exception("Invalid node json");
-				}
-
-				return Nodes;
+			    return null;
 			}
+
+		    var nodes = new List<Node>();
+
+		    // The Json passed in can be a JObject or JArray - this is to test for that.
+		    var jo = JObject.Parse(string.Concat("{\"root\":", jsonNodes, "}"));
+
+		    switch (jo["root"].Type)
+		    {
+		        case JTokenType.Object:
+		            nodes.Add(InitializeFromNodeJson(jo["root"].ToString(Formatting.None)));
+		            break;
+
+		        case JTokenType.Array:
+		            nodes.AddRange(from JObject jsonNode in jo["root"] select InitializeFromNodeJson(jsonNode));
+		            break;
+
+		        default:
+		            throw new Exception("Invalid node json");
+		    }
+
+		    return nodes;
 		}
 
 		#endregion
@@ -566,14 +562,14 @@ namespace Neo4jRestNet.Core
 		{
 			if (ReferenceEquals(other, null))
 				return false;
-			else if (ReferenceEquals(this, other))
-				return true;
-			else if (this.EncryptedId == null || other.EncryptedId == null)
-				return false;
-			else if (this.EncryptedId.Equals(other.EncryptedId))
-				return true;
 
-			return false;
+		    if (ReferenceEquals(this, other))
+		        return true;
+
+		    if (EncryptedId == null || other.EncryptedId == null)
+		        return false;
+
+		    return EncryptedId.Equals(other.EncryptedId);
 		}
 
 		public override bool Equals(Object obj)
@@ -583,33 +579,32 @@ namespace Neo4jRestNet.Core
 
 		public override int GetHashCode()
 		{
-			return (int)this.EncryptedId;
+			return (int)EncryptedId;
 		}
 
-		public static bool operator ==(Node Value1, Node Value2)
+		public static bool operator ==(Node value1, Node value2)
 		{
-			if (object.ReferenceEquals(Value1, Value2))
+			if (ReferenceEquals(value1, value2))
 			{
 				return true;
 			}
-			if (object.ReferenceEquals(Value1, null)) // Value2=null is covered by Equals
-			{
-				return false;
-			}
-			return Value1.Equals(Value2);
+
+			return !ReferenceEquals(value1, null) && value1.Equals(value2);
 		}
 
-		public static bool operator !=(Node Value1, Node Value2)
+		public static bool operator !=(Node value1, Node value2)
 		{
-			if (object.ReferenceEquals(Value1, Value2))
+			if (ReferenceEquals(value1, value2))
 			{
 				return false;
 			}
-			if (object.ReferenceEquals(Value1, null)) // Value2=null is covered by Equals
+
+			if (ReferenceEquals(value1, null)) // Value2=null is covered by Equals
 			{
 				return false;
 			}
-			return !Value1.Equals(Value2);
+
+			return !value1.Equals(value2);
 		}
 
 		#endregion

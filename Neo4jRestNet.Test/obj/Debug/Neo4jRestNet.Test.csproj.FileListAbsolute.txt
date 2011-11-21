@@ -1,9 +1,0 @@
-C:\SepiaGroup\Neo4j\Neo4jRestNet\Neo4jRestNet.Test\bin\Debug\Neo4jRestNet.Test.dll
-C:\SepiaGroup\Neo4j\Neo4jRestNet\Neo4jRestNet.Test\bin\Debug\Neo4jRestNet.Test.pdb
-C:\SepiaGroup\Neo4j\Neo4jRestNet\Neo4jRestNet.Test\bin\Debug\Neo4Net.dll
-C:\SepiaGroup\Neo4j\Neo4jRestNet\Neo4jRestNet.Test\bin\Debug\Newtonsoft.Json.dll
-C:\SepiaGroup\Neo4j\Neo4jRestNet\Neo4jRestNet.Test\bin\Debug\Neo4Net.pdb
-C:\SepiaGroup\Neo4j\Neo4jRestNet\Neo4jRestNet.Test\obj\Debug\ResolveAssemblyReference.cache
-C:\SepiaGroup\Neo4j\Neo4jRestNet\Neo4jRestNet.Test\obj\Debug\Neo4jRestNet.Test.dll
-C:\SepiaGroup\Neo4j\Neo4jRestNet\Neo4jRestNet.Test\obj\Debug\Neo4jRestNet.Test.pdb
-C:\SepiaGroup\Neo4j\Neo4jRestNet\Neo4jRestNet.Test\bin\Debug\Neo4jRestNet.Test.dll.config
