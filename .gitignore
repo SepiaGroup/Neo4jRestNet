@@ -1,0 +1,29 @@
+# Standard VS.NET
+
+*.pdb
+*.exe
+obj
+bin
+Obj
+Bin
+TestResults
+*.csproj.user
+*.suo
+*.scc
+*.dll
+*.vspscc
+obj/
+
+# Other useful stuff
+* Thumbs.db
+*.bak
+*.cache
+*.log
+*.swp
+*.user
+*.rdl.data
+*.MDF
+*.LDF
+*.scc
+*.ilk
+*.ncb

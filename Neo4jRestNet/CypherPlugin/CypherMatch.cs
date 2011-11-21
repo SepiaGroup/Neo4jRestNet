@@ -69,9 +69,9 @@ namespace Neo4jRestNet.CypherPlugin
 
 		#region To
 
-		public CypherMatch To(string Name)
+		public CypherMatch To(string Relationship)
 		{
-			_sb.AppendFormat("-[{0}]->", Name);
+			_sb.AppendFormat("-[:{0}]->", Relationship);
 
 			return this;
 		}
@@ -94,9 +94,9 @@ namespace Neo4jRestNet.CypherPlugin
 
 		#region From
 
-		public CypherMatch From(string Name)
+		public CypherMatch From(string Relationship)
 		{
-			_sb.AppendFormat("<-[{0}]-", Name);
+			_sb.AppendFormat("<-[:{0}]-", Relationship);
 
 			return this;
 		}
