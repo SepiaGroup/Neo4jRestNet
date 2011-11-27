@@ -445,12 +445,12 @@ namespace Neo4jRestNet.Core
 
 		#region Index
 
-		public static Node AddToIndex(long nodeId, string indexName, string key, object value)
+		public static Node AddNodeToIndex(long nodeId, string indexName, string key, object value)
 		{
-			return AddToIndex(_defaultDbUrl, nodeId, indexName, key, value);
+			return AddNodeToIndex(_defaultDbUrl, nodeId, indexName, key, value);
 		}
 
-		public static Node AddToIndex(string dbUrl, long nodeId, string indexName, string key, object value)
+		public static Node AddNodeToIndex(string dbUrl, long nodeId, string indexName, string key, object value)
 		{
 			string response;
 			var status = Neo4jRestApi.AddNodeToIndex(dbUrl, nodeId, indexName, key, value, out response);
@@ -462,12 +462,12 @@ namespace Neo4jRestNet.Core
 			return InitializeFromNodeJson(response);
 		}
 
-        public static HttpStatusCode RemoveFromIndex(long nodeId, string indexName)
+        public static HttpStatusCode RemoveNodeFromIndex(long nodeId, string indexName)
 		{
-			return RemoveFromIndex(_defaultDbUrl, nodeId, indexName);
+			return RemoveNodeFromIndex(_defaultDbUrl, nodeId, indexName);
 		}
 
-        public static HttpStatusCode RemoveFromIndex(string dbUrl, long nodeId, string indexName)
+        public static HttpStatusCode RemoveNodeFromIndex(string dbUrl, long nodeId, string indexName)
 		{
 			var status = Neo4jRestApi.RemoveNodeFromIndex(dbUrl, nodeId, indexName);
 			if (status != HttpStatusCode.NoContent)
@@ -478,12 +478,12 @@ namespace Neo4jRestNet.Core
 			return status;
 		}
 
-        public static HttpStatusCode RemoveFromIndex(long nodeId, string indexName, string key)
+        public static HttpStatusCode RemoveNodeFromIndex(long nodeId, string indexName, string key)
 		{
-			return RemoveFromIndex(_defaultDbUrl, nodeId, indexName, key);
+			return RemoveNodeFromIndex(_defaultDbUrl, nodeId, indexName, key);
 		}
 
-        public static HttpStatusCode RemoveFromIndex(string dbUrl, long nodeId, string indexName, string key)
+        public static HttpStatusCode RemoveNodeFromIndex(string dbUrl, long nodeId, string indexName, string key)
 		{
 			var status = Neo4jRestApi.RemoveNodeFromIndex(dbUrl, nodeId, indexName, key);
 			if (status != HttpStatusCode.NoContent)
@@ -494,12 +494,12 @@ namespace Neo4jRestNet.Core
 			return status;
 		}
 
-        public static HttpStatusCode RemoveFromIndex(long nodeId, string indexName, string key, object value)
+        public static HttpStatusCode RemoveNodeFromIndex(long nodeId, string indexName, string key, object value)
 		{
-			return RemoveFromIndex(_defaultDbUrl, nodeId, indexName, key, value);
+			return RemoveNodeFromIndex(_defaultDbUrl, nodeId, indexName, key, value);
 		}
 
-        public static HttpStatusCode RemoveFromIndex(string dbUrl, long nodeId, string indexName, string key, object value)
+        public static HttpStatusCode RemoveNodeFromIndex(string dbUrl, long nodeId, string indexName, string key, object value)
 		{
 			var status = Neo4jRestApi.RemoveNodeFromIndex(dbUrl, nodeId, indexName, key, value);
 			if (status != HttpStatusCode.NoContent)
