@@ -22,6 +22,15 @@ namespace Neo4jRestNet.CypherPlugin
 			return this;
 		}
 
+		public CypherOrderBy Node(string Name, string Property, bool Decending)
+		{
+			_sb.AppendFormat("{0} {1}.{2} {3}", _IsStringEmpty ? string.Empty : ",", Name, Property, Decending ? "DESC" : string.Empty);
+
+			_IsStringEmpty = false;
+
+			return this;
+		}
+
 		#endregion
 
 		#region CypherRelationship
@@ -29,6 +38,15 @@ namespace Neo4jRestNet.CypherPlugin
 		public CypherOrderBy Relationship(string Name, string Property)
 		{
 			_sb.AppendFormat("{0} {1}.{2}", _IsStringEmpty ? string.Empty : ",", Name, Property);
+
+			_IsStringEmpty = false;
+
+			return this;
+		}
+
+		public CypherOrderBy Relationship(string Name, string Property, bool Decending)
+		{
+			_sb.AppendFormat("{0} {1}.{2} {3}", _IsStringEmpty ? string.Empty : ",", Name, Property, Decending ? "DESC" : string.Empty);
 
 			_IsStringEmpty = false;
 

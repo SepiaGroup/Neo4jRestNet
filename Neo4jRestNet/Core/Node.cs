@@ -38,7 +38,7 @@ namespace Neo4jRestNet.Core
 		public static Node GetRootNode(string dbUrl)
 		{
 			string response;
-			var status = Neo4jRestApi.GetRoot(dbUrl, out response);
+			HttpStatusCode status = Neo4jRestApi.GetRoot(dbUrl, out response);
 			if (status != HttpStatusCode.OK)
 			{
 				throw new Exception(string.Format("Error getting root node (http response:{0})", status));
@@ -77,7 +77,7 @@ namespace Neo4jRestNet.Core
 		public static Node GetNode(string dbUrl, EncryptId nodeId)
 		{
 			string response;
-			var status = Neo4jRestApi.GetNode(dbUrl, (long)nodeId, out response);
+			HttpStatusCode status = Neo4jRestApi.GetNode(dbUrl, (long)nodeId, out response);
 			if (status != HttpStatusCode.OK)
 			{
 				throw new Exception(string.Format("Node not found (node id:{0})", (long)nodeId));
@@ -94,7 +94,7 @@ namespace Neo4jRestNet.Core
 		public static IEnumerable<Node> GetNode(string dbUrl, string indexName, string key, object value)
 		{
 			string response;
-			var status = Neo4jRestApi.GetNode(dbUrl, indexName, key, value, out response);
+			HttpStatusCode status = Neo4jRestApi.GetNode(dbUrl, indexName, key, value, out response);
 			if (status != HttpStatusCode.OK)
 			{
 				throw new Exception(string.Format("Index not found in (index:{0})", indexName));
@@ -111,7 +111,7 @@ namespace Neo4jRestNet.Core
 		public static IEnumerable<Node> GetNode(string dbUrl, string indexName, string searchQuery)
 		{
 			string response;
-			var status = Neo4jRestApi.GetNode(dbUrl, indexName, searchQuery, out response);
+			HttpStatusCode status = Neo4jRestApi.GetNode(dbUrl, indexName, searchQuery, out response);
 			if (status != HttpStatusCode.OK)
 			{
 				throw new Exception(string.Format("Index not found in (index:{0})", indexName));
@@ -165,7 +165,7 @@ namespace Neo4jRestNet.Core
 		private static Node CreateNodeFromJson(string dbUrl, string jsonProperties)
 		{
 			string response;
-			var status = Neo4jRestApi.CreateNode(dbUrl, jsonProperties, out response);
+			HttpStatusCode status = Neo4jRestApi.CreateNode(dbUrl, jsonProperties, out response);
 			if (status != HttpStatusCode.Created)
 			{
 				throw new Exception(string.Format("Error creating node (http response:{0})", status));
@@ -180,7 +180,7 @@ namespace Neo4jRestNet.Core
 
         public HttpStatusCode Delete()
         {
-            var status = Neo4jRestApi.DeleteNode(_dbUrl, Id);
+			HttpStatusCode status = Neo4jRestApi.DeleteNode(_dbUrl, Id);
             if (status != HttpStatusCode.NoContent)
             {
                 throw new Exception(string.Format("Error deleting node (node id:{0} http response:{1})", Id, status));
@@ -300,7 +300,7 @@ namespace Neo4jRestNet.Core
 			}
 
 			string response;
-			var status = Neo4jRestApi.GetPropertiesOnNode(_dbUrl, (long)EncryptedId, out response);
+			HttpStatusCode status = Neo4jRestApi.GetPropertiesOnNode(_dbUrl, (long)EncryptedId, out response);
 			if (status != HttpStatusCode.OK)
 			{
 				throw new Exception(string.Format("Error retrieving properties on node (node id:{0} http response:{1})", (long)EncryptedId, status));
@@ -331,7 +331,7 @@ namespace Neo4jRestNet.Core
 				properties.SetProperty(NodeProperty.NodeType.ToString(), Properties.GetProperty<string>(NodeProperty.NodeType.ToString()));
 			}
 
-			var status = Neo4jRestApi.SetPropertiesOnNode(_dbUrl, (long)EncryptedId, properties.ToString());
+			HttpStatusCode status = Neo4jRestApi.SetPropertiesOnNode(_dbUrl, (long)EncryptedId, properties.ToString());
 			if (status != HttpStatusCode.NoContent)
 			{
 				throw new Exception(string.Format("Error setting properties on node (node id:{0} http response:{1})", (long)EncryptedId, status));
@@ -379,7 +379,7 @@ namespace Neo4jRestNet.Core
 		public IEnumerable<Relationship> GetRelationships(RelationshipDirection direction, IEnumerable<string> names)
 		{
 			string response;
-			var status = Neo4jRestApi.GetRelationshipsOnNode(_dbUrl, (long)EncryptedId, direction, names, out response);
+			HttpStatusCode status = Neo4jRestApi.GetRelationshipsOnNode(_dbUrl, (long)EncryptedId, direction, names, out response);
 			if (status != HttpStatusCode.OK)
 			{
 				throw new Exception(string.Format("Error retrieving relationships on node (node id:{0} http response:{1})", (long)EncryptedId, status));
@@ -396,7 +396,7 @@ namespace Neo4jRestNet.Core
 		public Relationship CreateRelationshipTo(Node toNode, string relationshipType, Properties relationshipProperties)
 		{
 			string response;
-			var status = Neo4jRestApi.CreateRelationship(_dbUrl, 
+			HttpStatusCode status = Neo4jRestApi.CreateRelationship(_dbUrl, 
 																	(long)EncryptedId, 
 																	toNode.Self, 
 																	relationshipType, 
@@ -417,7 +417,7 @@ namespace Neo4jRestNet.Core
 		public IEnumerable<IGraphObject> Traverse(Order order, Uniqueness uniqueness, IEnumerable<TraverseRelationship> relationships, PruneEvaluator pruneEvaluator, ReturnFilter returnFilter, int? maxDepth, ReturnType returnType)
 		{
 			string response;
-			var status = Neo4jRestApi.Traverse(_dbUrl, (long)EncryptedId, order, uniqueness, relationships, pruneEvaluator, returnFilter, maxDepth, returnType, out response);
+			HttpStatusCode status = Neo4jRestApi.Traverse(_dbUrl, (long)EncryptedId, order, uniqueness, relationships, pruneEvaluator, returnFilter, maxDepth, returnType, out response);
 			if (status != HttpStatusCode.OK)
 			{
 				throw new Exception(string.Format("Error traversing nodes (node id:{0} status code:{1})", (long)EncryptedId, status));
@@ -453,7 +453,7 @@ namespace Neo4jRestNet.Core
 		public static Node AddNodeToIndex(string dbUrl, long nodeId, string indexName, string key, object value)
 		{
 			string response;
-			var status = Neo4jRestApi.AddNodeToIndex(dbUrl, nodeId, indexName, key, value, out response);
+			HttpStatusCode status = Neo4jRestApi.AddNodeToIndex(dbUrl, nodeId, indexName, key, value, out response);
 			if (status != HttpStatusCode.Created)
 			{
 				throw new Exception(string.Format("Error creating index for node (http response:{0})", status));
@@ -469,7 +469,7 @@ namespace Neo4jRestNet.Core
 
         public static HttpStatusCode RemoveNodeFromIndex(string dbUrl, long nodeId, string indexName)
 		{
-			var status = Neo4jRestApi.RemoveNodeFromIndex(dbUrl, nodeId, indexName);
+			HttpStatusCode status = Neo4jRestApi.RemoveNodeFromIndex(dbUrl, nodeId, indexName);
 			if (status != HttpStatusCode.NoContent)
 			{
 				throw new Exception(string.Format("Error remove node from index (node id:{0} index name:{1} http response:{2})", nodeId, indexName, status));
@@ -485,7 +485,7 @@ namespace Neo4jRestNet.Core
 
         public static HttpStatusCode RemoveNodeFromIndex(string dbUrl, long nodeId, string indexName, string key)
 		{
-			var status = Neo4jRestApi.RemoveNodeFromIndex(dbUrl, nodeId, indexName, key);
+			HttpStatusCode status = Neo4jRestApi.RemoveNodeFromIndex(dbUrl, nodeId, indexName, key);
 			if (status != HttpStatusCode.NoContent)
 			{
 				throw new Exception(string.Format("Error remove node from index (node id:{0} index name:{1} http response:{2})", nodeId, indexName, status));
@@ -501,7 +501,7 @@ namespace Neo4jRestNet.Core
 
         public static HttpStatusCode RemoveNodeFromIndex(string dbUrl, long nodeId, string indexName, string key, object value)
 		{
-			var status = Neo4jRestApi.RemoveNodeFromIndex(dbUrl, nodeId, indexName, key, value);
+			HttpStatusCode status = Neo4jRestApi.RemoveNodeFromIndex(dbUrl, nodeId, indexName, key, value);
 			if (status != HttpStatusCode.NoContent)
 			{
 				throw new Exception(string.Format("Error remove node from index (node id:{0} index name:{1} http response:{2})", nodeId, indexName, status));

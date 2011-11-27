@@ -1,16 +1,18 @@
 # Standard VS.NET
+
+*.pdb
+*.exe
 obj
 bin
 Obj
 Bin
 TestResults
 *.csproj.user
-
-# Resharper
-*ReSharper*
-*resharper*
 *.suo
-*.cache
+*.scc
+*.dll
+*.vspscc
+obj/
 
 # Other useful stuff
 * Thumbs.db
@@ -19,4 +21,9 @@ TestResults
 *.log
 *.swp
 *.user
-*.sdf
+*.rdl.data
+*.MDF
+*.LDF
+*.scc
+*.ilk
+*.ncb
