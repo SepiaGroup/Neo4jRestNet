@@ -7,6 +7,8 @@ bin
 Obj
 Bin
 TestResults
+_ReSharper
+*.vs10x
 *.csproj.user
 *.suo
 *.scc
