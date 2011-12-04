@@ -1,49 +1,46 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Text;
 
 namespace Neo4jRestNet.CypherPlugin
 {
 	public class CypherStart
 	{
 
-		private StringBuilder _sb = new StringBuilder();
+		private readonly StringBuilder _sb = new StringBuilder();
 
 		#region Node
 
-		public CypherStart Node(string Name, long Id)
+		public CypherStart Node(string name, long id)
 		{
-			string comma = _sb.Length == 0 ? string.Empty : ",";
-			_sb.AppendFormat("{2} {0}=node({1})", Name, Id, comma);
+			var comma = _sb.Length == 0 ? string.Empty : ",";
+			_sb.AppendFormat("{2} {0}=node({1})", name, id, comma);
 
 			return this;
 		}
 
-		public CypherStart Node(string Name, params long[] Ids)
+		public CypherStart Node(string name, params long[] ids)
 		{
-			string ids = string.Join(",", Ids);
-			string comma = _sb.Length == 0 ? string.Empty : ",";
+			var strIds = string.Join(",", ids);
+			var comma = _sb.Length == 0 ? string.Empty : ",";
 
-			_sb.AppendFormat("{2} {0}=node({1})", Name, ids, comma);
+			_sb.AppendFormat("{2} {0}=node({1})", name, strIds, comma);
 
 			return this;
 		}
 
-		public CypherStart Node(string Name, string IndexName, string ParameterName, object Value)
+		public CypherStart Node(string name, string indexName, string parameterName, object value)
 		{
-			string comma = _sb.Length == 0 ? string.Empty : ",";
+			var comma = _sb.Length == 0 ? string.Empty : ",";
 
-			_sb.AppendFormat("{4} {0}=node:{1}({2}=\"{3}\")", Name, IndexName, ParameterName, Value, comma);
+			_sb.AppendFormat("{4} {0}=node:{1}({2}=\"{3}\")", name, indexName, parameterName, value, comma);
 
 			return this;
 		}
 
-		public CypherStart Node(string Name, string IndexName, string Query)
+		public CypherStart Node(string name, string indexName, string query)
 		{
-			string comma = _sb.Length == 0 ? string.Empty : ",";
+			var comma = _sb.Length == 0 ? string.Empty : ",";
 
-			_sb.AppendFormat("{3} {0}=node:{1}({2})", Name, IndexName, Query, comma);
+			_sb.AppendFormat("{3} {0}=node:{1}({2})", name, indexName, query, comma);
 
 			return this;
 		}
@@ -52,39 +49,39 @@ namespace Neo4jRestNet.CypherPlugin
 
 		#region Relationship
 
-		public CypherStart Relationship(string Name, long Id)
+		public CypherStart Relationship(string name, long id)
 		{
-			string comma = _sb.Length == 0 ? string.Empty : ",";
+			var comma = _sb.Length == 0 ? string.Empty : ",";
 
-			_sb.AppendFormat("{2} {0}=relationship({1})", Name, Id, comma);
+			_sb.AppendFormat("{2} {0}=relationship({1})", name, id, comma);
 
 			return this;
 		}
 
-		public CypherStart Relationship(string Name, params long[] Ids)
+		public CypherStart Relationship(string name, params long[] ids)
 		{
-			string ids = string.Join(",", Ids);
-			string comma = _sb.Length == 0 ? string.Empty : ",";
+			var strIds = string.Join(",", ids);
+			var comma = _sb.Length == 0 ? string.Empty : ",";
 
-			_sb.AppendFormat("{2} {0}=relationship({1})", Name, ids,comma);
+			_sb.AppendFormat("{2} {0}=relationship({1})", name, strIds,comma);
 
 			return this;
 		}
 
-		public CypherStart Relationship(string Name, string IndexName, string ParameterName, object Value)
+		public CypherStart Relationship(string name, string indexName, string parameterName, object value)
 		{
-			string comma = _sb.Length == 0 ? string.Empty : ",";
+			var comma = _sb.Length == 0 ? string.Empty : ",";
 
-			_sb.AppendFormat("{4} {0}=relationship:{1}({2}='{3}')", Name, IndexName, ParameterName, Value, comma);
+			_sb.AppendFormat("{4} {0}=relationship:{1}({2}='{3}')", name, indexName, parameterName, value, comma);
 
 			return this;
 		}
 
-		public CypherStart Relationship(string Name, string IndexName, string Query)
+		public CypherStart Relationship(string name, string indexName, string query)
 		{
-			string comma = _sb.Length == 0 ? string.Empty : ",";
+			var comma = _sb.Length == 0 ? string.Empty : ",";
 
-			_sb.AppendFormat("{2} {0}=relationship:{1}('{2}')", Name, IndexName, Query, comma);
+			_sb.AppendFormat("{3} {0}=relationship:{1}('{2}')", name, indexName, query, comma);
 
 			return this;
 		}

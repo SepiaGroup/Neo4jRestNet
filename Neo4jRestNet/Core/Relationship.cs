@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using System.Net;
 using System.Linq;
+using System.Configuration;
+using System.Collections.Generic;
 using Neo4jRestNet.Rest;
-using System;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
-using System.Configuration;
+
 
 namespace Neo4jRestNet.Core
 {
@@ -14,11 +15,11 @@ namespace Neo4jRestNet.Core
 		private static readonly string DefaultDbUrl = ConfigurationManager.ConnectionStrings["neo4j"].ConnectionString.TrimEnd('/');
 
 		private string _dbUrl;
-		private string _Self;
+		private string _self;
 		public Node StartNode { get; private set; }
 		public Node EndNode { get; private set; }
 		public string Name { get; private set; }
-		private Properties _Properties;
+		private Properties _properties;
 		public long Id { get; private set; }
 		public EncryptId EncryptedId { get; private set; }
 		public string OriginalRelationshipJson { get; private set; }
@@ -27,51 +28,51 @@ namespace Neo4jRestNet.Core
 
 		#region GetRelationship
 
-		public static IEnumerable<Relationship> GetRelationship(string IndexName, string Key, object Value)
+		public static IEnumerable<Relationship> GetRelationship(string indexName, string key, object value)
 		{
-			return GetRelationship(DefaultDbUrl, IndexName, Key, Value);
+			return GetRelationship(DefaultDbUrl, indexName, key, value);
 		}
 
-		public static IEnumerable<Relationship> GetRelationship(string dbUrl, string IndexName, string Key, object Value)
+		public static IEnumerable<Relationship> GetRelationship(string dbUrl, string indexName, string key, object value)
 		{
-			string Response;
-			HttpStatusCode status = Neo4jRestApi.GetRelationship(dbUrl, IndexName, Key, Value, out Response);
+			string response;
+			HttpStatusCode status = Neo4jRestApi.GetRelationship(dbUrl, indexName, key, value, out response);
 			if (status != HttpStatusCode.OK)
 			{
-				throw new Exception(string.Format("Index not found in (index:{0})", IndexName));
+				throw new Exception(string.Format("Index not found in (index:{0})", indexName));
 			}
 
-			return Relationship.ParseJson(Response);
+			return ParseJson(response);
 		}
 
-		public static IEnumerable<Relationship> GetRelationship(string IndexName, string SearchQuery)
+		public static IEnumerable<Relationship> GetRelationship(string indexName, string searchQuery)
 		{
-			return GetRelationship(DefaultDbUrl, IndexName, SearchQuery);
+			return GetRelationship(DefaultDbUrl, indexName, searchQuery);
 		}
 
-		public static IEnumerable<Relationship> GetRelationship(string dbUrl, string IndexName, string SearchQuery)
+		public static IEnumerable<Relationship> GetRelationship(string dbUrl, string indexName, string searchQuery)
 		{
-			string Response;
-			HttpStatusCode status = Neo4jRestApi.GetRelationship(dbUrl, IndexName, SearchQuery, out Response);
+			string response;
+			HttpStatusCode status = Neo4jRestApi.GetRelationship(dbUrl, indexName, searchQuery, out response);
 			if (status != HttpStatusCode.OK)
 			{
-				throw new Exception(string.Format("Index not found in (index:{0})", IndexName));
+				throw new Exception(string.Format("Index not found in (index:{0})", indexName));
 			}
 
-			return Relationship.ParseJson(Response);
+			return ParseJson(response);
 		}
 
 		#endregion
 
 		#region Initializers 
 
-		public static Relationship InitializeFromRelationshipJson(string RelationshipJson)
+		public static Relationship InitializeFromRelationshipJson(string relationshipJson)
 		{
 			JObject jo;
 
 			try
 			{
-				jo = JObject.Parse(RelationshipJson);
+				jo = JObject.Parse(relationshipJson);
 			}
 			catch (Exception e)
 			{
@@ -81,11 +82,11 @@ namespace Neo4jRestNet.Core
 			return InitializeFromRelationshipJson(jo);
 		}
 
-		public static Relationship InitializeFromRelationshipJson(JObject RelationshipJson)
+		public static Relationship InitializeFromRelationshipJson(JObject relationshipJson)
 		{
-			Relationship relationship = new Relationship();
+			var relationship = new Relationship();
 			JToken self;
-			if (!RelationshipJson.TryGetValue("self", out self) || self.Type != JTokenType.String)
+			if (!relationshipJson.TryGetValue("self", out self) || self.Type != JTokenType.String)
 			{
 				throw new Exception("Invalid relationship json");
 			}
@@ -93,13 +94,13 @@ namespace Neo4jRestNet.Core
 			relationship.Self = self.Value<string>();
 
 			JToken properties;
-			if (!RelationshipJson.TryGetValue("data", out properties) || properties.Type != JTokenType.Object)
+			if (!relationshipJson.TryGetValue("data", out properties) || properties.Type != JTokenType.Object)
 			{
 				throw new Exception("Invalid relationship json");
 			}
 
 			JToken startNode;
-			if (!RelationshipJson.TryGetValue("start", out startNode))
+			if (!relationshipJson.TryGetValue("start", out startNode))
 			{
 				throw new Exception("Invalid relationship json");
 			}
@@ -119,7 +120,7 @@ namespace Neo4jRestNet.Core
 			}
 
 			JToken endNode;
-			if (!RelationshipJson.TryGetValue("end", out endNode))
+			if (!relationshipJson.TryGetValue("end", out endNode))
 			{
 				throw new Exception("Invalid relationship json");
 			}
@@ -139,38 +140,40 @@ namespace Neo4jRestNet.Core
 			}
 
 			JToken name;
-			if (!RelationshipJson.TryGetValue("type", out name) || name.Type != JTokenType.String)
+			if (!relationshipJson.TryGetValue("type", out name) || name.Type != JTokenType.String)
 			{
 				throw new Exception("Invalid relationship json");
 			}
 
 			relationship.Name = name.Value<string>();
 
-			relationship._Properties = Properties.ParseJson(properties.ToString(Formatting.None));
+			relationship._properties = Properties.ParseJson(properties.ToString(Formatting.None));
 
-			relationship.OriginalRelationshipJson = RelationshipJson.ToString(Formatting.None);
-
-			return relationship;
-		}
-
-		public static Relationship InitializeFromSelf(string Self)
-		{
-			Relationship relationship = new Relationship();
-
-			relationship.Self = Self;
-			relationship.StartNode = null;
-			relationship.EndNode = null;
-			relationship.Name = null;
-			relationship._Properties = null;
-			relationship.OriginalRelationshipJson = null;
+			relationship.OriginalRelationshipJson = relationshipJson.ToString(Formatting.None);
 
 			return relationship;
 		}
 
-		public static bool IsSelfARelationship(string Self)
+		public static Relationship InitializeFromSelf(string self)
 		{
-			string[] selfArray = Self.Split('/');
-			return (selfArray.Length > 2 && selfArray[selfArray.Length - 2] == "relationship") ? true : false;
+			var relationship = new Relationship
+			                   	{
+			                   		Self = self,
+			                   		StartNode = null,
+			                   		EndNode = null,
+			                   		Name = null,
+			                   		_properties = null,
+			                   		OriginalRelationshipJson = null
+			                   	};
+
+
+			return relationship;
+		}
+
+		public static bool IsSelfARelationship(string self)
+		{
+			var selfArray = self.Split('/');
+			return (selfArray.Length > 2 && selfArray[selfArray.Length - 2] == "relationship");
 		}
 		#endregion
 
@@ -180,12 +183,12 @@ namespace Neo4jRestNet.Core
 		{
 			get
 			{
-				return _Self;
+				return _self;
 			}
 
 			private set
 			{
-				if (!Relationship.IsSelfARelationship(value))
+				if (!IsSelfARelationship(value))
 				{
 					throw new Exception(string.Format("Self is not a Relationship ({0})", Self));
 				}
@@ -193,17 +196,17 @@ namespace Neo4jRestNet.Core
 				// Make sure there is no trailing /
 				string self = value.TrimEnd('/');
 
-				string[] SelfArray = self.Split('/');
+				var selfArray = self.Split('/');
 
-				long RelationshipId;
-				if (!long.TryParse(SelfArray.Last(), out RelationshipId))
+				long relationshipId;
+				if (!long.TryParse(selfArray.Last(), out relationshipId))
 				{
 					throw new Exception(string.Format("Invalid Self id ({0})", value));
 				}
 
 				_dbUrl = self.Substring(0, self.LastIndexOf("/relationship"));
-				_Self = self;
-				this.Id = RelationshipId;
+				_self = self;
+				Id = relationshipId;
 			}
 		}
 
@@ -211,26 +214,26 @@ namespace Neo4jRestNet.Core
 
 		#region Properties
 
-		private void LoadProperties(bool Refresh)
+		private void LoadProperties(bool refresh)
 		{
-			if (Refresh)
+			if (refresh)
 			{
-				this._Properties = null;
+				_properties = null;
 			}
 
-			if (this._Properties != null)
+			if (_properties != null)
 			{
 				return;
 			}
 
-			string Response;
-			HttpStatusCode status = Neo4jRestApi.GetPropertiesOnRelationship(_dbUrl, Id, out Response);
+			string response;
+			HttpStatusCode status = Neo4jRestApi.GetPropertiesOnRelationship(_dbUrl, Id, out response);
 			if (status != HttpStatusCode.OK)
 			{
 				throw new Exception(string.Format("Error retrieving properties on relationship (relationship id:{0} http response:{1})", Id, status));
 			}
 
-			this._Properties = Properties.ParseJson(Response);
+			_properties = Properties.ParseJson(response);
 		}
 
 		public Properties Properties
@@ -238,7 +241,7 @@ namespace Neo4jRestNet.Core
 			get
 			{
 				LoadProperties(false);
-				return _Properties;
+				return _properties;
 			}
 		}
 
@@ -262,66 +265,66 @@ namespace Neo4jRestNet.Core
 
 		#region Index
 
-		public static Relationship AddToIndex(long RelationshipId, string IndexName, string Key, object Value)
+		public static Relationship AddToIndex(long relationshipId, string indexName, string key, object value)
 		{
-			return AddToIndex(DefaultDbUrl, RelationshipId, IndexName, Key, Value);
+			return AddToIndex(DefaultDbUrl, relationshipId, indexName, key, value);
 		}
 
-		public static Relationship AddToIndex(string dbUrl, long RelationshipId, string IndexName, string Key, object Value)
+		public static Relationship AddToIndex(string dbUrl, long relationshipId, string indexName, string key, object value)
 		{
-			string Response;
-			HttpStatusCode status = Neo4jRestApi.AddRelationshipToIndex(dbUrl, RelationshipId, IndexName, Key, Value, out Response);
+			string response;
+			HttpStatusCode status = Neo4jRestApi.AddRelationshipToIndex(dbUrl, relationshipId, indexName, key, value, out response);
 			if (status != HttpStatusCode.Created)
 			{
 				throw new Exception(string.Format("Error creating index for relationship (http response:{0})", status));
 			}
 
-			return Relationship.InitializeFromRelationshipJson(Response);
+			return InitializeFromRelationshipJson(response);
 		}
 
-		public HttpStatusCode RemoveFromIndex(long RelationshipId, string IndexName)
+		public HttpStatusCode RemoveFromIndex(long relationshipId, string indexName)
 		{
-			return RemoveFromIndex(DefaultDbUrl, RelationshipId, IndexName);
+			return RemoveFromIndex(DefaultDbUrl, relationshipId, indexName);
 		}
 
-		public HttpStatusCode RemoveFromIndex(string dbUrl, long RelationshipId, string IndexName)
+		public HttpStatusCode RemoveFromIndex(string dbUrl, long relationshipId, string indexName)
 		{
-			HttpStatusCode status = Neo4jRestApi.RemoveRelationshipFromIndex(dbUrl, RelationshipId, IndexName);
+			HttpStatusCode status = Neo4jRestApi.RemoveRelationshipFromIndex(dbUrl, relationshipId, indexName);
 			if (status != HttpStatusCode.NoContent)
 			{
-				throw new Exception(string.Format("Error remove relationship from index (relationship id:{0} index name:{1} http response:{2})", RelationshipId, IndexName, status));
+				throw new Exception(string.Format("Error remove relationship from index (relationship id:{0} index name:{1} http response:{2})", relationshipId, indexName, status));
 			}
 
 			return status;
 		}
 
-		public HttpStatusCode RemoveFromIndex(long RelationshipId, string IndexName, string Key)
+		public HttpStatusCode RemoveFromIndex(long relationshipId, string indexName, string key)
 		{
-			return RemoveFromIndex(DefaultDbUrl, RelationshipId, IndexName, Key);
+			return RemoveFromIndex(DefaultDbUrl, relationshipId, indexName, key);
 		}
 
-		public HttpStatusCode RemoveFromIndex(string dbUrl, long RelationshipId, string IndexName, string Key)
+		public HttpStatusCode RemoveFromIndex(string dbUrl, long relationshipId, string indexName, string key)
 		{
-			HttpStatusCode status = Neo4jRestApi.RemoveRelationshipFromIndex(dbUrl, RelationshipId, IndexName, Key);
+			HttpStatusCode status = Neo4jRestApi.RemoveRelationshipFromIndex(dbUrl, relationshipId, indexName, key);
 			if (status != HttpStatusCode.NoContent)
 			{
-				throw new Exception(string.Format("Error remove relationship from index (relationship id:{0} index name:{1} http response:{2})", RelationshipId, IndexName, status));
+				throw new Exception(string.Format("Error remove relationship from index (relationship id:{0} index name:{1} http response:{2})", relationshipId, indexName, status));
 			}
 
 			return status;
 		}
 
-		public HttpStatusCode RemoveFromIndex(long RelationshipId, string IndexName, string Key, object Value)
+		public HttpStatusCode RemoveFromIndex(long relationshipId, string indexName, string key, object value)
 		{
-			return RemoveFromIndex(DefaultDbUrl, RelationshipId, IndexName, Key, Value);
+			return RemoveFromIndex(DefaultDbUrl, relationshipId, indexName, key, value);
 		}
 
-		public HttpStatusCode RemoveFromIndex(string dbUrl, long RelationshipId, string IndexName, string Key, object Value)
+		public HttpStatusCode RemoveFromIndex(string dbUrl, long relationshipId, string indexName, string key, object value)
 		{
-			HttpStatusCode status = Neo4jRestApi.RemoveRelationshipFromIndex(dbUrl, RelationshipId, IndexName, Key, Value);
+			HttpStatusCode status = Neo4jRestApi.RemoveRelationshipFromIndex(dbUrl, relationshipId, indexName, key, value);
 			if (status != HttpStatusCode.NoContent)
 			{
-				throw new Exception(string.Format("Error remove relationship from index (relationship id:{0} index name:{1} http response:{2})", RelationshipId, IndexName, status));
+				throw new Exception(string.Format("Error remove relationship from index (relationship id:{0} index name:{1} http response:{2})", relationshipId, indexName, status));
 			}
 
 			return status;
@@ -332,7 +335,7 @@ namespace Neo4jRestNet.Core
 
 		public HttpStatusCode Delete()
 		{
-			HttpStatusCode status = Neo4jRestApi.DeleteRelationship(this._dbUrl, this.Id);
+			HttpStatusCode status = Neo4jRestApi.DeleteRelationship(_dbUrl, Id);
 			if (status != HttpStatusCode.NoContent)
 			{
 				throw new Exception(string.Format("Error deleteing relationship (relationship id:{0} http response:{1})", Id, status));
@@ -345,36 +348,31 @@ namespace Neo4jRestNet.Core
 
 		#region ParseJson
 
-		public static IEnumerable<Relationship> ParseJson(string JsonRelationships)
+		public static IEnumerable<Relationship> ParseJson(string jsonRelationships)
 		{
-			if (String.IsNullOrEmpty(JsonRelationships))
+			if (String.IsNullOrEmpty(jsonRelationships))
 				return null;
-			else
+			
+			var relationships = new List<Relationship>();
+
+			// The Json passed in can be a JObject or JArray - this is to test for that.
+			JObject jo = JObject.Parse(string.Concat("{\"root\":", jsonRelationships, "}"));
+
+			switch (jo["root"].Type)
 			{
-				List<Relationship> Relationships = new List<Relationship>();
+				case JTokenType.Object:
+					relationships.Add(InitializeFromRelationshipJson(jo["root"].ToString(Formatting.None)));
+					break;
 
-				// The Json passed in can be a JObject or JArray - this is to test for that.
-				JObject jo = JObject.Parse(string.Concat("{\"root\":", JsonRelationships, "}"));
+				case JTokenType.Array:
+					relationships.AddRange(from JObject jsonRelationship in jo["root"] select InitializeFromRelationshipJson(jsonRelationship));
+					break;
 
-				switch (jo["root"].Type)
-				{
-					case JTokenType.Object:
-						Relationships.Add(Relationship.InitializeFromRelationshipJson(jo["root"].ToString(Formatting.None)));
-						break;
-
-					case JTokenType.Array:
-						foreach (JObject jsonRelationship in jo["root"])
-						{
-							Relationships.Add(Relationship.InitializeFromRelationshipJson(jsonRelationship));
-						}
-						break;
-
-					default:
-						throw new Exception("Invalid relationship json");
-				}
-
-				return Relationships;
+				default:
+					throw new Exception("Invalid relationship json");
 			}
+
+			return relationships;
 		}
 
 		#endregion

@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Linq.Expressions;
 using System.Configuration;
-using System.Net;
+using System.Linq.Expressions;
+using System.Data;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
-using System.Data;
 using Neo4jRestNet.Core;
+using System.Collections.ObjectModel;
+using System.Text;
 
 namespace Neo4jRestNet.CypherPlugin
 {
@@ -17,155 +16,221 @@ namespace Neo4jRestNet.CypherPlugin
 		private static readonly string DefaultDbUrl = ConfigurationManager.ConnectionStrings["neo4j"].ConnectionString.TrimEnd('/');
 		private static readonly string DefaultCypherExtensionPath = ConfigurationManager.ConnectionStrings["neo4jCypherExtension"].ConnectionString.TrimEnd('/');
 
-		public static DataTable Post(CypherQuery query)
+		readonly List<Func<CypherStart, object>> _start = new List<Func<CypherStart, object>>();
+		readonly List<Func<CypherMatch, object>> _match = new List<Func<CypherMatch, object>>();
+		readonly List<Expression<Func<CypherWhere, object>>> _where = new List<Expression<Func<CypherWhere, object>>>();
+		readonly List<Func<CypherReturn, object>> _return = new List<Func<CypherReturn, object>>();
+		readonly List<Func<CypherOrderBy, object>> _orderBy = new List<Func<CypherOrderBy, object>>();
+		String _skip = string.Empty;
+		String _limit = string.Empty;
+
+		public DataTable Post()
 		{
-			return Post(string.Concat(DefaultDbUrl, DefaultCypherExtensionPath), query.ToString());
-		}
-		
-		public static DataTable Post(string query)
-		{
-			return Post(string.Concat(DefaultDbUrl, DefaultCypherExtensionPath), query);
+			return Post(string.Concat(DefaultDbUrl, DefaultCypherExtensionPath));
 		}
 
-		public static DataTable Post(string gremlinUrl, string query)
+		public DataTable Post(string cypherUrl)
 		{
 			// Remove trailing /
-			gremlinUrl = gremlinUrl.TrimEnd('/');
+			cypherUrl = cypherUrl.TrimEnd('/');
 
-			JObject joScript = new JObject();
-			joScript.Add("query", query);
+			var joScript = new JObject {{"query", Query}};
 
-			string Response;
-			HttpStatusCode status = Rest.HttpRest.Post(gremlinUrl, joScript.ToString(Formatting.None), out Response);
+			string response;
+			Rest.HttpRest.Post(cypherUrl, joScript.ToString(Formatting.None), out response);
 
-			JObject joResponse = JObject.Parse(Response);
-			JArray jaColumns = (JArray)joResponse["columns"];
-			JArray jaData = (JArray)joResponse["data"];
+			var joResponse = JObject.Parse(response);
+			var jaColumns = (JArray)joResponse["columns"];
+			var jaData = (JArray)joResponse["data"];
+			var returnTypes = GetReturnTypes;
 
-			DataTable dt = new DataTable();
+			var dt = new DataTable();
 
-			bool InitColumns = true;
-			int ColIndex = 0;
+			var initColumns = true;
+			
 			foreach (JArray jRow in jaData)
 			{
-				List<object> row = new List<object>();
-				foreach (JToken jCol in jRow)
+				var colIndex = 0;
+				var row = new List<object>();
+
+				foreach (var jCol in jRow)
 				{
-					switch (jCol.Type)
+					if (initColumns)
 					{
-						case JTokenType.String:
-							row.Add(jCol.ToString());
-							if (InitColumns)
-							{
-								dt.Columns.Add(jaColumns[ColIndex].ToString(), typeof(string));
-								ColIndex++;
-							}
-							break;
-
-						case JTokenType.Object:
-							if (jCol["self"] == null)
-							{
-								row.Add(jCol.ToString());
-
-								if (InitColumns)
-								{
-									dt.Columns.Add(jaColumns[ColIndex].ToString(), typeof(string));
-									ColIndex++;
-								}
-							}
-							else
-							{
-								string self = jCol["self"].ToString();
-								string[] selfArray = self.Split('/');
-								if (selfArray.Length > 2 && selfArray[selfArray.Length - 2] == "node")
-								{
-									row.Add(Node.InitializeFromNodeJson((JObject)jCol));
-
-									if (InitColumns)
-									{
-										dt.Columns.Add(jaColumns[ColIndex].ToString(), typeof(Node));
-										ColIndex++;
-									}
-								}
-								else if (selfArray.Length > 2 && selfArray[selfArray.Length - 2] == "relationship")
-								{
-									row.Add(Relationship.InitializeFromRelationshipJson((JObject)jCol));
-
-									if (InitColumns)
-									{
-										dt.Columns.Add(jaColumns[ColIndex].ToString(), typeof(Relationship));
-										ColIndex++;
-									}
-								}
-								else
-								{
-									// Not a Node or Relationship - return as string
-									row.Add(jCol.ToString());
-
-									if (InitColumns)
-									{
-										dt.Columns.Add(jaColumns[ColIndex].ToString(), typeof(string));
-										ColIndex++;
-									}
-								}
-							}
-							break;
-
-						case JTokenType.Integer:
-							row.Add(jCol.ToString());
-							if (InitColumns)
-							{
-								dt.Columns.Add(jaColumns[ColIndex].ToString(), typeof(int));
-								ColIndex++;
-							}
-							break;
-
-						case JTokenType.Float:
-							row.Add(jCol.ToString());
-							if (InitColumns)
-							{
-								dt.Columns.Add(jaColumns[ColIndex].ToString(), typeof(float));
-								ColIndex++;
-							}
-							break;
-
-						case JTokenType.Date:
-							row.Add(jCol.ToString());
-							if (InitColumns)
-							{
-								dt.Columns.Add(jaColumns[ColIndex].ToString(), typeof(DateTime));
-								ColIndex++;
-							}
-							break;
-
-						case JTokenType.Boolean:
-							row.Add(jCol.ToString());
-							if (InitColumns)
-							{
-								dt.Columns.Add(jaColumns[ColIndex].ToString(), typeof(bool));
-								ColIndex++;
-							}
-							break;
-
-						default:
-							row.Add(jCol.ToString());
-
-							if (InitColumns)
-							{
-								dt.Columns.Add(jaColumns[ColIndex].ToString(), typeof(string));
-								ColIndex++;
-							}
-							break;
+						dt.Columns.Add(jaColumns[colIndex].ToString(), returnTypes[colIndex]);
 					}
+
+					if (returnTypes[colIndex] == typeof (Node))
+					{
+						row.Add(jCol.Type == JTokenType.Null ? null : Node.InitializeFromNodeJson((JObject)jCol));
+					}
+					else if (returnTypes[colIndex] == typeof (Relationship))
+					{
+						row.Add(jCol.Type == JTokenType.Null ? null : Relationship.InitializeFromRelationshipJson((JObject) jCol));
+					}
+					else if (returnTypes[colIndex] == typeof (Path))
+					{
+						row.Add(jCol.Type == JTokenType.Null ? null : Path.ParseJson((JArray)jCol));
+					}
+					else if (returnTypes[colIndex] == typeof(string))
+					{
+						row.Add(jCol.Type == JTokenType.Null ? null : (string)jCol);
+					}
+					else if (returnTypes[colIndex] == typeof (int))
+					{
+						if(jCol.Type == JTokenType.Null)
+						{
+							throw new ArgumentNullException(string.Format("Value for column {0} of type {1} can not be null", jaColumns[colIndex], returnTypes[colIndex].Name));
+						}
+
+						row.Add((int) jCol);
+					}
+					else if (returnTypes[colIndex] == typeof(int?))
+					{
+						row.Add(jCol.Type == JTokenType.Null ? null : (int?)jCol);
+					}
+					else if (returnTypes[colIndex] == typeof(long))
+					{
+						if (jCol.Type == JTokenType.Null)
+						{
+							throw new ArgumentNullException(string.Format("Value for column {0} of type {1} can not be null", jaColumns[colIndex], returnTypes[colIndex].Name));
+						}
+
+						row.Add((long)jCol);
+					}
+					else if (returnTypes[colIndex] == typeof(long?))
+					{
+						row.Add(jCol.Type == JTokenType.Null ? null : (long?)jCol);
+					}
+					else
+					{
+						throw new NotSupportedException(string.Format("Return Type of {0} is not supported", returnTypes[colIndex].Name));
+					}
+
+					colIndex++;
 				}
 
-				InitColumns = false;
-				DataRow dtRow = dt.NewRow();
+				initColumns = false;
+				var dtRow = dt.NewRow();
 				dtRow.ItemArray = row.ToArray();
 				dt.Rows.Add(dtRow);
 			}
 
 			return dt;
+		}
+
+				public void Start(Func<CypherStart, object> start)
+		{
+			_start.Add(start);
+		}
+
+		public void Match(Func<CypherMatch, object> match)
+		{
+			_match.Add(match);
+		}
+
+		public void Where(Expression<Func<CypherWhere, object>> where)
+		{
+			_where.Add(where);
+		}
+
+		public void Return(Func<CypherReturn, object> cypherReturn)
+		{
+			_return.Add(cypherReturn);
+		}
+
+		public void OrderBy(Func<CypherOrderBy, object> cypherOrderBy)
+		{
+			_orderBy.Add(cypherOrderBy);
+		}
+
+		public void Skip(int skip)
+		{
+			_skip = string.Format(" SKIP {0}", skip);
+		}
+		
+		public void Limit(int limit)
+		{
+			_limit = string.Format(" LIMIT {0}", limit);
+		}
+
+		private ReadOnlyCollection<Type> GetReturnTypes
+		{
+			get
+			{
+				var returnTypes = new List<Type>();
+
+				foreach (var r in _return)
+				{
+					//  call GetReturnTypes somehow
+					var obj = (CypherReturn)r.Invoke(new CypherReturn());
+					returnTypes.AddRange(obj.GetReturnTypes);
+				}
+
+				return returnTypes.AsReadOnly();
+			}
+		}
+
+		public string Query
+		{
+			get
+			{
+				var sbToString = new StringBuilder();
+
+				string label = "START";
+				foreach (var s in _start)
+				{
+					sbToString.AppendFormat("{1}{0}", s.Invoke(new CypherStart()), label);
+					label = ",";
+				}
+
+				if (_match != null)
+				{
+					label = "MATCH";
+					foreach (var m in _match)
+					{
+						sbToString.AppendFormat(" {1}{0}", m.Invoke(new CypherMatch()), label);
+						label = ",";
+					}
+				}
+
+				if (_where != null)
+				{
+					label = "WHERE";
+					foreach (var w in _where)
+					{
+						sbToString.AppendFormat(" {1} {0}", new ParseWhereLambda().Parse(w), label);
+						label = string.Empty;
+					}
+				}
+
+				if (_return != null)
+				{
+					label = "RETURN";
+					foreach (var r in _return)
+					{
+						sbToString.AppendFormat(" {1}{0}", r.Invoke(new CypherReturn()), label);
+						label = ",";
+					}
+				}
+
+				if (_orderBy != null)
+				{
+					label = "ORDER BY";
+					foreach (var o in _orderBy)
+					{
+						sbToString.AppendFormat(" {1}{0}", o.Invoke(new CypherOrderBy()), label);
+						label = ",";
+					}
+				}
+
+				// Append Skip
+				sbToString.Append(_skip);
+
+				// Append Limit
+				sbToString.Append(_limit);
+				return sbToString.ToString();
+			}
 		}
 	}
 }

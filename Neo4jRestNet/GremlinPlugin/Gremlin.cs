@@ -1,14 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Neo4jRestNet.Rest;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System.Configuration;
-using Neo4jRestNet.Core;
 using System.Net;
 using System.Data;
+using System.Configuration;
+using System.Collections.Generic;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Neo4jRestNet.Core;
+
 
 namespace Neo4jRestNet.GremlinPlugin
 {
@@ -37,18 +35,17 @@ namespace Neo4jRestNet.GremlinPlugin
 			// Remove trailing /
 			gremlinUrl = gremlinUrl.TrimEnd('/');
 
-			JObject jo = new JObject();
-			jo.Add("script", script);
+			var jo = new JObject {{"script", script}};
 
-			string Response;
-			HttpStatusCode status = Rest.HttpRest.Post(gremlinUrl, jo.ToString(Formatting.None), out Response);
+			string response;
+			HttpStatusCode status = Rest.HttpRest.Post(gremlinUrl, jo.ToString(Formatting.None), out response);
 
 			return status;
 		}
 
-		public static IEnumerable<T> Post<T>(EncryptId StartNodeId, string script) where T : IGraphObject
+		public static IEnumerable<T> Post<T>(EncryptId startNodeId, string script) where T : IGraphObject
 		{
-			return Post<T>(string.Concat(DefaultDbUrl, DefaultGremlinExtensionPath), string.Format("g.v({0}).{1}", (long)StartNodeId, script)); 
+			return Post<T>(string.Concat(DefaultDbUrl, DefaultGremlinExtensionPath), string.Format("g.v({0}).{1}", (long)startNodeId, script)); 
 		}
 		
 		public static IEnumerable<T> Post<T>(string script) where T : IGraphObject
@@ -71,25 +68,26 @@ namespace Neo4jRestNet.GremlinPlugin
 			// Remove trailing /
 			gremlinUrl = gremlinUrl.TrimEnd('/');
 
-			Type typeParameterType = typeof(T);
+			var typeParameterType = typeof(T);
 
-			JObject jo = new JObject();
-			jo.Add("script", script);
+			var jo = new JObject {{"script", script}};
 
-			string Response;
-			HttpStatusCode status = Rest.HttpRest.Post(gremlinUrl, jo.ToString(Formatting.None), out Response);
+			string response;
+			HttpStatusCode status = Rest.HttpRest.Post(gremlinUrl, jo.ToString(Formatting.None), out response);
 
 			if (typeParameterType == typeof(Node))
 			{
-				return (IEnumerable<T>)Node.ParseJson(Response);
+				return (IEnumerable<T>)Node.ParseJson(response);
 			}
-			else if (typeParameterType == typeof(Relationship))
+			
+			if (typeParameterType == typeof(Relationship))
 			{
-				return (IEnumerable<T>)Relationship.ParseJson(Response);
+				return (IEnumerable<T>)Relationship.ParseJson(response);
 			}
-			else if (typeParameterType == typeof(Path))
+			
+			if (typeParameterType == typeof(Path))
 			{
-				return (IEnumerable<T>)Path.ParseJson(Response);
+				return (IEnumerable<T>)Path.ParseJson(response);
 			}
 
 			throw new Exception("Return type " + typeParameterType.ToString() + " not implemented");
@@ -115,33 +113,32 @@ namespace Neo4jRestNet.GremlinPlugin
 			// Remove trailing /
 			gremlinUrl = gremlinUrl.TrimEnd('/');
 
-			JObject joScript = new JObject();
-			joScript.Add("script", script);
+			var joScript = new JObject {{"script", script}};
 
-			string Response;
-			HttpStatusCode status = Rest.HttpRest.Post(gremlinUrl, joScript.ToString(Formatting.None), out Response);
+			string response;
+			HttpStatusCode status = Rest.HttpRest.Post(gremlinUrl, joScript.ToString(Formatting.None), out response);
 
-			JObject joResponse = JObject.Parse(Response);
-			JArray jaColumns =(JArray)joResponse["columns"];
-			JArray jaData = (JArray)joResponse["data"];
+			var joResponse = JObject.Parse(response);
+			var jaColumns =(JArray)joResponse["columns"];
+			var jaData = (JArray)joResponse["data"];
 			
-			DataTable dt = new DataTable();
+			var dt = new DataTable();
 
-			bool InitColumns = true;
-			int ColIndex = 0;
+			var initColumns = true;
+			var colIndex = 0;
 			foreach (JArray jRow in jaData)
 			{
-				List<object> row = new List<object>();
-				foreach (JToken jCol in jRow)
+				var row = new List<object>();
+				foreach (var jCol in jRow)
 				{
 					switch (jCol.Type)
 					{
 						case JTokenType.String:
 							row.Add(jCol.ToString());
-							if (InitColumns)
+							if (initColumns)
 							{
-								dt.Columns.Add(jaColumns[ColIndex].ToString(), typeof(string));
-								ColIndex++;
+								dt.Columns.Add(jaColumns[colIndex].ToString(), typeof(string));
+								colIndex++;
 							}
 							break;
 
@@ -150,10 +147,10 @@ namespace Neo4jRestNet.GremlinPlugin
 							{
 								row.Add(jCol.ToString());
 
-								if (InitColumns)
+								if (initColumns)
 								{
-									dt.Columns.Add(jaColumns[ColIndex].ToString(), typeof(string));
-									ColIndex++;
+									dt.Columns.Add(jaColumns[colIndex].ToString(), typeof(string));
+									colIndex++;
 								}
 							}
 							else
@@ -164,20 +161,20 @@ namespace Neo4jRestNet.GremlinPlugin
 								{
 									row.Add(Node.InitializeFromNodeJson((JObject)jCol));
 
-									if (InitColumns)
+									if (initColumns)
 									{
-										dt.Columns.Add(jaColumns[ColIndex].ToString(), typeof(Node));
-										ColIndex++;
+										dt.Columns.Add(jaColumns[colIndex].ToString(), typeof(Node));
+										colIndex++;
 									}
 								}
 								else if (selfArray.Length > 2 && selfArray[selfArray.Length - 2] == "relationship")
 								{
 									row.Add(Relationship.InitializeFromRelationshipJson((JObject)jCol));
 
-									if (InitColumns)
+									if (initColumns)
 									{
-										dt.Columns.Add(jaColumns[ColIndex].ToString(), typeof(Relationship));
-										ColIndex++;
+										dt.Columns.Add(jaColumns[colIndex].ToString(), typeof(Relationship));
+										colIndex++;
 									}
 								}
 								else
@@ -185,10 +182,10 @@ namespace Neo4jRestNet.GremlinPlugin
 									// Not a Node or Relationship - return as string
 									row.Add(jCol.ToString());
 
-									if (InitColumns)
+									if (initColumns)
 									{
-										dt.Columns.Add(jaColumns[ColIndex].ToString(), typeof(string));
-										ColIndex++;
+										dt.Columns.Add(jaColumns[colIndex].ToString(), typeof(string));
+										colIndex++;
 									}
 								}
 							}
@@ -196,53 +193,53 @@ namespace Neo4jRestNet.GremlinPlugin
 
 						case JTokenType.Integer:
 							row.Add(jCol.ToString());
-							if (InitColumns)
+							if (initColumns)
 							{
-								dt.Columns.Add(jaColumns[ColIndex].ToString(), typeof(int));
-								ColIndex++;
+								dt.Columns.Add(jaColumns[colIndex].ToString(), typeof(int));
+								colIndex++;
 							}
 							break;
 
 						case JTokenType.Float:
 							row.Add(jCol.ToString());
-							if (InitColumns)
+							if (initColumns)
 							{
-								dt.Columns.Add(jaColumns[ColIndex].ToString(), typeof(float));
-								ColIndex++;
+								dt.Columns.Add(jaColumns[colIndex].ToString(), typeof(float));
+								colIndex++;
 							}
 							break;
 
 						case JTokenType.Date:
 							row.Add(jCol.ToString());
-							if (InitColumns)
+							if (initColumns)
 							{
-								dt.Columns.Add(jaColumns[ColIndex].ToString(), typeof(DateTime));
-								ColIndex++;
+								dt.Columns.Add(jaColumns[colIndex].ToString(), typeof(DateTime));
+								colIndex++;
 							}
 							break;
 
 						case JTokenType.Boolean:
 							row.Add(jCol.ToString());
-							if (InitColumns)
+							if (initColumns)
 							{
-								dt.Columns.Add(jaColumns[ColIndex].ToString(), typeof(bool));
-								ColIndex++;
+								dt.Columns.Add(jaColumns[colIndex].ToString(), typeof(bool));
+								colIndex++;
 							}
 							break;
 
 						default:
 							row.Add(jCol.ToString());
 
-							if (InitColumns)
+							if (initColumns)
 							{
-								dt.Columns.Add(jaColumns[ColIndex].ToString(), typeof(string));
-								ColIndex++;
+								dt.Columns.Add(jaColumns[colIndex].ToString(), typeof(string));
+								colIndex++;
 							}
 							break;
 					}
 				}
 
-				InitColumns = false;
+				initColumns = false;
 				DataRow dtRow = dt.NewRow();
 				dtRow.ItemArray = row.ToArray();
 				dt.Rows.Add(dtRow);

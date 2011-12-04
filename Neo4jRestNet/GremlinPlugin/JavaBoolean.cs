@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Text;
 
 namespace Neo4jRestNet.GremlinPlugin
 {
@@ -31,14 +28,14 @@ namespace Neo4jRestNet.GremlinPlugin
 			return this;
 		}
 
-		public JavaBoolean Append(string Format, params object[] args)
+		public JavaBoolean Append(string format, params object[] args)
 		{
 			if (_sb.Length == 0)
 			{
 				_sb.Append("it");
 			}
 
-			_sb.Append(".").Append(string.Format(Format, args));
+			_sb.Append(".").Append(string.Format(format, args));
 
 			return this;
 		}

@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Linq.Expressions;
-using System.Reflection;
 
 namespace Neo4jRestNet.ExpressionTreeParser
 {
@@ -19,31 +16,32 @@ namespace Neo4jRestNet.ExpressionTreeParser
 						// Quote string values
 						return Expression.Constant(string.Format("'{0}'", ((ConstantExpression)expression).Value));
 					}
-					else if (expression.Type == typeof(bool))
+					
+					if (expression.Type == typeof(bool))
 					{
 						// Convert bool values to lowercase strings 
 						return Expression.Constant(string.Format("{0}", (bool)((ConstantExpression)expression).Value ? "true" : "false"));
 					}
 
-					return (ConstantExpression)expression;
+					return expression;
 
 				case ExpressionType.Call:
-					MethodCallExpression mce = (MethodCallExpression)expression;
+					var mce = (MethodCallExpression)expression;
 
-					List<ParameterExpression> ParameterExpressions = new List<ParameterExpression>();
-					List<Expression> AssignExpressions = new List<Expression>();
+					var parameterExpressions = new List<ParameterExpression>();
+					var assignExpressions = new List<Expression>();
 					foreach (Expression argument in mce.Arguments)
 					{
 						ParameterExpression p = Expression.Parameter(argument.Type);
-						ParameterExpressions.Add(p);
+						parameterExpressions.Add(p);
 
-						AssignExpressions.Add(GetAssignExpression(p, argument));
+						assignExpressions.Add(GetAssignExpression(p, argument));
 					}
 
 					if (mce.Object == null)
 					{
 						// Static Method Call
-						AssignExpressions.Add(Expression.Call(mce.Method, ParameterExpressions));
+						assignExpressions.Add(Expression.Call(mce.Method, parameterExpressions));
 					}
 					else
 					{
@@ -51,26 +49,26 @@ namespace Neo4jRestNet.ExpressionTreeParser
 						switch (mce.Object.NodeType)
 						{
 							case ExpressionType.Constant:
-								AssignExpressions.Add(Expression.Call(mce.Object, mce.Method, ParameterExpressions));
+								assignExpressions.Add(Expression.Call(mce.Object, mce.Method, parameterExpressions));
 								break;
 
 							case ExpressionType.Parameter:
-								AssignExpressions.Add(Expression.Call(Expression.New(mce.Object.Type), mce.Method, ParameterExpressions));
+								assignExpressions.Add(Expression.Call(Expression.New(mce.Object.Type), mce.Method, parameterExpressions));
 								break;
 
 							case ExpressionType.Call:
 
-								AssignExpressions.Add(Expression.Call(ParseExpression(mce.Object), mce.Method, ParameterExpressions));
+								assignExpressions.Add(Expression.Call(ParseExpression(mce.Object), mce.Method, parameterExpressions));
 								break;
 
 							case ExpressionType.MemberAccess:
 								if (mce.Object.Type == typeof(string)) // Quote String values ie. Enums are strings
 								{
-									AssignExpressions.Add(Expression.Constant(String.Format("'{0}'", Expression.Lambda(mce.Object).Compile().DynamicInvoke().ToString())));
+									assignExpressions.Add(Expression.Constant(String.Format("'{0}'", Expression.Lambda(mce.Object).Compile().DynamicInvoke().ToString())));
 								}
 								else
 								{
-									AssignExpressions.Add(Expression.Constant(Expression.Lambda(mce.Object).Compile().DynamicInvoke().ToString()));
+									assignExpressions.Add(Expression.Constant(Expression.Lambda(mce.Object).Compile().DynamicInvoke().ToString()));
 								}
 								break; 
 
@@ -79,7 +77,7 @@ namespace Neo4jRestNet.ExpressionTreeParser
 						}
 					}
 
-					BlockExpression block = Expression.Block(ParameterExpressions, AssignExpressions);
+					BlockExpression block = Expression.Block(parameterExpressions, assignExpressions);
 
 					return block;
 
@@ -93,7 +91,7 @@ namespace Neo4jRestNet.ExpressionTreeParser
 			switch (expression.NodeType)
 			{
 				case ExpressionType.Constant:
-					return Expression.Assign(parameter, (ConstantExpression)expression);
+					return Expression.Assign(parameter, expression);
 
 				case ExpressionType.Parameter:
 					return Expression.Assign(parameter, Expression.New(expression.Type));
@@ -109,7 +107,7 @@ namespace Neo4jRestNet.ExpressionTreeParser
 					return Expression.Assign(parameter, Expression.NewArrayInit(expression.Type.GetElementType(), ((NewArrayExpression)expression).Expressions));
 
 				case ExpressionType.MemberAccess:
-					MemberExpression me = (MemberExpression)expression;
+					var me = (MemberExpression)expression;
 					return Expression.Assign(parameter, Expression.MakeMemberAccess(me.Expression, me.Member ));
 
 				default:

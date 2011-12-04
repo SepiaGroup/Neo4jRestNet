@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Neo4jRestNet.Core
+﻿namespace Neo4jRestNet.Core
 {
     public interface IGraphObject 
     {

@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Linq.Expressions;
 using Neo4jRestNet.ExpressionTreeParser;
@@ -13,7 +11,7 @@ namespace Neo4jRestNet.GremlinPlugin
 
 		public string Parse(Expression expression)
 		{
-			StringBuilder sbFilter = new StringBuilder();
+			var sbFilter = new StringBuilder();
 			Expression body = expression.NodeType == ExpressionType.Lambda ? ((LambdaExpression)expression).Body : expression;
 			BinaryExpression be;
 
@@ -47,12 +45,12 @@ namespace Neo4jRestNet.GremlinPlugin
 					break; 
 
 				case ExpressionType.Convert:
-					UnaryExpression convert = (UnaryExpression)body;
+					var convert = (UnaryExpression)body;
 					sbFilter.Append(Parse(convert.Operand));
 					break;
 
 				case ExpressionType.Not:
-					UnaryExpression ue = (UnaryExpression)body;
+					var ue = (UnaryExpression)body;
 					sbFilter.Append("!");
 					sbFilter.Append(Parse(ue.Operand));
 					break;
@@ -105,13 +103,13 @@ namespace Neo4jRestNet.GremlinPlugin
 			return sbFilter.ToString();
 		}
 
-		private string InvokeExpression(Expression LeftExpression, string Operator, Expression RightExpression)
+		private string InvokeExpression(Expression leftExpression, string Operator, Expression rightExpression)
 		{
-			StringBuilder sb = new StringBuilder();
+			var sb = new StringBuilder();
 
-			sb.Append(Parse(LeftExpression));
+			sb.Append(Parse(leftExpression));
 			sb.AppendFormat(" {0} ", Operator);
-			sb.Append(Parse(RightExpression));
+			sb.Append(Parse(rightExpression));
 
 			return sb.ToString();
 		}

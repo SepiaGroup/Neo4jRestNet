@@ -1,19 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 namespace Neo4jRestNet.CypherPlugin
 {
 	public class CypherWhere : ICypherObject, IComparable
 	{
-		private StringBuilder _sb = new StringBuilder();
+		private readonly StringBuilder _sb = new StringBuilder();
 
 		#region Node
 
-		public CypherWhere Node(string Name) 
+		public CypherWhere Node(string name) 
 		{
-			_sb.AppendFormat("{0}", Name);
+			_sb.AppendFormat("{0}", name);
 
 			return this;
 		}
@@ -22,9 +20,9 @@ namespace Neo4jRestNet.CypherPlugin
 
 		#region Relationship
 
-		public CypherWhere Relationship(string Name)
+		public CypherWhere Relationship(string name)
 		{
-			_sb.AppendFormat("{0}", Name);
+			_sb.AppendFormat("{0}", name);
 
 			return this;
 		}
@@ -67,9 +65,9 @@ namespace Neo4jRestNet.CypherPlugin
 			return this;
 		}
 
-		public ICypherObject Append(string Format, params object[] args)
+		public ICypherObject Append(string format, params object[] args)
 		{
-			_sb.Append(string.Format(Format, args));
+			_sb.Append(string.Format(format, args));
 
 			return this;
 		}

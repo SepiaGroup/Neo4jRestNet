@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Text;
 
 namespace Neo4jRestNet.CypherPlugin
 {
 	public class CypherMatch : ICypherObject
 	{
 
-		private StringBuilder _sb = new StringBuilder();
+		private readonly StringBuilder _sb = new StringBuilder();
 
 		#region Node
 
@@ -17,9 +14,9 @@ namespace Neo4jRestNet.CypherPlugin
 			return Node(string.Empty);
 		}
 
-		public CypherMatch Node(string Name)
+		public CypherMatch Node(string name)
 		{
-			_sb.AppendFormat(" ({0}) ", Name);
+			_sb.AppendFormat(" ({0}) ", name);
 
 			return this;
 		}
@@ -33,9 +30,9 @@ namespace Neo4jRestNet.CypherPlugin
 			return Relationship(string.Empty);
 		}
 
-		public CypherMatch Relationship(string Name)
+		public CypherMatch Relationship(string name)
 		{
-			_sb.AppendFormat(" ({0}) ", Name);
+			_sb.AppendFormat(" ({0}) ", name);
 
 			return this;
 		}
@@ -44,23 +41,23 @@ namespace Neo4jRestNet.CypherPlugin
 
 		#region Any
 
-		public CypherMatch Any(string Name)
+		public CypherMatch Any(string name)
 		{
-			_sb.AppendFormat("-[{0}]-", Name);
+			_sb.AppendFormat("-[{0}]-", name);
 
 			return this;
 		}
 
-		public CypherMatch Any(string Name, string Relationship)
+		public CypherMatch Any(string name, string relationship)
 		{
-			_sb.AppendFormat("-[{0}:{1}]-", Name, Relationship);
+			_sb.AppendFormat("-[{0}:{1}]-", name, relationship);
 
 			return this;
 		}
 
-		public CypherMatch Any(string Name, string Relationship, int MinHops, int MaxHops)
+		public CypherMatch Any(string name, string relationship, int minHops, int maxHops)
 		{
-			_sb.AppendFormat("-[{0}:{1}*{2}..{3}]-", Name, Relationship, MinHops, MaxHops);
+			_sb.AppendFormat("-[{0}:{1}*{2}..{3}]-", name, relationship, minHops, maxHops);
 
 			return this;
 		}
@@ -69,23 +66,37 @@ namespace Neo4jRestNet.CypherPlugin
 
 		#region To
 
-		public CypherMatch To(string Relationship)
+		public CypherMatch To(string relationship)
 		{
-			_sb.AppendFormat("-[:{0}]->", Relationship);
+			_sb.AppendFormat("-[:{0}]->", relationship);
+
+			return this;
+		}
+		
+		public CypherMatch To(string relationship, bool optional)
+		{
+			_sb.AppendFormat("-[{1}:{0}]->", relationship, optional ? "?" : string.Empty);
 
 			return this;
 		}
 
-		public CypherMatch To(string Name, string Relationship)
+		public CypherMatch To(string name, string relationship)
 		{
-			_sb.AppendFormat("-[{0}:{1}]->", Name, Relationship);
+			_sb.AppendFormat("-[{0}:{1}]->", name, relationship);
 
 			return this;
 		}
 
-		public CypherMatch To(string Name, string Relationship, int MinHops, int MaxHops)
+		public CypherMatch To(string name, string relationship, bool optional)
 		{
-			_sb.AppendFormat("-[{0}:{1}*{2}..{3}]->", Name, Relationship, MinHops, MaxHops);
+			_sb.AppendFormat("-[{0}{2}:{1}]->", name, relationship, optional ? "?" : string.Empty);
+
+			return this;
+		}
+
+		public CypherMatch To(string name, string relationship, int minHops, int maxHops, bool optional)
+		{
+			_sb.AppendFormat("-[{0}{4}:{1}*{2}..{3}]->", name, relationship, minHops, maxHops, optional ? "?" : string.Empty);
 
 			return this;
 		}
@@ -94,23 +105,44 @@ namespace Neo4jRestNet.CypherPlugin
 
 		#region From
 
-		public CypherMatch From(string Relationship)
+		public CypherMatch From(string relationship)
 		{
-			_sb.AppendFormat("<-[:{0}]-", Relationship);
+			_sb.AppendFormat("<-[:{0}]-", relationship);
 
 			return this;
 		}
 
-		public CypherMatch From(string Name, string Relationship)
+		public CypherMatch From(string relationship, bool optional)
 		{
-			_sb.AppendFormat("<-[{0}:{1}]-", Name, Relationship);
+			_sb.AppendFormat("<-[{1}:{0}]-", relationship, optional ? "?" : string.Empty);
 
 			return this;
 		}
 
-		public CypherMatch From(string Name, string Relationship, int MinHops, int MaxHops)
+		public CypherMatch From(string name, string relationship)
 		{
-			_sb.AppendFormat("<-[{0}:{1}*{2}..{3}]-", Name, Relationship, MinHops, MaxHops);
+			_sb.AppendFormat("<-[{0}:{1}]-", name, relationship);
+
+			return this;
+		}
+
+		public CypherMatch From(string name, string relationship, bool optional)
+		{
+			_sb.AppendFormat("<-[{0}{2}:{1}]-", name, relationship, optional ? "?" : string.Empty);
+
+			return this;
+		}
+
+		public CypherMatch From(string name, string relationship, int minHops, int maxHops)
+		{
+			_sb.AppendFormat("<-[{0}:{1}*{2}..{3}]-", name, relationship, minHops, maxHops);
+
+			return this;
+		}
+
+		public CypherMatch From(string name, string relationship, int minHops, int maxHops, bool optional)
+		{
+			_sb.AppendFormat("<-[{0}{4}:{1}*{2}..{3}]-", name, relationship, minHops, maxHops, optional ? "?" : string.Empty);
 
 			return this;
 		}
@@ -119,16 +151,16 @@ namespace Neo4jRestNet.CypherPlugin
 
 		#region Path
 
-		public CypherMatch SortestPath(string Name, string FromNodeName, string ToNodeName, int MaxHops)
+		public CypherMatch SortestPath(string name, string fromNodeName, string toNodeName, int maxHops)
 		{
-			_sb.AppendFormat("{0}=shortestPath({1}-[*..{2}]->{3))", Name, FromNodeName, ToNodeName, MaxHops);
+			_sb.AppendFormat("{0}=shortestPath({1}-[*..{2}]->{3})", name, fromNodeName, maxHops, toNodeName);
 
 			return this;
 		}
 
-		public CypherMatch Path(string Name, string FromNodeName, string ToNodeName)
+		public CypherMatch Path(string name, string fromNodeName, string toNodeName)
 		{
-			_sb.AppendFormat("{0}={1}-->{2))", Name, FromNodeName, ToNodeName);
+			_sb.AppendFormat("{0}={1}-->{2})", name, fromNodeName, toNodeName);
 
 			return this;
 		}
@@ -142,9 +174,9 @@ namespace Neo4jRestNet.CypherPlugin
 			return this;
 		}
 
-		public ICypherObject Append(string Format, params object[] args)
+		public ICypherObject Append(string format, params object[] args)
 		{
-			_sb.Append(string.Format(Format, args));
+			_sb.Append(string.Format(format, args));
 
 			return this;
 		}

@@ -1,9 +1,6 @@
-using System;
 using System.Net;
 using System.Text;
-using Neo4jRestNet.Core;
 using System.IO;
-using Newtonsoft.Json.Linq;
 
 namespace Neo4jRestNet.Rest
 {
@@ -12,7 +9,7 @@ namespace Neo4jRestNet.Rest
 		private static HttpStatusCode BaseRestRequest(string url, string method, string body)
 		{
 
-			HttpWebRequest w = (HttpWebRequest)WebRequest.Create(url);
+			var w = (HttpWebRequest)WebRequest.Create(url);
 			w.Proxy = null;
 			w.Method = method;
 			w.ContentType = "application/json";
@@ -29,15 +26,15 @@ namespace Neo4jRestNet.Rest
 			WebResponse resp = w.GetResponse();
 			resp.Close();
 
-			HttpStatusCode StatusCode = ((HttpWebResponse)resp).StatusCode;
+			HttpStatusCode statusCode = ((HttpWebResponse)resp).StatusCode;
 
-			return StatusCode;
+			return statusCode;
 		}
 
 		private static HttpStatusCode BaseRestRequest(string url, string method, string body, out string response)
         {
 
-			HttpWebRequest w = (HttpWebRequest)WebRequest.Create(url);
+			var w = (HttpWebRequest)WebRequest.Create(url);
 			w.Proxy = null;
 			w.Method = method;
 			w.ContentType = "application/json";
@@ -52,37 +49,39 @@ namespace Neo4jRestNet.Rest
 				dataStream.Close();
 			}
 
-			WebResponse resp = w.GetResponse();
+			var resp = w.GetResponse();
 
-			StreamReader reader = new StreamReader(resp.GetResponseStream());
+			var reader = new StreamReader(resp.GetResponseStream());
 
 			response = reader.ReadToEnd();
 
 			reader.Close();
 			resp.Close();
 
-			HttpStatusCode StatusCode = ((HttpWebResponse)resp).StatusCode;
+			var statusCode = ((HttpWebResponse)resp).StatusCode;
 
-			return StatusCode;
+			return statusCode;
         }
 
-        /// <summary>
-        /// Http GET Request
-        /// </summary>
-        /// <param name="url">What to get</param>
-        /// <returns>Response body from server</returns>
-		public static HttpStatusCode Get(string url, out string response)
+    	/// <summary>
+    	/// Http GET Request
+    	/// </summary>
+    	/// <param name="url">What to get</param>
+    	/// <param name="response">body</param>
+    	/// <returns>Response body from server</returns>
+    	public static HttpStatusCode Get(string url, out string response)
         {
             return BaseRestRequest(url, "GET", null, out response);
         }
 
-        /// <summary>
-        /// Http POST Request
-        /// </summary>
-        /// <param name="url">Where to post</param>
-        /// <param name="body">Data to post</param>
-        /// <returns>Response body from server</returns>
-		public static HttpStatusCode Post(string url, string body, out string response)
+    	/// <summary>
+    	/// Http POST Request
+    	/// </summary>
+    	/// <param name="url">Where to post</param>
+    	/// <param name="body">Data to post</param>
+    	/// <param name="response"></param>
+    	/// <returns>Response body from server</returns>
+    	public static HttpStatusCode Post(string url, string body, out string response)
         {
             return BaseRestRequest(url, "POST", body, out response);
         }

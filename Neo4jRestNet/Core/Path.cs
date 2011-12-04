@@ -1,8 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Net;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using Neo4jRestNet.Rest;
-using System;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 
@@ -17,10 +15,10 @@ namespace Neo4jRestNet.Core
 		public List<Relationship> Relationships { get; private set; }
 		public string OriginalPathJson { get; private set; }
 
-		private Path(JObject Path)
+		private Path(JObject path)
 		{
 			JToken startNode;
-			if (!Path.TryGetValue("start", out startNode))
+			if (!path.TryGetValue("start", out startNode))
 			{
 				throw new Exception("Invalid path json");
 			}
@@ -40,7 +38,7 @@ namespace Neo4jRestNet.Core
 			}
 
 			JToken endNode;
-			if (!Path.TryGetValue("end", out endNode))
+			if (!path.TryGetValue("end", out endNode))
 			{
 				throw new Exception("Invalid path json");
 			}
@@ -61,7 +59,7 @@ namespace Neo4jRestNet.Core
 			
 			Nodes = new List<Node>();
 			JToken nodes;
-			if (!Path.TryGetValue("nodes", out nodes) || nodes.Type != JTokenType.Array)
+			if (!path.TryGetValue("nodes", out nodes) || nodes.Type != JTokenType.Array)
 			{
 				throw new Exception("Invalid path json");
 			}
@@ -85,7 +83,7 @@ namespace Neo4jRestNet.Core
 
 			Relationships = new List<Relationship>();
 			JToken relationships;
-			if (!Path.TryGetValue("relationships", out relationships) || relationships.Type != JTokenType.Array)
+			if (!path.TryGetValue("relationships", out relationships) || relationships.Type != JTokenType.Array)
 			{
 				throw new Exception("Invalid path json");
 			}
@@ -107,26 +105,30 @@ namespace Neo4jRestNet.Core
 				}
 			}
 
-			OriginalPathJson = Path.ToString(Formatting.None);
+			OriginalPathJson = path.ToString(Formatting.None);
 		}
 
-		public static List<Path> ParseJson(string JsonPaths)
+		public static List<Path> ParseJson(string jsonPaths)
 		{
-			if (String.IsNullOrEmpty(JsonPaths))
-				return null;
-			else
+			if (String.IsNullOrEmpty(jsonPaths))
 			{
-				List<Path> Paths = new List<Path>();
-
-				JArray jsonPaths = JArray.Parse(JsonPaths);
-
-				foreach (JObject jsonPath in jsonPaths)
-				{
-					Paths.Add(new Path(jsonPath));
-				}
-
-				return Paths;
+				return null;
 			}
+			
+			var jaPaths = JArray.Parse(jsonPaths);
+			return ParseJson(jaPaths);
+		}
+
+		public static List<Path> ParseJson(JArray jsonPaths)
+		{
+			if (jsonPaths == null)
+			{
+				return null;
+			}
+
+			var jaPaths = jsonPaths;
+
+			return (from JObject joPath in jaPaths select new Path(joPath)).ToList();
 		}
 	}
 }

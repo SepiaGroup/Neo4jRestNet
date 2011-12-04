@@ -1,7 +1,3 @@
-using System.Collections.Generic;
-using Neo4jRestNet.Core;
-using Newtonsoft.Json.Linq;
-
 namespace Neo4jRestNet.Rest
 {
     public class ReturnType
@@ -11,16 +7,16 @@ namespace Neo4jRestNet.Rest
 		public static readonly ReturnType Path = new ReturnType("path");
 		public static readonly ReturnType FullPath = new ReturnType("fullpath");
 
-		private string _ReturnType;
+		private readonly string _returnType;
 
-		private ReturnType(string ReturnType)
+		private ReturnType(string returnType)
 		{
-			_ReturnType = ReturnType;
+			_returnType = returnType;
 		}
 
         public override string ToString()
         {
-			return _ReturnType;
+			return _returnType;
         }
     }
 }

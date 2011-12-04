@@ -1,32 +1,29 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Text;
 
 namespace Neo4jRestNet.CypherPlugin
 {
 	public class CypherOrderBy : ICypherObject
 	{
 
-		private StringBuilder _sb = new StringBuilder();
-		private bool _IsStringEmpty = true; // used becuase string could contain Distinct 
+		private readonly StringBuilder _sb = new StringBuilder();
+		private bool _isStringEmpty = true; // used becuase string could contain Distinct 
 
 		#region Node
 
-		public CypherOrderBy Node(string Name, string Property)
+		public CypherOrderBy Node(string name, string property)
 		{
-			_sb.AppendFormat("{0} {1}.{2}", _IsStringEmpty ? string.Empty : ",", Name, Property);
+			_sb.AppendFormat("{0} {1}.{2}", _isStringEmpty ? string.Empty : ",", name, property);
 
-			_IsStringEmpty = false;
+			_isStringEmpty = false;
 
 			return this;
 		}
 
-		public CypherOrderBy Node(string Name, string Property, bool Decending)
+		public CypherOrderBy Node(string name, string property, bool decending)
 		{
-			_sb.AppendFormat("{0} {1}.{2} {3}", _IsStringEmpty ? string.Empty : ",", Name, Property, Decending ? "DESC" : string.Empty);
+			_sb.AppendFormat("{0} {1}.{2} {3}", _isStringEmpty ? string.Empty : ",", name, property, decending ? "DESC" : string.Empty);
 
-			_IsStringEmpty = false;
+			_isStringEmpty = false;
 
 			return this;
 		}
@@ -35,20 +32,20 @@ namespace Neo4jRestNet.CypherPlugin
 
 		#region CypherRelationship
 
-		public CypherOrderBy Relationship(string Name, string Property)
+		public CypherOrderBy Relationship(string name, string property)
 		{
-			_sb.AppendFormat("{0} {1}.{2}", _IsStringEmpty ? string.Empty : ",", Name, Property);
+			_sb.AppendFormat("{0} {1}.{2}", _isStringEmpty ? string.Empty : ",", name, property);
 
-			_IsStringEmpty = false;
+			_isStringEmpty = false;
 
 			return this;
 		}
 
-		public CypherOrderBy Relationship(string Name, string Property, bool Decending)
+		public CypherOrderBy Relationship(string name, string property, bool decending)
 		{
-			_sb.AppendFormat("{0} {1}.{2} {3}", _IsStringEmpty ? string.Empty : ",", Name, Property, Decending ? "DESC" : string.Empty);
+			_sb.AppendFormat("{0} {1}.{2} {3}", _isStringEmpty ? string.Empty : ",", name, property, decending ? "DESC" : string.Empty);
 
-			_IsStringEmpty = false;
+			_isStringEmpty = false;
 
 			return this;
 		}
@@ -62,9 +59,9 @@ namespace Neo4jRestNet.CypherPlugin
 			return this;
 		}
 
-		public ICypherObject Append(string Format, params object[] args)
+		public ICypherObject Append(string format, params object[] args)
 		{
-			_sb.Append(string.Format(Format, args));
+			_sb.Append(string.Format(format, args));
 
 			return this;
 		}

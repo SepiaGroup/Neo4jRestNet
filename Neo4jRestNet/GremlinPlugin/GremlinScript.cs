@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Text;
 using Neo4jRestNet.Core;
 
 namespace Neo4jRestNet.GremlinPlugin
@@ -53,9 +50,9 @@ namespace Neo4jRestNet.GremlinPlugin
 			return this; 
 		}
 
-		public GremlinScript Append(string Format, params object[] args)
+		public GremlinScript Append(string format, params object[] args)
 		{
-			_sb.Append(string.Format(Format, args));
+			_sb.Append(string.Format(format, args));
 
 			return this;
 		}

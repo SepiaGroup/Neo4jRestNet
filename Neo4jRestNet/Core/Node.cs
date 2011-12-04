@@ -16,7 +16,7 @@ namespace Neo4jRestNet.Core
 			NodeType
 		}
 
-		private static readonly string _defaultDbUrl = ConfigurationManager.ConnectionStrings["neo4j"].ConnectionString.TrimEnd('/');
+		private static readonly string DefaultDbUrl = ConfigurationManager.ConnectionStrings["neo4j"].ConnectionString.TrimEnd('/');
 
 		private string _dbUrl;
         private string _self;
@@ -32,7 +32,7 @@ namespace Neo4jRestNet.Core
 
 		public static Node GetRootNode()
 		{
-			return GetRootNode(_defaultDbUrl);
+			return GetRootNode(DefaultDbUrl);
 		}
 
 		public static Node GetRootNode(string dbUrl)
@@ -71,7 +71,7 @@ namespace Neo4jRestNet.Core
 
 		public static Node GetNode(EncryptId nodeId)
 		{
-			return GetNode(_defaultDbUrl, nodeId);
+			return GetNode(DefaultDbUrl, nodeId);
 		}
 
 		public static Node GetNode(string dbUrl, EncryptId nodeId)
@@ -88,7 +88,7 @@ namespace Neo4jRestNet.Core
 
 		public static IEnumerable<Node> GetNode(string indexName, string key, object value)
 		{
-			return GetNode(_defaultDbUrl, indexName, key, value);
+			return GetNode(DefaultDbUrl, indexName, key, value);
 		}
 
 		public static IEnumerable<Node> GetNode(string dbUrl, string indexName, string key, object value)
@@ -105,7 +105,7 @@ namespace Neo4jRestNet.Core
 
 		public static IEnumerable<Node> GetNode(string indexName, string searchQuery)
 		{
-			return GetNode(_defaultDbUrl, indexName, searchQuery);
+			return GetNode(DefaultDbUrl, indexName, searchQuery);
 		}
 
 		public static IEnumerable<Node> GetNode(string dbUrl, string indexName, string searchQuery)
@@ -128,7 +128,7 @@ namespace Neo4jRestNet.Core
 		{
 			var properties = new Properties();
 			properties.SetProperty(NodeProperty.NodeType.ToString(), nodeType);
-			return CreateNodeFromJson(_defaultDbUrl, properties.ToString());
+			return CreateNodeFromJson(DefaultDbUrl, properties.ToString());
 		}
 
 		public static Node CreateNode(string dbUrl, string nodeType)
@@ -141,7 +141,7 @@ namespace Neo4jRestNet.Core
 		public static Node CreateNode(string nodeType, Properties properties)
 		{
 			properties.SetProperty(NodeProperty.NodeType.ToString(), nodeType);
-			return CreateNodeFromJson(_defaultDbUrl, properties.ToString());
+			return CreateNodeFromJson(DefaultDbUrl, properties.ToString());
 		}
 
 		public static Node CreateNode(string dbUrl, string nodeType, Properties properties)
@@ -153,7 +153,7 @@ namespace Neo4jRestNet.Core
 		public static Node CreateNode(string nodeType, IDictionary<string, object> properties)
 		{
 			properties.Add(NodeProperty.NodeType.ToString(), nodeType);
-			return CreateNodeFromJson(_defaultDbUrl, JObject.FromObject(properties).ToString(Formatting.None));
+			return CreateNodeFromJson(DefaultDbUrl, JObject.FromObject(properties).ToString(Formatting.None));
 		}
 
 		public static Node CreateNode(string dbUrl, string nodeType, IDictionary<string, object> properties)
@@ -242,7 +242,7 @@ namespace Neo4jRestNet.Core
 		public static bool IsSelfANode(string self)
 		{
 			var selfArray = self.Split('/');
-			return (selfArray.Length > 2 && selfArray[selfArray.Length - 2] == "node") ? true : false;
+			return (selfArray.Length > 2 && selfArray[selfArray.Length - 2] == "node");
 		}
 
 		#endregion
@@ -346,14 +346,12 @@ namespace Neo4jRestNet.Core
 
 		public IEnumerable<Relationship> GetRelationships()
 		{
-			IEnumerable<string> names = null;
-			return GetRelationships(RelationshipDirection.All, names);
+			return GetRelationships(RelationshipDirection.All, (IEnumerable<string>)null);
 		}
 
 		public IEnumerable<Relationship> GetRelationships(RelationshipDirection direction)
 		{
-			IEnumerable<string> names = null;
-			return GetRelationships(direction, names);
+			return GetRelationships(direction, (IEnumerable<string>)null);
 		}
 
 		public IEnumerable<Relationship> GetRelationships(RelationshipDirection direction, Relationship relationshipType)
@@ -447,7 +445,7 @@ namespace Neo4jRestNet.Core
 
 		public static Node AddToIndex(long nodeId, string indexName, string key, object value)
 		{
-			return AddToIndex(_defaultDbUrl, nodeId, indexName, key, value);
+			return AddToIndex(DefaultDbUrl, nodeId, indexName, key, value);
 		}
 
 		public static Node AddToIndex(string dbUrl, long nodeId, string indexName, string key, object value)
@@ -464,7 +462,7 @@ namespace Neo4jRestNet.Core
 
         public static HttpStatusCode RemoveFromIndex(long nodeId, string indexName)
 		{
-			return RemoveFromIndex(_defaultDbUrl, nodeId, indexName);
+			return RemoveFromIndex(DefaultDbUrl, nodeId, indexName);
 		}
 
         public static HttpStatusCode RemoveFromIndex(string dbUrl, long nodeId, string indexName)
@@ -480,7 +478,7 @@ namespace Neo4jRestNet.Core
 
         public static HttpStatusCode RemoveFromIndex(long nodeId, string indexName, string key)
 		{
-			return RemoveFromIndex(_defaultDbUrl, nodeId, indexName, key);
+			return RemoveFromIndex(DefaultDbUrl, nodeId, indexName, key);
 		}
 
         public static HttpStatusCode RemoveFromIndex(string dbUrl, long nodeId, string indexName, string key)
@@ -496,7 +494,7 @@ namespace Neo4jRestNet.Core
 
         public static HttpStatusCode RemoveFromIndex(long nodeId, string indexName, string key, object value)
 		{
-			return RemoveFromIndex(_defaultDbUrl, nodeId, indexName, key, value);
+			return RemoveFromIndex(DefaultDbUrl, nodeId, indexName, key, value);
 		}
 
         public static HttpStatusCode RemoveFromIndex(string dbUrl, long nodeId, string indexName, string key, object value)

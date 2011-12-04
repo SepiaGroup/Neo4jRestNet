@@ -1,7 +1,3 @@
-using System.Collections.Generic;
-using Neo4jRestNet.Core;
-using Newtonsoft.Json.Linq;
-
 namespace Neo4jRestNet.Rest
 {
     public class PathAlgorithm
@@ -11,16 +7,16 @@ namespace Neo4jRestNet.Rest
 		public static readonly PathAlgorithm AllSimplePaths = new PathAlgorithm("allSimplePaths ");
 		public static readonly PathAlgorithm Dijkstra = new PathAlgorithm("dijkstra");
 
-		private string _PathAlgorithm;
+		private readonly string _pathAlgorithm;
 
-		private PathAlgorithm(string PathAlgorithm)
+		private PathAlgorithm(string pathAlgorithm)
 		{
-			_PathAlgorithm = PathAlgorithm;
+			_pathAlgorithm = pathAlgorithm;
 		}
 
         public override string ToString()
         {
-			return _PathAlgorithm;
+			return _pathAlgorithm;
         }
     }
 }

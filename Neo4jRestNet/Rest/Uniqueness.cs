@@ -12,16 +12,16 @@ namespace Neo4jRestNet.Rest
 		public static readonly Uniqueness NodeRecent = new Uniqueness("node_recent");
 		public static readonly Uniqueness RelationshipRecent = new Uniqueness("relationship_recent");
 
-		private string _Uniqueness;
+		private readonly string _uniqueness;
 
-		private Uniqueness(string Uniqueness)
+		private Uniqueness(string uniqueness)
 		{
-			_Uniqueness = Uniqueness;
+			_uniqueness = uniqueness;
 		}
 
         public JProperty ToJson()
         {
-			return new JProperty("uniqueness", _Uniqueness);
+			return new JProperty("uniqueness", _uniqueness);
         }
     }
 }

@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Security.Cryptography;
 using System.IO;
 using System.Configuration;
@@ -15,12 +12,12 @@ namespace Neo4jRestNet.Core
 
 		private static class Encryption
 		{
-			private static readonly byte[] SecretKey = System.Text.Encoding.ASCII.GetBytes(ConfigurationManager.AppSettings["EncryptIdKey"].ToString());
-			private static readonly byte[] SecretIV = System.Text.Encoding.ASCII.GetBytes(ConfigurationManager.AppSettings["EncryptIdIV"].ToString()); 
+			private static readonly byte[] SecretKey = Encoding.ASCII.GetBytes(ConfigurationManager.AppSettings["EncryptIdKey"]);
+			private static readonly byte[] SecretIV = Encoding.ASCII.GetBytes(ConfigurationManager.AppSettings["EncryptIdIV"]); 
 
 
 			//Creates a symmetric RijndaelCipher encryptor object. 
-			private static RijndaelManaged esp = new RijndaelManaged();
+			private static readonly RijndaelManaged Esp = new RijndaelManaged();
 
 			//Creates a symmetric DES encryptor object.
 			//DESCryptoServiceProvider esp = new DESCryptoServiceProvider();
@@ -34,89 +31,89 @@ namespace Neo4jRestNet.Core
 			//private static ICryptoTransform Encryptor = esp.CreateEncryptor(SecretKey, SecretIV);
 			//private static ICryptoTransform Decryptor = esp.CreateDecryptor(SecretKey, SecretIV);
 
-			public static string Decrypt(string TextToBeDecrypted)
+			public static string Decrypt(string textToBeDecrypted)
 			{
-				esp.Padding = PaddingMode.Zeros;
-				ICryptoTransform Decryptor = esp.CreateDecryptor(SecretKey, SecretIV);
+				Esp.Padding = PaddingMode.Zeros;
+				ICryptoTransform decryptor = Esp.CreateDecryptor(SecretKey, SecretIV);
 
-				byte[] EncryptedData = Convert.FromBase64String(TextToBeDecrypted.Replace('-', '/').Replace('_', '+')); // replace reserved HTTP charactors
-				MemoryStream memoryStream = new MemoryStream(EncryptedData);
+				byte[] encryptedData = Convert.FromBase64String(textToBeDecrypted.Replace('-', '/').Replace('_', '+')); // replace reserved HTTP charactors
+				var memoryStream = new MemoryStream(encryptedData);
 
 				//Defines the cryptographics stream for decryption.THe stream contains decrpted data
-				CryptoStream cryptoStream = new CryptoStream(memoryStream, Decryptor, CryptoStreamMode.Read);
+				var cryptoStream = new CryptoStream(memoryStream, decryptor, CryptoStreamMode.Read);
 
-				byte[] PlainText = new byte[EncryptedData.Length];
-				int DecryptedCount = cryptoStream.Read(PlainText, 0, PlainText.Length);
+				var plainText = new byte[encryptedData.Length];
+				int decryptedCount = cryptoStream.Read(plainText, 0, plainText.Length);
 
 				memoryStream.Close();
 				cryptoStream.Close();
 
 				//Converting to string
-				return Encoding.Unicode.GetString(PlainText, 0, DecryptedCount);
+				return Encoding.Unicode.GetString(plainText, 0, decryptedCount);
 			}
 
-			public static string Encrypt(string TextToBeEncrypted)
+			public static string Encrypt(string textToBeEncrypted)
 			{
-				esp.Padding = PaddingMode.Zeros;
-				ICryptoTransform Encryptor = esp.CreateEncryptor(SecretKey, SecretIV);
+				Esp.Padding = PaddingMode.Zeros;
+				ICryptoTransform encryptor = Esp.CreateEncryptor(SecretKey, SecretIV);
 
-				byte[] PlainText = System.Text.Encoding.Unicode.GetBytes(TextToBeEncrypted);
-				MemoryStream memoryStream = new MemoryStream();
+				var plainText = Encoding.Unicode.GetBytes(textToBeEncrypted);
+				var memoryStream = new MemoryStream();
 
 				//Defines a stream that links data streams to cryptographic transformations
-				CryptoStream cryptoStream = new CryptoStream(memoryStream, Encryptor, CryptoStreamMode.Write);
-				cryptoStream.Write(PlainText, 0, PlainText.Length);
+				var cryptoStream = new CryptoStream(memoryStream, encryptor, CryptoStreamMode.Write);
+				cryptoStream.Write(plainText, 0, plainText.Length);
 
 				//Writes the final state and clears the buffer
 				cryptoStream.FlushFinalBlock();
-				byte[] CipherBytes = memoryStream.ToArray();
+				byte[] cipherBytes = memoryStream.ToArray();
 
 				memoryStream.Close();
 				cryptoStream.Close();
 
-				return Convert.ToBase64String(CipherBytes).Replace('/', '-').Replace('+', '_');  // replace reserved HTTP charactors	
+				return Convert.ToBase64String(cipherBytes).Replace('/', '-').Replace('+', '_');  // replace reserved HTTP charactors	
 			}
 		}
 		#endregion
 
-		long? _id = null;
+		long? _id;
 
-		public static readonly EncryptId Null = new EncryptId((long?)null, true);
+		public static readonly EncryptId Null = new EncryptId(null, true);
 
 		private EncryptId(long? id, bool init)
 		{
-			this._id = id;
+			_id = id;
 		}
 
 		public EncryptId(long id)
 		{
-			this._id = id;
+			_id = id;
 		}
 
 		public EncryptId(string encryptedId)
 		{
 			if (encryptedId == null || encryptedId.Trim() == string.Empty)
-				this._id = null;
+				_id = null;
 			else
-				this._id = long.Parse(Encryption.Decrypt(encryptedId));
+				_id = long.Parse(Encryption.Decrypt(encryptedId));
 		}
 
-		public static bool TryParse(string InEncryptedId, out EncryptId OutEncryptedId)
+		public static bool TryParse(string inEncryptedId, out EncryptId outEncryptedId)
 		{
-			if (string.IsNullOrWhiteSpace(InEncryptedId)) 
+			if (string.IsNullOrWhiteSpace(inEncryptedId)) 
 			{
-				OutEncryptedId = null;
+				outEncryptedId = null;
 				return false;
 			}
 
 			try
 			{
-				OutEncryptedId = InEncryptedId;
+				outEncryptedId = inEncryptedId;
 				return true;
 			}
 			catch
 			{
-				OutEncryptedId = null;
+				outEncryptedId = null;
 				return false;
 			}
 		}
@@ -149,10 +146,7 @@ namespace Neo4jRestNet.Core
 
 		public override string ToString()
 		{
-			if (_id == null)
-				return null;
-
-			return Encryption.Encrypt(_id.ToString());
+			return _id == null ? string.Empty : Encryption.Encrypt(_id.ToString());
 		}
 
 		#region IEquatable<EncryptId> Members
@@ -161,13 +155,17 @@ namespace Neo4jRestNet.Core
 		{
 			if (ReferenceEquals(other, null))
 				return false;
-			else if (ReferenceEquals(this, other))
+			
+			if (ReferenceEquals(this, other))
 				return true;
-			else if (this._id == null && other._id == null)
+			
+			if (_id == null && other._id == null)
 				return true;
-			else if (this._id == null || other._id == null)
+			
+			if (_id == null || other._id == null)
 				return false;
-			else if (this._id.Value == other._id.Value)
+			
+			if (_id.Value == other._id.Value)
 				return true;
 
 			return false;
@@ -178,14 +176,16 @@ namespace Neo4jRestNet.Core
 			if (obj == null) return base.Equals(obj);
 
 			if (!(obj is EncryptId))
+			{
 				throw new InvalidCastException("The 'obj' argument is not a EncryptId object.");
-			else
-				return Equals(obj as EncryptId);
+			}
+
+			return Equals(obj as EncryptId);
 		}
 
 		public override int GetHashCode()
 		{
-			return this._id.GetHashCode();
+			return _id.GetHashCode();
 		}
 
 		public static bool operator ==(EncryptId id1, EncryptId id2)
@@ -193,7 +193,7 @@ namespace Neo4jRestNet.Core
 			if (ReferenceEquals(id1, null) && ReferenceEquals(id2, null))
 				return true;
 
-			return ReferenceEquals(id1, null) ? false : id1.Equals(id2);
+			return !ReferenceEquals(id1, null) && id1.Equals(id2);
 		}
 
 		public static bool operator !=(EncryptId id1, EncryptId id2)
@@ -201,7 +201,7 @@ namespace Neo4jRestNet.Core
 			if (ReferenceEquals(id1, null) && ReferenceEquals(id2, null))
 				return false;
 
-			return !(ReferenceEquals(id1, null) ? false : id1.Equals(id2));
+			return !(!ReferenceEquals(id1, null) && id1.Equals(id2));
 		}
 
 		#endregion

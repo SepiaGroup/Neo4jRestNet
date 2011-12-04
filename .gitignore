@@ -27,3 +27,4 @@ obj/
 *.scc
 *.ilk
 *.ncb
+_ReSharper*

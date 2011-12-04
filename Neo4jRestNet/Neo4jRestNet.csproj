@@ -87,7 +87,6 @@
     <Compile Include="Core\IGraphObject.cs" />
     <Compile Include="Core\RelationshipDirection.cs" />
     <Compile Include="CypherPlugin\CypherOrderBy.cs" />
-    <Compile Include="CypherPlugin\CypherQuery.cs" />
     <Compile Include="CypherPlugin\CypherWhere.cs" />
     <Compile Include="CypherPlugin\CypherReturn.cs" />
     <Compile Include="CypherPlugin\CypherMatch.cs" />

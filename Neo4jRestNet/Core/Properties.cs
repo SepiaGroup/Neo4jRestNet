@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Linq;
 using System.Collections;
-using System.Collections.ObjectModel;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 
@@ -11,7 +9,7 @@ namespace Neo4jRestNet.Core
 {
 	public class Properties
 	{
-		private IDictionary<string, object> _properties;
+		private readonly IDictionary<string, object> _properties;
 
 		public Properties()
 		{
@@ -36,10 +34,8 @@ namespace Neo4jRestNet.Core
 
 				return (T)Convert.ChangeType(o, u);
 			}
-			else
-			{
-				return (T)Convert.ChangeType(o, t);
-			}
+			
+			return (T)Convert.ChangeType(o, t);
 		}
 
 		public T GetProperty<T>(string key)
@@ -72,23 +68,28 @@ namespace Neo4jRestNet.Core
 			{
 				return string.Empty;
 			}
-			else if (typeof(T) == typeof(int))
+			
+			if (typeof(T) == typeof(int))
 			{
 				return 0;
 			}
-			else if (typeof(T) == typeof(long))
+			
+			if (typeof(T) == typeof(long))
 			{
 				return 0L;
 			}
-			else if (typeof(T) == typeof(float))
+			
+			if (typeof(T) == typeof(float))
 			{
 				return 0F;
 			}
-			else if (typeof(T) == typeof(decimal))
+			
+			if (typeof(T) == typeof(decimal))
 			{
 				return 0D;
 			}
-			else if (typeof(T) == typeof(bool))
+			
+			if (typeof(T) == typeof(bool))
 			{
 				return false;
 			}
@@ -106,7 +107,7 @@ namespace Neo4jRestNet.Core
 			return (T)DefaultTypeValue<T>();
 		}
 
-		public T GetPropertyOrOther<T>(string key, T OtherValue)
+		public T GetPropertyOrOther<T>(string key, T otherValue)
 		{
 
 			if (_properties.Keys.Contains(key))
@@ -114,7 +115,7 @@ namespace Neo4jRestNet.Core
 				return Unbox<T>(_properties[key]);
 			}
 
-			return OtherValue;
+			return otherValue;
 		}
 
 		public IEnumerable<string> GetPropertyKeys()
@@ -147,30 +148,30 @@ namespace Neo4jRestNet.Core
 			_properties[key] = value;
 		}
 
-		public static Properties ParseJson(string JsonProperties)
+		public static Properties ParseJson(string jsonProperties)
 		{
-			if (String.IsNullOrEmpty(JsonProperties))
-				return null;
-			else
+			if (String.IsNullOrEmpty(jsonProperties))
 			{
-				Dictionary<string, object> properties = new Dictionary<string, object>(StringComparer.CurrentCultureIgnoreCase);
-
-				JObject jsonProperties = JObject.Parse(JsonProperties);
-
-				foreach (KeyValuePair<string, JToken> kvpProperty in jsonProperties)
-				{
-					properties.Add(kvpProperty.Key, ParseToken(kvpProperty.Value));
-				}
-
-				return new Properties(properties);
+				return null;
 			}
+
+			var properties = new Dictionary<string, object>(StringComparer.CurrentCultureIgnoreCase);
+
+			JObject joProperties = JObject.Parse(jsonProperties);
+
+			foreach (var kvpProperty in joProperties)
+			{
+				properties.Add(kvpProperty.Key, ParseToken(kvpProperty.Value));
+			}
+
+			return new Properties(properties);
 		}
 
 		public override string ToString()
 		{
-			JObject jo = new JObject();
+			var jo = new JObject();
 
-			foreach (var kvp in this._properties.Where(kvp => kvp.Value != null))
+			foreach (var kvp in _properties.Where(kvp => kvp.Value != null))
 			{
 				jo.Add(kvp.Key, JToken.FromObject(kvp.Value));
 			}

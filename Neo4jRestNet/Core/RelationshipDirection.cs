@@ -1,7 +1,3 @@
-using System.Collections.Generic;
-using Neo4jRestNet.Core;
-using Newtonsoft.Json.Linq;
-
 namespace Neo4jRestNet.Core
 {
     public class RelationshipDirection
@@ -10,16 +6,16 @@ namespace Neo4jRestNet.Core
 		public static readonly RelationshipDirection Out = new RelationshipDirection("out");
 		public static readonly RelationshipDirection All = new RelationshipDirection("all");
 
-		private string _Direction;
+		private readonly string _direction;
 
-		private RelationshipDirection(string Direction)
+		private RelationshipDirection(string direction)
 		{
-			_Direction = Direction;
+			_direction = direction;
 		}
 
 		public override string ToString()
 		{
-			return _Direction;
+			return _direction;
 		}
     }
 }

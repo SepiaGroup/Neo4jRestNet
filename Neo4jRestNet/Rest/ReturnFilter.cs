@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using Neo4jRestNet.Core;
 using Newtonsoft.Json.Linq;
 
 namespace Neo4jRestNet.Rest
@@ -14,27 +12,27 @@ namespace Neo4jRestNet.Rest
 			Javascript = 0
 		}
 
-		private string _Language;
-		private string _Name;
-		private string _Body;
+		private readonly string _language;
+		private readonly string _name;
+		private readonly string _body;
 
 		private ReturnFilter(string builtin)
 		{
-			_Language = "builtin";
-			_Name = builtin;
-			_Body = null;
+			_language = "builtin";
+			_name = builtin;
+			_body = null;
 		}
 
-		public ReturnFilter(Language Language, string Script)
+		public ReturnFilter(Language language, string script)
 		{
-			_Language = GetLanguageName(Language);
-			_Name = null;
-			_Body = Script;
+			_language = GetLanguageName(language);
+			_name = null;
+			_body = script;
 		}
 
-		private string GetLanguageName(Language Language)
+		private string GetLanguageName(Language language)
 		{
-			switch (Language)
+			switch (language)
 			{
 				case Language.Javascript: return "javascript";
 				default: return "javascript";
@@ -43,13 +41,12 @@ namespace Neo4jRestNet.Rest
 
         public JProperty ToJson()
         {
-			JObject jo = new JObject();
-			jo.Add("language", _Language);
+			var jo = new JObject {{"language", _language}};
 
-			if (_Name != null)
-				jo.Add("name", _Name);
+        	if (_name != null)
+				jo.Add("name", _name);
 			else
-				jo.Add("body", _Body);
+				jo.Add("body", _body);
 
 			return new JProperty("return_filter", jo);
         }
