@@ -50,6 +50,13 @@ namespace Neo4jRestNet.GremlinPlugin
 			return query.Append(".in()");
 		}
 
+		public static GremlinScript In(this GremlinScript query, params Enum[] relationshipName)
+		{
+			var names = relationshipName.Select(r => r.ToString()).ToArray();
+
+			return In(query, names);
+		}
+
 		public static GremlinScript In(this GremlinScript query, params string[] relationshipName)
 		{
 			var relationships = string.Join(",", relationshipName.Select(r => string.Concat("'", r, "'")));
@@ -63,6 +70,13 @@ namespace Neo4jRestNet.GremlinPlugin
 		public static GremlinScript InE(this GremlinScript query)
 		{
 			return query.Append(".inE()");
+		}
+
+		public static GremlinScript InE(this GremlinScript query, params Enum[] relationshipName)
+		{
+			var names = relationshipName.Select(r => r.ToString()).ToArray();
+
+			return InE(query, names);
 		}
 
 		public static GremlinScript InE(this GremlinScript query, params string[] relationshipName)
@@ -80,6 +94,13 @@ namespace Neo4jRestNet.GremlinPlugin
 			return query.Append(".inV()");
 		}
 
+		public static GremlinScript InV(this GremlinScript query, params Enum[] relationshipName)
+		{
+			var names = relationshipName.Select(r => r.ToString()).ToArray();
+
+			return InV(query, names);
+		}
+
 		public static GremlinScript InV(this GremlinScript query, params string[] relationshipName)
 		{
 			var relationships = string.Join(",", relationshipName.Select(r => string.Concat("'", r, "'")));
@@ -93,6 +114,13 @@ namespace Neo4jRestNet.GremlinPlugin
 		public static GremlinScript Out(this GremlinScript query)
 		{
 			return query.Append(".out()");
+		}
+
+		public static GremlinScript Out(this GremlinScript query, params Enum[] relationshipName)
+		{
+			var names = relationshipName.Select(r => r.ToString()).ToArray();
+
+			return Out(query, names);
 		}
 
 		public static GremlinScript Out(this GremlinScript query, params string[] relationshipName)
@@ -110,6 +138,13 @@ namespace Neo4jRestNet.GremlinPlugin
 			return query.Append(".outE()");
 		}
 
+		public static GremlinScript OutE(this GremlinScript query, params Enum[] relationshipName)
+		{
+			var names = relationshipName.Select(r => r.ToString()).ToArray();
+
+			return OutE(query, names);
+		}
+
 		public static GremlinScript OutE(this GremlinScript query, params string[] relationshipName)
 		{
 			var relationships = string.Join(",", relationshipName.Select(r => string.Concat("'", r, "'")));
@@ -123,6 +158,13 @@ namespace Neo4jRestNet.GremlinPlugin
 		public static GremlinScript OutV(this GremlinScript query)
 		{
 			return query.Append(".outV()");
+		}
+
+		public static GremlinScript OutV(this GremlinScript query, params Enum[] relationshipName)
+		{
+			var names = relationshipName.Select(r => r.ToString()).ToArray();
+
+			return OutV(query, names);
 		}
 
 		public static GremlinScript OutV(this GremlinScript query, params string[] relationshipName)
@@ -154,6 +196,13 @@ namespace Neo4jRestNet.GremlinPlugin
 			return query.Append(".bothE()");
 		}
 
+		public static GremlinScript BothE(this GremlinScript query, params Enum[] relationshipName)
+		{
+			var names = relationshipName.Select(r => r.ToString()).ToArray();
+
+			return BothE(query, names);
+		}
+
 		public static GremlinScript BothE(this GremlinScript query, params string[] relationshipName)
 		{
 			var relationships = string.Join(",", relationshipName.Select(r => string.Concat("'", r, "'")));
@@ -169,9 +218,16 @@ namespace Neo4jRestNet.GremlinPlugin
 			return query.Append(".bothV()");
 		}
 
+		public static GremlinScript BothV(this GremlinScript query, params Enum[] relationshipName)
+		{
+			var names = relationshipName.Select(r => r.ToString()).ToArray();
+
+			return BothV(query, names);
+		}
+
 		public static GremlinScript BothV(this GremlinScript query, params string[] relationshipName)
 		{
-			string relationships = string.Join(",", relationshipName.Select(r => string.Concat("'", r, "'")));
+			var relationships = string.Join(",", relationshipName.Select(r => string.Concat("'", r, "'")));
 			return query.Append(string.Format(".bothV({0})", relationships));
 		}
 
@@ -268,6 +324,28 @@ namespace Neo4jRestNet.GremlinPlugin
 		public static GremlinScript Retain(this GremlinScript query, string variable)
 		{
 			return query.Append(string.Format(".retain({0})", variable));
+		}
+
+		public static GremlinScript NodeIndexLookup(this GremlinScript query, IEnumerable<KeyValuePair<Enum, object>> propertyKeyValue)
+		{
+			var sb = new StringBuilder();
+			foreach (var kvp in propertyKeyValue)
+			{
+				if (kvp.Value is string)
+				{
+					sb.AppendFormat("{0}'{1}':'{2}'", sb.Length > 0 ? "," : "", kvp.Key, kvp.Value);
+				}
+				else if (kvp.Value is bool)
+				{
+					sb.AppendFormat("{0}'{1}':{2}", sb.Length > 0 ? "," : "", kvp.Key, (bool)kvp.Value ? "true" : "false");
+				}
+				else
+				{
+					sb.AppendFormat("{0}'{1}':{2}", sb.Length > 0 ? "," : "", kvp.Key, kvp.Value);
+				}
+			}
+
+			return query.Append("g.V[[{0}]]", sb.ToString());
 		}
 
 		public static GremlinScript NodeIndexLookup(this GremlinScript query, IEnumerable<KeyValuePair<string, object>> propertyKeyValue)

@@ -50,6 +50,11 @@ namespace Neo4jRestNet.Core
 			return Unbox<T>(property);
 		}
 
+		public T GetProperty<T>(Enum key)
+		{
+			return GetProperty<T>(key.ToString());
+		}
+
 		public object GetProperty(string key)
 		{
 			if (!_properties.Keys.Contains(key)) throw new Exception(string.Format("Failed to retrieve property {0}", key));
@@ -60,6 +65,11 @@ namespace Neo4jRestNet.Core
 				// return (T)property;
 			}
 			return property;
+		}
+		
+		public object GetProperty(Enum key)
+		{
+			return GetProperty(key.ToString());
 		}
 
 		private object DefaultTypeValue<T>()
@@ -107,15 +117,19 @@ namespace Neo4jRestNet.Core
 			return (T)DefaultTypeValue<T>();
 		}
 
+		public T GetPropertyOrDefault<T>(Enum key)
+		{
+			return GetPropertyOrDefault<T>(key.ToString());
+		}
+
 		public T GetPropertyOrOther<T>(string key, T otherValue)
 		{
-
-			if (_properties.Keys.Contains(key))
-			{
-				return Unbox<T>(_properties[key]);
-			}
-
-			return otherValue;
+			return _properties.Keys.Contains(key) ? Unbox<T>(_properties[key]) : otherValue;
+		}
+		
+		public T GetPropertyOrOther<T>(Enum key, T otherValue)
+		{
+			return GetPropertyOrOther(key.ToString(), otherValue);
 		}
 
 		public IEnumerable<string> GetPropertyKeys()
@@ -128,6 +142,11 @@ namespace Neo4jRestNet.Core
 			return _properties.Keys.Contains(key);
 		}
 
+		public bool HasProperty(Enum key)
+		{
+			return HasProperty(key.ToString());
+		}
+
 		public object RemoveProperty(string key)
 		{
 			// Return old value
@@ -137,15 +156,20 @@ namespace Neo4jRestNet.Core
 
 			return oldValue;
 		}
-		/*
-				public void SetProperty<T>(PropertyBase key, T value)
-				{
-					_properties[key] = value;
-				}
-		*/
+
+		public object RemoveProperty(Enum key)
+		{
+			return RemoveProperty(key.ToString());
+		}
+
 		public void SetProperty<T>(string key, T value)
 		{
 			_properties[key] = value;
+		}
+		
+		public void SetProperty<T>(Enum key, T value)
+		{
+			SetProperty(key.ToString(),value);
 		}
 
 		public static Properties ParseJson(string jsonProperties)

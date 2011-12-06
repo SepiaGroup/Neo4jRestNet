@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 
 namespace Neo4jRestNet.CypherPlugin
 {
@@ -20,7 +21,7 @@ namespace Neo4jRestNet.CypherPlugin
 
 			return this;
 		}
-
+		
 		#endregion
 
 		#region Relationship
@@ -48,6 +49,11 @@ namespace Neo4jRestNet.CypherPlugin
 			return this;
 		}
 
+		public CypherMatch Any(Enum name)
+		{
+			return Any(name.ToString());
+		}
+
 		public CypherMatch Any(string name, string relationship)
 		{
 			_sb.AppendFormat("-[{0}:{1}]-", name, relationship);
@@ -55,11 +61,21 @@ namespace Neo4jRestNet.CypherPlugin
 			return this;
 		}
 
+		public CypherMatch Any(string name, Enum relationship)
+		{
+			return Any(name, relationship.ToString());
+		}
+
 		public CypherMatch Any(string name, string relationship, int minHops, int maxHops)
 		{
 			_sb.AppendFormat("-[{0}:{1}*{2}..{3}]-", name, relationship, minHops, maxHops);
 
 			return this;
+		}
+		
+		public CypherMatch Any(string name, Enum relationship, int minHops, int maxHops)
+		{
+			return Any(name, relationship.ToString(), minHops, maxHops);
 		}
 
 		#endregion
@@ -72,12 +88,22 @@ namespace Neo4jRestNet.CypherPlugin
 
 			return this;
 		}
-		
+
+		public CypherMatch To(Enum relationship)
+		{
+			return To(relationship.ToString());
+		}
+
 		public CypherMatch To(string relationship, bool optional)
 		{
 			_sb.AppendFormat("-[{1}:{0}]->", relationship, optional ? "?" : string.Empty);
 
 			return this;
+		}
+		
+		public CypherMatch To(Enum relationship, bool optional)
+		{
+			return To(relationship.ToString(), optional);
 		}
 
 		public CypherMatch To(string name, string relationship)
@@ -85,6 +111,11 @@ namespace Neo4jRestNet.CypherPlugin
 			_sb.AppendFormat("-[{0}:{1}]->", name, relationship);
 
 			return this;
+		}
+		
+		public CypherMatch To(string name, Enum relationship)
+		{
+			return To(name, relationship.ToString());
 		}
 
 		public CypherMatch To(string name, string relationship, bool optional)
@@ -94,11 +125,21 @@ namespace Neo4jRestNet.CypherPlugin
 			return this;
 		}
 
+		public CypherMatch To(string name, Enum relationship, bool optional)
+		{
+			return To(name, relationship.ToString(), optional);
+		}
+
 		public CypherMatch To(string name, string relationship, int minHops, int maxHops, bool optional)
 		{
 			_sb.AppendFormat("-[{0}{4}:{1}*{2}..{3}]->", name, relationship, minHops, maxHops, optional ? "?" : string.Empty);
 
 			return this;
+		}
+
+		public CypherMatch To(string name, Enum relationship, int minHops, int maxHops, bool optional)
+		{
+			return To(name, relationship.ToString(), minHops, maxHops, optional);
 		}
 
 		#endregion
@@ -112,11 +153,21 @@ namespace Neo4jRestNet.CypherPlugin
 			return this;
 		}
 
+		public CypherMatch From(Enum relationship)
+		{
+			return From(relationship.ToString());
+		}
+
 		public CypherMatch From(string relationship, bool optional)
 		{
 			_sb.AppendFormat("<-[{1}:{0}]-", relationship, optional ? "?" : string.Empty);
 
 			return this;
+		}
+
+		public CypherMatch From(Enum relationship, bool optional)
+		{
+			return From(relationship.ToString(), optional);
 		}
 
 		public CypherMatch From(string name, string relationship)
@@ -126,11 +177,21 @@ namespace Neo4jRestNet.CypherPlugin
 			return this;
 		}
 
+		public CypherMatch From(string name, Enum relationship)
+		{
+			return From(name, relationship.ToString());
+		}
+
 		public CypherMatch From(string name, string relationship, bool optional)
 		{
 			_sb.AppendFormat("<-[{0}{2}:{1}]-", name, relationship, optional ? "?" : string.Empty);
 
 			return this;
+		}
+
+		public CypherMatch From(string name, Enum relationship, bool optional)
+		{
+			return From(name, relationship.ToString(), optional);
 		}
 
 		public CypherMatch From(string name, string relationship, int minHops, int maxHops)
@@ -140,11 +201,21 @@ namespace Neo4jRestNet.CypherPlugin
 			return this;
 		}
 
+		public CypherMatch From(string name, Enum relationship, int minHops, int maxHops)
+		{
+			return From(name, relationship.ToString(), minHops, maxHops);
+		}
+		
 		public CypherMatch From(string name, string relationship, int minHops, int maxHops, bool optional)
 		{
 			_sb.AppendFormat("<-[{0}{4}:{1}*{2}..{3}]-", name, relationship, minHops, maxHops, optional ? "?" : string.Empty);
 
 			return this;
+		}
+
+		public CypherMatch From(string name, Enum relationship, int minHops, int maxHops, bool optional)
+		{
+			return From(name, relationship.ToString(), minHops, maxHops, optional);
 		}
 
 		#endregion
