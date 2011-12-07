@@ -162,9 +162,10 @@ namespace Example
 
 			// Alt Syntax
 			var c7 = new Cypher();
+			c7.Start(s => s.Node("MyNode", "Index-Name", "QueryString"));
 			c7.Start(s => s.Node("A", 0));
 			c7.Start(s => s.Node("B", 1));
-
+			
 			c7.Return(r => r.Node("A"));
 			c7.Return(r => r.Node("B"));
 

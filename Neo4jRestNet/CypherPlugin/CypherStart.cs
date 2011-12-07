@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 
 namespace Neo4jRestNet.CypherPlugin
 {
@@ -36,6 +37,21 @@ namespace Neo4jRestNet.CypherPlugin
 			return this;
 		}
 
+		public CypherStart Node(string name, Enum indexName, string parameterName, object value)
+		{
+			return Node(name, indexName.ToString(), parameterName, value);
+		}
+		
+		public CypherStart Node(string name, string indexName, Enum parameterName, object value)
+		{
+			return Node(name, indexName, parameterName.ToString(), value);
+		}
+
+		public CypherStart Node(string name, Enum indexName, Enum parameterName, object value)
+		{
+			return Node(name, indexName.ToString(), parameterName.ToString(), value);
+		}
+
 		public CypherStart Node(string name, string indexName, string query)
 		{
 			var comma = _sb.Length == 0 ? string.Empty : ",";
@@ -43,6 +59,11 @@ namespace Neo4jRestNet.CypherPlugin
 			_sb.AppendFormat("{3} {0}=node:{1}({2})", name, indexName, query, comma);
 
 			return this;
+		}
+
+		public CypherStart Node(string name, Enum indexName, string query)
+		{
+			return Node(name, indexName.ToString(), query);
 		}
 
 		#endregion
@@ -77,6 +98,21 @@ namespace Neo4jRestNet.CypherPlugin
 			return this;
 		}
 
+		public CypherStart Relationship(string name, Enum indexName, string parameterName, object value)
+		{
+			return Relationship(name, indexName.ToString(), parameterName, value);
+		}
+
+		public CypherStart Relationship(string name, string indexName, Enum parameterName, object value)
+		{
+			return Relationship(name, indexName, parameterName.ToString(), value);
+		}
+
+		public CypherStart Relationship(string name, Enum indexName, Enum parameterName, object value)
+		{
+			return Relationship(name, indexName.ToString(), parameterName.ToString(), value);
+		}
+
 		public CypherStart Relationship(string name, string indexName, string query)
 		{
 			var comma = _sb.Length == 0 ? string.Empty : ",";
@@ -84,6 +120,11 @@ namespace Neo4jRestNet.CypherPlugin
 			_sb.AppendFormat("{3} {0}=relationship:{1}('{2}')", name, indexName, query, comma);
 
 			return this;
+		}
+
+		public CypherStart Relationship(string name, Enum indexName, string query)
+		{
+			return Relationship(name, indexName.ToString(), query);
 		}
 
 		#endregion

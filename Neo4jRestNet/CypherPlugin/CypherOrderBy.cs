@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 
 namespace Neo4jRestNet.CypherPlugin
 {
@@ -19,6 +20,11 @@ namespace Neo4jRestNet.CypherPlugin
 			return this;
 		}
 
+		public CypherOrderBy Node(string name, Enum property)
+		{
+			return Node(name, property.ToString());
+		}
+		
 		public CypherOrderBy Node(string name, string property, bool decending)
 		{
 			_sb.AppendFormat("{0} {1}.{2} {3}", _isStringEmpty ? string.Empty : ",", name, property, decending ? "DESC" : string.Empty);
@@ -26,6 +32,11 @@ namespace Neo4jRestNet.CypherPlugin
 			_isStringEmpty = false;
 
 			return this;
+		}
+
+		public CypherOrderBy Node(string name, Enum property, bool decending)
+		{
+			return Node(name, property.ToString(), decending);
 		}
 
 		#endregion
@@ -41,6 +52,11 @@ namespace Neo4jRestNet.CypherPlugin
 			return this;
 		}
 
+		public CypherOrderBy Relationship(string name, Enum property)
+		{
+			return Relationship(name, property.ToString());
+		}
+
 		public CypherOrderBy Relationship(string name, string property, bool decending)
 		{
 			_sb.AppendFormat("{0} {1}.{2} {3}", _isStringEmpty ? string.Empty : ",", name, property, decending ? "DESC" : string.Empty);
@@ -48,6 +64,11 @@ namespace Neo4jRestNet.CypherPlugin
 			_isStringEmpty = false;
 
 			return this;
+		}
+
+		public CypherOrderBy Relationship(string name, Enum property, bool decending)
+		{
+			return Relationship(name, property.ToString(), decending);
 		}
 
 		#endregion

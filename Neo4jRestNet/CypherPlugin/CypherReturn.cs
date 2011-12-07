@@ -89,6 +89,21 @@ namespace Neo4jRestNet.CypherPlugin
 
 		#endregion
 
+		#region Length
+
+		public CypherReturn Length(string name)
+		{
+			_sb.AppendFormat("{1} length({0})", name, _isStringEmpty ? string.Empty : ",");
+
+			_isStringEmpty = false;
+
+			_returnTypes.Add(typeof(int));
+
+			return this;
+		}
+
+		#endregion
+
 		#region Distinct
 
 		public CypherReturn Distinct()
