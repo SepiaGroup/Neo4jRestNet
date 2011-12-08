@@ -29,6 +29,17 @@ namespace Neo4jRestNet.CypherPlugin
 
 		#endregion
 
+		#region RelationshipType
+
+		public CypherWhere RelationshipType(string name)
+		{
+			_sb.AppendFormat("type({0})", name);
+
+			return this;
+		}
+
+		#endregion
+
 		#region RegEx
 
 		public CypherWhere RegEx(string regEx)
