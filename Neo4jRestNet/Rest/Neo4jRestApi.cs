@@ -193,10 +193,9 @@ namespace Neo4jRestNet.Rest
 
 		public static HttpStatusCode AddRelationshipToIndex(string dbUrl, string relationshipself, string indexName, string key, object value, out string response)
 		{
-			return
-				HttpRest.Post(
-					string.Concat(dbUrl, "/index/relationship/", indexName, "/", key, "/",
-								  JToken.FromObject(value).ToString(Formatting.None)), relationshipself, out response);
+            var obj = new { value, uri = relationshipself, key };
+			return HttpRest.Post(string.Concat(dbUrl, "/index/relationship/", indexName),
+                                  JToken.FromObject(obj).ToString(Formatting.None), out response);
 		}
 
 		public static HttpStatusCode RemoveNodeFromIndex(string dbUrl, long nodeId, string indexName, string key, object value)
@@ -245,10 +244,7 @@ namespace Neo4jRestNet.Rest
 
 		public static HttpStatusCode GetRelationship(string dbUrl, string indexName, string key, object value, out string response)
 		{
-			return
-				HttpRest.Get(
-					string.Concat(dbUrl, "/index/relationship/", indexName, "/", key, "/",
-								  JToken.FromObject(value).ToString(Formatting.None)), out response);
+			return HttpRest.Get(string.Concat(dbUrl, "/index/relationship/", indexName, "/", key, "/", value.ToString()), out response);
 		}
 
 		public static HttpStatusCode GetRelationship(string dbUrl, string indexName, string searchQuery, out string response)
