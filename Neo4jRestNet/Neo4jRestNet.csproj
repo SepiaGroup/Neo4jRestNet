@@ -81,6 +81,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CleanDbPlugin\CleanDbPlugin.cs" />
     <Compile Include="Core\EncryptId.cs" />
     <Compile Include="Core\Path.cs" />
     <Compile Include="Core\Properties.cs" />
