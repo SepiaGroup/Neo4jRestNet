@@ -16,7 +16,7 @@ namespace Neo4jRestNet.Core
 			NodeType
 		}
 
-		private static readonly string DefaultDbUrl = ConfigurationManager.ConnectionStrings["neo4j"].ConnectionString.TrimEnd('/');
+		private static readonly string _defaultDbUrl = ConfigurationManager.ConnectionStrings["neo4j"].ConnectionString.TrimEnd('/');
 
 		private string _dbUrl;
         private string _self;
@@ -32,7 +32,7 @@ namespace Neo4jRestNet.Core
 
 		public static Node GetRootNode()
 		{
-			return GetRootNode(DefaultDbUrl);
+			return GetRootNode(_defaultDbUrl);
 		}
 
 		public static Node GetRootNode(string dbUrl)
@@ -71,7 +71,7 @@ namespace Neo4jRestNet.Core
 
 		public static Node GetNode(EncryptId nodeId)
 		{
-			return GetNode(DefaultDbUrl, nodeId);
+			return GetNode(_defaultDbUrl, nodeId);
 		}
 
 		public static Node GetNode(string dbUrl, EncryptId nodeId)
@@ -88,22 +88,22 @@ namespace Neo4jRestNet.Core
 
 		public static IEnumerable<Node> GetNode(string indexName, string key, object value)
 		{
-			return GetNode(DefaultDbUrl, indexName, key, value);
+			return GetNode(_defaultDbUrl, indexName, key, value);
 		}
 
 		public static IEnumerable<Node> GetNode(Enum indexName, string key, object value)
 		{
-			return GetNode(DefaultDbUrl, indexName.ToString(), key, value);
+			return GetNode(_defaultDbUrl, indexName.ToString(), key, value);
 		}
 
 		public static IEnumerable<Node> GetNode(string indexName, Enum key, object value)
 		{
-			return GetNode(DefaultDbUrl, indexName, key.ToString(), value);
+			return GetNode(_defaultDbUrl, indexName, key.ToString(), value);
 		}
 
 		public static IEnumerable<Node> GetNode(Enum indexName, Enum key, object value)
 		{
-			return GetNode(DefaultDbUrl, indexName.ToString(), key.ToString(), value);
+			return GetNode(_defaultDbUrl, indexName.ToString(), key.ToString(), value);
 		}
 
 		public static IEnumerable<Node> GetNode(string dbUrl, string indexName, string key, object value)
@@ -135,12 +135,12 @@ namespace Neo4jRestNet.Core
 
 		public static IEnumerable<Node> GetNode(string indexName, string searchQuery)
 		{
-			return GetNode(DefaultDbUrl, indexName, searchQuery);
+			return GetNode(_defaultDbUrl, indexName, searchQuery);
 		}
 
 		public static IEnumerable<Node> GetNode(Enum indexName, string searchQuery)
 		{
-			return GetNode(DefaultDbUrl, indexName.ToString(), searchQuery);
+			return GetNode(_defaultDbUrl, indexName.ToString(), searchQuery);
 		}
 
 		public static IEnumerable<Node> GetNode(string dbUrl, string indexName, string searchQuery)
@@ -168,7 +168,7 @@ namespace Neo4jRestNet.Core
 		{
 			var properties = new Properties();
 			properties.SetProperty(NodeProperty.NodeType.ToString(), nodeType);
-			return CreateNodeFromJson(DefaultDbUrl, properties.ToString());
+			return CreateNodeFromJson(_defaultDbUrl, properties.ToString());
 		}
 
 		public static Node CreateNode(Enum nodeType)
@@ -190,7 +190,7 @@ namespace Neo4jRestNet.Core
 		public static Node CreateNode(string nodeType, Properties properties)
 		{
 			properties.SetProperty(NodeProperty.NodeType.ToString(), nodeType);
-			return CreateNodeFromJson(DefaultDbUrl, properties.ToString());
+			return CreateNodeFromJson(_defaultDbUrl, properties.ToString());
 		}
 
 		public static Node CreateNode(Enum nodeType, Properties properties)
@@ -212,7 +212,7 @@ namespace Neo4jRestNet.Core
 		public static Node CreateNode(string nodeType, IDictionary<string, object> properties)
 		{
 			properties.Add(NodeProperty.NodeType.ToString(), nodeType);
-			return CreateNodeFromJson(DefaultDbUrl, JObject.FromObject(properties).ToString(Formatting.None));
+			return CreateNodeFromJson(_defaultDbUrl, JObject.FromObject(properties).ToString(Formatting.None));
 		}
 
 		public static Node CreateNode(Enum nodeType, IDictionary<string, object> properties)
@@ -247,7 +247,7 @@ namespace Neo4jRestNet.Core
 
         #region Delete
 
-        public HttpStatusCode Delete()
+        public HttpStatusCode DeleteNode()
         {
 			HttpStatusCode status = Neo4jRestApi.DeleteNode(_dbUrl, Id);
             if (status != HttpStatusCode.NoContent)
@@ -537,35 +537,35 @@ namespace Neo4jRestNet.Core
 
 		#region Index
 
-		public static Node AddToIndex(long nodeId, string indexName, string key, object value)
+		public static Node AddNodeToIndex(long nodeId, string indexName, string key, object value)
 		{
-			return AddToIndex(DefaultDbUrl, nodeId, indexName, key, value);
+			return AddNodeToIndex(_defaultDbUrl, nodeId, indexName, key, value);
 		}
 		
-		public static Node AddToIndex(long nodeId, Enum indexName, string key, object value)
+		public static Node AddNodeToIndex(long nodeId, Enum indexName, string key, object value)
 		{
-			return AddToIndex(DefaultDbUrl, nodeId, indexName.ToString(), key, value);
+			return AddNodeToIndex(_defaultDbUrl, nodeId, indexName.ToString(), key, value);
 		}
 
-		public static Node AddToIndex(long nodeId, string indexName, Enum key, object value)
+		public static Node AddNodeToIndex(long nodeId, string indexName, Enum key, object value)
 		{
-			return AddToIndex(DefaultDbUrl, nodeId, indexName, key.ToString(), value);
+			return AddNodeToIndex(_defaultDbUrl, nodeId, indexName, key.ToString(), value);
 		}
 
-		public static Node AddToIndex(long nodeId, Enum indexName, Enum key, object value)
+		public static Node AddNodeToIndex(long nodeId, Enum indexName, Enum key, object value)
 		{
-			return AddToIndex(DefaultDbUrl, nodeId, indexName.ToString(), key.ToString(), value);
+			return AddNodeToIndex(_defaultDbUrl, nodeId, indexName.ToString(), key.ToString(), value);
 		}
 
-		public static Node AddToIndex(string dbUrl, long nodeId, Enum indexName, Enum key, object value)
+		public static Node AddNodeToIndex(string dbUrl, long nodeId, Enum indexName, Enum key, object value)
 		{
-			return AddToIndex(dbUrl, nodeId, indexName.ToString(), key.ToString(), value);
+			return AddNodeToIndex(dbUrl, nodeId, indexName.ToString(), key.ToString(), value);
 		}
 
-		public static Node AddToIndex(string dbUrl, long nodeId, string indexName, string key, object value)
+		public static Node AddNodeToIndex(string dbUrl, long nodeId, string indexName, string key, object value)
 		{
 			string response;
-			HttpStatusCode status = Neo4jRestApi.AddNodeToIndex(dbUrl, nodeId, indexName, key, value, out response);
+			var status = Neo4jRestApi.AddNodeToIndex(dbUrl, nodeId, indexName, key, value, out response);
 			if (status != HttpStatusCode.Created)
 			{
 				throw new Exception(string.Format("Error creating index for node (http response:{0})", status));
@@ -574,24 +574,24 @@ namespace Neo4jRestNet.Core
 			return InitializeFromNodeJson(response);
 		}
 
-        public static HttpStatusCode RemoveFromIndex(long nodeId, string indexName)
+        public static HttpStatusCode RemoveNodeFromIndex(long nodeId, string indexName)
 		{
-			return RemoveFromIndex(DefaultDbUrl, nodeId, indexName);
+			return RemoveNodeFromIndex(_defaultDbUrl, nodeId, indexName);
 		}
 
-		public static HttpStatusCode RemoveFromIndex(long nodeId, Enum indexName)
+		public static HttpStatusCode RemoveNodeFromIndex(long nodeId, Enum indexName)
 		{
-			return RemoveFromIndex(DefaultDbUrl, nodeId, indexName.ToString());
+			return RemoveNodeFromIndex(_defaultDbUrl, nodeId, indexName.ToString());
 		}
 
-		public static HttpStatusCode RemoveFromIndex(string dbUrl, long nodeId, Enum indexName)
+		public static HttpStatusCode RemoveNodeFromIndex(string dbUrl, long nodeId, Enum indexName)
 		{
-			return RemoveFromIndex(dbUrl, nodeId, indexName.ToString());
+			return RemoveNodeFromIndex(dbUrl, nodeId, indexName.ToString());
 		}
 
-		public static HttpStatusCode RemoveFromIndex(string dbUrl, long nodeId, string indexName)
+        public static HttpStatusCode RemoveNodeFromIndex(string dbUrl, long nodeId, string indexName)
 		{
-			HttpStatusCode status = Neo4jRestApi.RemoveNodeFromIndex(dbUrl, nodeId, indexName);
+			var status = Neo4jRestApi.RemoveNodeFromIndex(dbUrl, nodeId, indexName);
 			if (status != HttpStatusCode.NoContent)
 			{
 				throw new Exception(string.Format("Error remove node from index (node id:{0} index name:{1} http response:{2})", nodeId, indexName, status));
@@ -600,34 +600,34 @@ namespace Neo4jRestNet.Core
 			return status;
 		}
 
-        public static HttpStatusCode RemoveFromIndex(long nodeId, string indexName, string key)
+        public static HttpStatusCode RemoveNodeFromIndex(long nodeId, string indexName, string key)
 		{
-			return RemoveFromIndex(DefaultDbUrl, nodeId, indexName, key);
+			return RemoveNodeFromIndex(_defaultDbUrl, nodeId, indexName, key);
 		}
 		
-		public static HttpStatusCode RemoveFromIndex(long nodeId, Enum indexName, string key)
+		public static HttpStatusCode RemoveNodeFromIndex(long nodeId, Enum indexName, string key)
 		{
-			return RemoveFromIndex(DefaultDbUrl, nodeId, indexName.ToString(), key);
+			return RemoveNodeFromIndex(_defaultDbUrl, nodeId, indexName.ToString(), key);
 		}
 
-		public static HttpStatusCode RemoveFromIndex(long nodeId, string indexName, Enum key)
+		public static HttpStatusCode RemoveNodeFromIndex(long nodeId, string indexName, Enum key)
 		{
-			return RemoveFromIndex(DefaultDbUrl, nodeId, indexName, key.ToString());
+			return RemoveNodeFromIndex(_defaultDbUrl, nodeId, indexName, key.ToString());
 		}
 
-		public static HttpStatusCode RemoveFromIndex(long nodeId, Enum indexName, Enum key)
+		public static HttpStatusCode RemoveNodeFromIndex(long nodeId, Enum indexName, Enum key)
 		{
-			return RemoveFromIndex(DefaultDbUrl, nodeId, indexName.ToString(), key.ToString());
+			return RemoveNodeFromIndex(_defaultDbUrl, nodeId, indexName.ToString(), key.ToString());
 		}
 		
-		public static HttpStatusCode RemoveFromIndex(string dbUrl, long nodeId, Enum indexName, Enum key)
+		public static HttpStatusCode RemoveNodeFromIndex(string dbUrl, long nodeId, Enum indexName, Enum key)
 		{
-			return RemoveFromIndex(dbUrl, nodeId, indexName.ToString(), key.ToString());
+			return RemoveNodeFromIndex(dbUrl, nodeId, indexName.ToString(), key.ToString());
 		}
 
-		public static HttpStatusCode RemoveFromIndex(string dbUrl, long nodeId, string indexName, string key)
+        public static HttpStatusCode RemoveNodeFromIndex(string dbUrl, long nodeId, string indexName, string key)
 		{
-			HttpStatusCode status = Neo4jRestApi.RemoveNodeFromIndex(dbUrl, nodeId, indexName, key);
+			var status = Neo4jRestApi.RemoveNodeFromIndex(dbUrl, nodeId, indexName, key);
 			if (status != HttpStatusCode.NoContent)
 			{
 				throw new Exception(string.Format("Error remove node from index (node id:{0} index name:{1} http response:{2})", nodeId, indexName, status));
@@ -636,29 +636,29 @@ namespace Neo4jRestNet.Core
 			return status;
 		}
 
-        public static HttpStatusCode RemoveFromIndex(long nodeId, string indexName, string key, object value)
+        public static HttpStatusCode RemoveNodeFromIndex(long nodeId, string indexName, string key, object value)
 		{
-			return RemoveFromIndex(DefaultDbUrl, nodeId, indexName, key, value);
+			return RemoveNodeFromIndex(_defaultDbUrl, nodeId, indexName, key, value);
 		}
 
-		public static HttpStatusCode RemoveFromIndex(long nodeId, Enum indexName, string key, object value)
+		public static HttpStatusCode RemoveNodeFromIndex(long nodeId, Enum indexName, string key, object value)
 		{
-			return RemoveFromIndex(DefaultDbUrl, nodeId, indexName.ToString(), key, value);
+			return RemoveNodeFromIndex(_defaultDbUrl, nodeId, indexName.ToString(), key, value);
 		}
 
-		public static HttpStatusCode RemoveFromIndex(long nodeId, string indexName, Enum key, object value)
+		public static HttpStatusCode RemoveNodeFromIndex(long nodeId, string indexName, Enum key, object value)
 		{
-			return RemoveFromIndex(DefaultDbUrl, nodeId, indexName, key.ToString(), value);
+			return RemoveNodeFromIndex(_defaultDbUrl, nodeId, indexName, key.ToString(), value);
 		}
 
-		public static HttpStatusCode RemoveFromIndex(long nodeId, Enum indexName, Enum key, object value)
+		public static HttpStatusCode RemoveNodeFromIndex(long nodeId, Enum indexName, Enum key, object value)
 		{
-			return RemoveFromIndex(DefaultDbUrl, nodeId, indexName.ToString(), key.ToString(), value);
+			return RemoveNodeFromIndex(_defaultDbUrl, nodeId, indexName.ToString(), key.ToString(), value);
 		}
 
-		public static HttpStatusCode RemoveFromIndex(string dbUrl, long nodeId, string indexName, string key, object value)
+        public static HttpStatusCode RemoveNodeFromIndex(string dbUrl, long nodeId, string indexName, string key, object value)
 		{
-			HttpStatusCode status = Neo4jRestApi.RemoveNodeFromIndex(dbUrl, nodeId, indexName, key, value);
+			var status = Neo4jRestApi.RemoveNodeFromIndex(dbUrl, nodeId, indexName, key, value);
 			if (status != HttpStatusCode.NoContent)
 			{
 				throw new Exception(string.Format("Error remove node from index (node id:{0} index name:{1} http response:{2})", nodeId, indexName, status));

@@ -12,7 +12,7 @@ namespace Neo4jRestNet.Core
 {
 	public class Relationship : IGraphObject
 	{
-		private static readonly string DefaultDbUrl = ConfigurationManager.ConnectionStrings["neo4j"].ConnectionString.TrimEnd('/');
+		private static readonly string _defaultDbUrl = ConfigurationManager.ConnectionStrings["neo4j"].ConnectionString.TrimEnd('/');
 
 		private string _dbUrl;
 		private string _self;
@@ -30,22 +30,22 @@ namespace Neo4jRestNet.Core
 
 		public static IEnumerable<Relationship> GetRelationship(string indexName, string key, object value)
 		{
-			return GetRelationship(DefaultDbUrl, indexName, key, value);
+			return GetRelationship(_defaultDbUrl, indexName, key, value);
 		}
 		
 		public static IEnumerable<Relationship> GetRelationship(Enum indexName, string key, object value)
 		{
-			return GetRelationship(DefaultDbUrl, indexName.ToString(), key, value);
+			return GetRelationship(_defaultDbUrl, indexName.ToString(), key, value);
 		}
 
 		public static IEnumerable<Relationship> GetRelationship(string indexName, Enum key, object value)
 		{
-			return GetRelationship(DefaultDbUrl, indexName, key.ToString(), value);
+			return GetRelationship(_defaultDbUrl, indexName, key.ToString(), value);
 		}
 		
 		public static IEnumerable<Relationship> GetRelationship(Enum indexName, Enum key, object value)
 		{
-			return GetRelationship(DefaultDbUrl, indexName.ToString(), key.ToString(), value);
+			return GetRelationship(_defaultDbUrl, indexName.ToString(), key.ToString(), value);
 		}
 
 		public static IEnumerable<Relationship> GetRelationship(string dbUrl, Enum indexName, Enum key, object value)
@@ -67,12 +67,12 @@ namespace Neo4jRestNet.Core
 
 		public static IEnumerable<Relationship> GetRelationship(string indexName, string searchQuery)
 		{
-			return GetRelationship(DefaultDbUrl, indexName, searchQuery);
+			return GetRelationship(_defaultDbUrl, indexName, searchQuery);
 		}
 
 		public static IEnumerable<Relationship> GetRelationship(Enum indexName, string searchQuery)
 		{
-			return GetRelationship(DefaultDbUrl, indexName.ToString(), searchQuery);
+			return GetRelationship(_defaultDbUrl, indexName.ToString(), searchQuery);
 		}
 
 		public static IEnumerable<Relationship> GetRelationship(string dbUrl, Enum indexName, string searchQuery)
@@ -295,35 +295,35 @@ namespace Neo4jRestNet.Core
 
 		#region Index
 
-		public static Relationship AddToIndex(long relationshipId, string indexName, string key, object value)
+		public static Relationship AddRelationshipToIndex(long relationshipId, string indexName, string key, object value)
 		{
-			return AddToIndex(DefaultDbUrl, relationshipId, indexName, key, value);
+			return AddRelationshipToIndex(_defaultDbUrl, relationshipId, indexName, key, value);
 		}
 
-		public static Relationship AddToIndex(long relationshipId, Enum indexName, string key, object value)
+		public static Relationship AddRelationshipToIndex(long relationshipId, Enum indexName, string key, object value)
 		{
-			return AddToIndex(DefaultDbUrl, relationshipId, indexName.ToString(), key, value);
+			return AddRelationshipToIndex(_defaultDbUrl, relationshipId, indexName.ToString(), key, value);
 		}
 
-		public static Relationship AddToIndex(long relationshipId, string indexName, Enum key, object value)
+		public static Relationship AddRelationshipToIndex(long relationshipId, string indexName, Enum key, object value)
 		{
-			return AddToIndex(DefaultDbUrl, relationshipId, indexName, key.ToString(), value);
+			return AddRelationshipToIndex(_defaultDbUrl, relationshipId, indexName, key.ToString(), value);
 		}
 
-		public static Relationship AddToIndex(long relationshipId, Enum indexName, Enum key, object value)
+		public static Relationship AddRelationshipToIndex(long relationshipId, Enum indexName, Enum key, object value)
 		{
-			return AddToIndex(DefaultDbUrl, relationshipId, indexName.ToString(), key.ToString(), value);
+			return AddRelationshipToIndex(_defaultDbUrl, relationshipId, indexName.ToString(), key.ToString(), value);
 		}
 
-		public static Relationship AddToIndex(string dbUrl, long relationshipId, Enum indexName, Enum key, object value)
+		public static Relationship AddRelationshipToIndex(string dbUrl, long relationshipId, Enum indexName, Enum key, object value)
 		{
-			return AddToIndex(dbUrl, relationshipId, indexName.ToString(), key.ToString(), value);
+			return AddRelationshipToIndex(dbUrl, relationshipId, indexName.ToString(), key.ToString(), value);
 		}
 
-		public static Relationship AddToIndex(string dbUrl, long relationshipId, string indexName, string key, object value)
+		public static Relationship AddRelationshipToIndex(string dbUrl, long relationshipId, string indexName, string key, object value)
 		{
 			string response;
-			HttpStatusCode status = Neo4jRestApi.AddRelationshipToIndex(dbUrl, relationshipId, indexName, key, value, out response);
+			var status = Neo4jRestApi.AddRelationshipToIndex(dbUrl, relationshipId, indexName, key, value, out response);
 			if (status != HttpStatusCode.Created)
 			{
 				throw new Exception(string.Format("Error creating index for relationship (http response:{0})", status));
@@ -332,24 +332,24 @@ namespace Neo4jRestNet.Core
 			return InitializeFromRelationshipJson(response);
 		}
 
-		public HttpStatusCode RemoveFromIndex(long relationshipId, string indexName)
+		public HttpStatusCode RemoveRelationshipFromIndex(long relationshipId, string indexName)
 		{
-			return RemoveFromIndex(DefaultDbUrl, relationshipId, indexName);
+			return RemoveRelationshipFromIndex(_defaultDbUrl, relationshipId, indexName);
 		}
 
-		public HttpStatusCode RemoveFromIndex(long relationshipId, Enum indexName)
+		public HttpStatusCode RemoveRelationshipFromIndex(long relationshipId, Enum indexName)
 		{
-			return RemoveFromIndex(DefaultDbUrl, relationshipId, indexName.ToString());
+			return RemoveRelationshipFromIndex(_defaultDbUrl, relationshipId, indexName.ToString());
 		}
 
-		public HttpStatusCode RemoveFromIndex(string dbUrl, long relationshipId, Enum indexName)
+		public HttpStatusCode RemoveRelationshipFromIndex(string dbUrl, long relationshipId, Enum indexName)
 		{
-			return RemoveFromIndex(dbUrl, relationshipId, indexName.ToString());
+			return RemoveRelationshipFromIndex(dbUrl, relationshipId, indexName.ToString());
 		}
 
-		public HttpStatusCode RemoveFromIndex(string dbUrl, long relationshipId, string indexName)
+		public HttpStatusCode RemoveRelationshipFromIndex(string dbUrl, long relationshipId, string indexName)
 		{
-			HttpStatusCode status = Neo4jRestApi.RemoveRelationshipFromIndex(dbUrl, relationshipId, indexName);
+			var status = Neo4jRestApi.RemoveRelationshipFromIndex(dbUrl, relationshipId, indexName);
 			if (status != HttpStatusCode.NoContent)
 			{
 				throw new Exception(string.Format("Error remove relationship from index (relationship id:{0} index name:{1} http response:{2})", relationshipId, indexName, status));
@@ -358,34 +358,34 @@ namespace Neo4jRestNet.Core
 			return status;
 		}
 
-		public HttpStatusCode RemoveFromIndex(long relationshipId, string indexName, string key)
+		public HttpStatusCode RemoveRelationshipFromIndex(long relationshipId, string indexName, string key)
 		{
-			return RemoveFromIndex(DefaultDbUrl, relationshipId, indexName, key);
+			return RemoveRelationshipFromIndex(_defaultDbUrl, relationshipId, indexName, key);
 		}
 
-		public HttpStatusCode RemoveFromIndex(long relationshipId, Enum indexName, string key)
+		public HttpStatusCode RemoveRelationshipFromIndex(long relationshipId, Enum indexName, string key)
 		{
-			return RemoveFromIndex(DefaultDbUrl, relationshipId, indexName.ToString(), key);
+			return RemoveRelationshipFromIndex(_defaultDbUrl, relationshipId, indexName.ToString(), key);
 		}
 
-		public HttpStatusCode RemoveFromIndex(long relationshipId, string indexName, Enum key)
+		public HttpStatusCode RemoveRelationshipFromIndex(long relationshipId, string indexName, Enum key)
 		{
-			return RemoveFromIndex(DefaultDbUrl, relationshipId, indexName, key.ToString());
+			return RemoveRelationshipFromIndex(_defaultDbUrl, relationshipId, indexName, key.ToString());
 		}
 
-		public HttpStatusCode RemoveFromIndex(long relationshipId, Enum indexName, Enum key)
+		public HttpStatusCode RemoveRelationshipFromIndex(long relationshipId, Enum indexName, Enum key)
 		{
-			return RemoveFromIndex(DefaultDbUrl, relationshipId, indexName.ToString(), key.ToString());
+			return RemoveRelationshipFromIndex(_defaultDbUrl, relationshipId, indexName.ToString(), key.ToString());
 		}
 
-		public HttpStatusCode RemoveFromIndex(string dbUrl, long relationshipId, Enum indexName, Enum key)
+		public HttpStatusCode RemoveRelationshipFromIndex(string dbUrl, long relationshipId, Enum indexName, Enum key)
 		{
-			return RemoveFromIndex(dbUrl, relationshipId, indexName.ToString(), key.ToString());
+			return RemoveRelationshipFromIndex(dbUrl, relationshipId, indexName.ToString(), key.ToString());
 		}
 
-		public HttpStatusCode RemoveFromIndex(string dbUrl, long relationshipId, string indexName, string key)
+		public HttpStatusCode RemoveRelationshipFromIndex(string dbUrl, long relationshipId, string indexName, string key)
 		{
-			HttpStatusCode status = Neo4jRestApi.RemoveRelationshipFromIndex(dbUrl, relationshipId, indexName, key);
+			var status = Neo4jRestApi.RemoveRelationshipFromIndex(dbUrl, relationshipId, indexName, key);
 			if (status != HttpStatusCode.NoContent)
 			{
 				throw new Exception(string.Format("Error remove relationship from index (relationship id:{0} index name:{1} http response:{2})", relationshipId, indexName, status));
@@ -394,34 +394,34 @@ namespace Neo4jRestNet.Core
 			return status;
 		}
 
-		public HttpStatusCode RemoveFromIndex(long relationshipId, string indexName, string key, object value)
+		public HttpStatusCode RemoveRelationshipFromIndex(long relationshipId, string indexName, string key, object value)
 		{
-			return RemoveFromIndex(DefaultDbUrl, relationshipId, indexName, key, value);
+			return RemoveRelationshipFromIndex(_defaultDbUrl, relationshipId, indexName, key, value);
 		}
 
-		public HttpStatusCode RemoveFromIndex(long relationshipId, Enum indexName, string key, object value)
+		public HttpStatusCode RemoveRelationshipFromIndex(long relationshipId, Enum indexName, string key, object value)
 		{
-			return RemoveFromIndex(DefaultDbUrl, relationshipId, indexName.ToString(), key, value);
+			return RemoveRelationshipFromIndex(_defaultDbUrl, relationshipId, indexName.ToString(), key, value);
 		}
 
-		public HttpStatusCode RemoveFromIndex(long relationshipId, string indexName, Enum key, object value)
+		public HttpStatusCode RemoveRelationshipFromIndex(long relationshipId, string indexName, Enum key, object value)
 		{
-			return RemoveFromIndex(DefaultDbUrl, relationshipId, indexName, key.ToString(), value);
+			return RemoveRelationshipFromIndex(_defaultDbUrl, relationshipId, indexName, key.ToString(), value);
 		}
 
-		public HttpStatusCode RemoveFromIndex(long relationshipId, Enum indexName, Enum key, object value)
+		public HttpStatusCode RemoveRelationshipFromIndex(long relationshipId, Enum indexName, Enum key, object value)
 		{
-			return RemoveFromIndex(DefaultDbUrl, relationshipId, indexName.ToString(), key.ToString(), value);
+			return RemoveRelationshipFromIndex(_defaultDbUrl, relationshipId, indexName.ToString(), key.ToString(), value);
 		}
 
-		public HttpStatusCode RemoveFromIndex(string dbUrl, long relationshipId, Enum indexName, Enum key, object value)
+		public HttpStatusCode RemoveRelationshipFromIndex(string dbUrl, long relationshipId, Enum indexName, Enum key, object value)
 		{
-			return RemoveFromIndex(dbUrl, relationshipId, indexName.ToString(), key.ToString(), value);
+			return RemoveRelationshipFromIndex(dbUrl, relationshipId, indexName.ToString(), key.ToString(), value);
 		}
 
-		public HttpStatusCode RemoveFromIndex(string dbUrl, long relationshipId, string indexName, string key, object value)
+		public HttpStatusCode RemoveRelationshipFromIndex(string dbUrl, long relationshipId, string indexName, string key, object value)
 		{
-			HttpStatusCode status = Neo4jRestApi.RemoveRelationshipFromIndex(dbUrl, relationshipId, indexName, key, value);
+			var status = Neo4jRestApi.RemoveRelationshipFromIndex(dbUrl, relationshipId, indexName, key, value);
 			if (status != HttpStatusCode.NoContent)
 			{
 				throw new Exception(string.Format("Error remove relationship from index (relationship id:{0} index name:{1} http response:{2})", relationshipId, indexName, status));
@@ -433,7 +433,7 @@ namespace Neo4jRestNet.Core
 
 		#region Delete
 
-		public HttpStatusCode Delete()
+		public HttpStatusCode DeleteRelationship()
 		{
 			HttpStatusCode status = Neo4jRestApi.DeleteRelationship(_dbUrl, Id);
 			if (status != HttpStatusCode.NoContent)
