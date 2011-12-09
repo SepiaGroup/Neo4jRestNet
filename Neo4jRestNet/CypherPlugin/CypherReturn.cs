@@ -43,7 +43,7 @@ namespace Neo4jRestNet.CypherPlugin
 
 		#endregion
 
-		#region CypherReturn
+		#region Relationship
 
 		public CypherReturn Relationship(string name)
 		{
@@ -128,6 +128,81 @@ namespace Neo4jRestNet.CypherPlugin
 			return this;
 		}
 		
+		#endregion
+
+		#region Type
+		
+		public CypherReturn Type(string name)
+		{
+			_sb.AppendFormat("{1} type({0})", name, _isStringEmpty ? string.Empty : ",");
+
+			_isStringEmpty = false;
+
+			_returnTypes.Add(typeof(string));
+
+			return this;
+		}
+		
+		#endregion
+	
+		#region Sum
+		
+		public CypherReturn Sum(string name)
+		{
+			_sb.AppendFormat("{1} sum({0})", name, _isStringEmpty ? string.Empty : ",");
+
+			_isStringEmpty = false;
+
+			_returnTypes.Add(typeof(string));
+
+			return this;
+		}
+		
+		#endregion
+
+		#region Avg
+
+		public CypherReturn Avg(string name)
+		{
+			_sb.AppendFormat("{1} avg({0})", name, _isStringEmpty ? string.Empty : ",");
+
+			_isStringEmpty = false;
+
+			_returnTypes.Add(typeof(float));
+
+			return this;
+		}
+
+		#endregion
+
+		#region Max
+
+		public CypherReturn Max(string name)
+		{
+			_sb.AppendFormat("{1} max({0})", name, _isStringEmpty ? string.Empty : ",");
+
+			_isStringEmpty = false;
+
+			_returnTypes.Add(typeof(float));
+
+			return this;
+		}
+
+		#endregion
+
+		#region Min
+
+		public CypherReturn Min(string name)
+		{
+			_sb.AppendFormat("{1} min({0})", name, _isStringEmpty ? string.Empty : ",");
+
+			_isStringEmpty = false;
+
+			_returnTypes.Add(typeof(float));
+
+			return this;
+		}
+
 		#endregion
 
 		public IEnumerable<Type> GetReturnTypes
