@@ -123,7 +123,7 @@ namespace Neo4jRestNet.CypherPlugin
 
 			_isStringEmpty = false;
 
-			_returnTypes.Add(typeof(long));
+			_returnTypes.Add(typeof(int));
 
 			return this;
 		}
@@ -143,6 +143,21 @@ namespace Neo4jRestNet.CypherPlugin
 			return this;
 		}
 		
+		#endregion
+
+		#region Id
+
+		public CypherReturn Id(string name)
+		{
+			_sb.AppendFormat("{1} id({0})", name, _isStringEmpty ? string.Empty : ",");
+
+			_isStringEmpty = false;
+
+			_returnTypes.Add(typeof(long));
+
+			return this;
+		}
+
 		#endregion
 	
 		#region Sum

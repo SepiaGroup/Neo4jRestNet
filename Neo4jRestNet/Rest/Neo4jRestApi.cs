@@ -7,31 +7,37 @@ using Newtonsoft.Json.Linq;
 
 namespace Neo4jRestNet.Rest
 {
-	internal class Neo4jRestApi
+	public class Neo4jRestApi
 	{
-		public static HttpStatusCode GetRoot(string dbUrl, out string response)
+		private readonly string _dbUrl;
+		public Neo4jRestApi(string dbUrl)
 		{
-			return HttpRest.Get(dbUrl, out response);
+			_dbUrl = dbUrl;
 		}
 
-		public static HttpStatusCode CreateNode(string dbUrl, string jsonProperties, out string response)
+		public HttpStatusCode GetRoot(out string response)
 		{
-			return HttpRest.Post(string.Concat(dbUrl, "/node"), string.IsNullOrWhiteSpace(jsonProperties) ? null : jsonProperties, out response);
+			return HttpRest.Get(_dbUrl, out response);
 		}
 
-		public static HttpStatusCode GetNode(string dbUrl, long nodeId, out string response)
+		public HttpStatusCode CreateNode(string jsonProperties, out string response)
 		{
-			return HttpRest.Get(string.Concat(dbUrl, "/node/", nodeId.ToString()), out response);
+			return HttpRest.Post(string.Concat(_dbUrl, "/node"), string.IsNullOrWhiteSpace(jsonProperties) ? null : jsonProperties, out response);
 		}
 
-		public static HttpStatusCode SetPropertiesOnNode(string dbUrl, long nodeId, string jsonProperties)
+		public HttpStatusCode GetNode(long nodeId, out string response)
 		{
-			return HttpRest.Put(string.Concat(dbUrl, "/node/", nodeId.ToString(), "/properties"), jsonProperties);
+			return HttpRest.Get(string.Concat(_dbUrl, "/node/", nodeId.ToString()), out response);
 		}
 
-		public static HttpStatusCode GetPropertiesOnNode(string dbUrl, long nodeId, out string response)
+		public HttpStatusCode SetPropertiesOnNode(long nodeId, string jsonProperties)
 		{
-			return HttpRest.Get(string.Concat(dbUrl, "/node/", nodeId.ToString(), "/properties"), out response);
+			return HttpRest.Put(string.Concat(_dbUrl, "/node/", nodeId.ToString(), "/properties"), jsonProperties);
+		}
+
+		public HttpStatusCode GetPropertiesOnNode(long nodeId, out string response)
+		{
+			return HttpRest.Get(string.Concat(_dbUrl, "/node/", nodeId.ToString(), "/properties"), out response);
 		}
 
 		public static HttpStatusCode RemovePropertiesFromNode(string dbUrl, long nodeId)
@@ -55,12 +61,12 @@ namespace Neo4jRestNet.Rest
 			return HttpRest.Delete(string.Concat(dbUrl, "/node/", nodeId.ToString(), "/properties/", propertyName));
 		}
 
-		public static HttpStatusCode DeleteNode(string dbUrl, long nodeId)
+		public HttpStatusCode DeleteNode(long nodeId)
 		{
-			return HttpRest.Delete(string.Concat(dbUrl, "/node/", nodeId.ToString()));
+			return HttpRest.Delete(string.Concat(_dbUrl, "/node/", nodeId.ToString()));
 		}
 
-		public static HttpStatusCode CreateRelationship(string dbUrl, long fromNodeId, string toNodeSelf, string name, string jsonProperties, out string response)
+		public HttpStatusCode CreateRelationship(long fromNodeId, string toNodeSelf, string name, string jsonProperties, out string response)
 		{
 			var jo = new JObject
                          {
@@ -69,7 +75,7 @@ namespace Neo4jRestNet.Rest
                              {"type", name}
                          };
 
-			return HttpRest.Post(string.Concat(dbUrl, "/node/", fromNodeId.ToString(), "/relationships"), jo.ToString(Formatting.None), out response);
+			return HttpRest.Post(string.Concat(_dbUrl, "/node/", fromNodeId.ToString(), "/relationships"), jo.ToString(Formatting.None), out response);
 		}
 
 		public static HttpStatusCode SetPropertiesOnRelationship(string dbUrl, long relationshipId, string jsonProperties)
@@ -114,7 +120,7 @@ namespace Neo4jRestNet.Rest
 			return HttpRest.Delete(string.Concat(dbUrl, "/relationship/", relationshipId.ToString()));
 		}
 
-		public static HttpStatusCode GetRelationshipsOnNode(string dbUrl, long nodeId, RelationshipDirection direction, IEnumerable<string> relationships, out string response)
+		public HttpStatusCode GetRelationshipsOnNode(long nodeId, RelationshipDirection direction, IEnumerable<string> relationships, out string response)
 		{
 			if (direction == null)
 			{
@@ -125,13 +131,13 @@ namespace Neo4jRestNet.Rest
 			{
 				return
 					HttpRest.Get(
-						string.Concat(dbUrl, "/node/", nodeId.ToString(), "/relationships/", direction.ToString()),
+						string.Concat(_dbUrl, "/node/", nodeId.ToString(), "/relationships/", direction.ToString()),
 						out response);
 			}
 
 			return
 				HttpRest.Get(
-					string.Concat(dbUrl, "/node/", nodeId.ToString(), "/relationships/", direction.ToString(), "/",
+					string.Concat(_dbUrl, "/node/", nodeId.ToString(), "/relationships/", direction.ToString(), "/",
 								  string.Join("&", relationships)), out response);
 		}
 
@@ -172,16 +178,16 @@ namespace Neo4jRestNet.Rest
 			return HttpRest.Get(string.Concat(dbUrl, "/index/relationship"), out response);
 		}
 
-		public static HttpStatusCode AddNodeToIndex(string dbUrl, long nodeId, string indexName, string key, object value, out string response)
+		public HttpStatusCode AddNodeToIndex(long nodeId, string indexName, string key, object value, out string response)
 		{
-			var self = string.Concat(dbUrl, "/", nodeId.ToString());
-			return AddNodeToIndex(dbUrl, self, indexName, key, value, out response);
+			var self = string.Concat(_dbUrl, "/", nodeId.ToString());
+			return AddNodeToIndex(self, indexName, key, value, out response);
 		}
 
-		public static HttpStatusCode AddNodeToIndex(string dbUrl, string nodeSelf, string indexName, string key, object value, out string response)
+		public HttpStatusCode AddNodeToIndex(string nodeSelf, string indexName, string key, object value, out string response)
 		{
 			var obj = new { value, uri = nodeSelf, key };
-			return HttpRest.Post(string.Concat(dbUrl, "/index/node/", indexName),
+			return HttpRest.Post(string.Concat(_dbUrl, "/index/node/", indexName),
 								 JToken.FromObject(obj).ToString(Formatting.None), out response);
 		}
 
@@ -198,21 +204,21 @@ namespace Neo4jRestNet.Rest
                                   JToken.FromObject(obj).ToString(Formatting.None), out response);
 		}
 
-		public static HttpStatusCode RemoveNodeFromIndex(string dbUrl, long nodeId, string indexName, string key, object value)
+		public HttpStatusCode RemoveNodeFromIndex(long nodeId, string indexName, string key, object value)
 		{
 			return
-				HttpRest.Delete(string.Concat(dbUrl, "/index/node/", indexName, "/", key, "/",
+				HttpRest.Delete(string.Concat(_dbUrl, "/index/node/", indexName, "/", key, "/",
 											  JToken.FromObject(value).ToString(Formatting.None), "/", nodeId));
 		}
 
-		public static HttpStatusCode RemoveNodeFromIndex(string dbUrl, long nodeId, string indexName, string key)
+		public HttpStatusCode RemoveNodeFromIndex(long nodeId, string indexName, string key)
 		{
-			return HttpRest.Delete(string.Concat(dbUrl, "/index/node/", indexName, "/", key, "/", nodeId));
+			return HttpRest.Delete(string.Concat(_dbUrl, "/index/node/", indexName, "/", key, "/", nodeId));
 		}
 
-		public static HttpStatusCode RemoveNodeFromIndex(string dbUrl, long nodeId, string indexName)
+		public HttpStatusCode RemoveNodeFromIndex(long nodeId, string indexName)
 		{
-			return HttpRest.Delete(string.Concat(dbUrl, "/index/node/", indexName, "/", nodeId));
+			return HttpRest.Delete(string.Concat(_dbUrl, "/index/node/", indexName, "/", nodeId));
 		}
 
 		public static HttpStatusCode RemoveRelationshipFromIndex(string dbUrl, long relationshipId, string indexName, string key, object value)
@@ -232,14 +238,14 @@ namespace Neo4jRestNet.Rest
 			return HttpRest.Delete(string.Concat(dbUrl, "/index/relationship/", indexName, "/", relationshipId));
 		}
 
-		public static HttpStatusCode GetNode(string dbUrl, string indexName, string key, object value, out string response)
+		public HttpStatusCode GetNode(string indexName, string key, object value, out string response)
 		{
-			return HttpRest.Get(string.Concat(dbUrl, "/index/node/", indexName, "/", key, "/", value.ToString()), out response);
+			return HttpRest.Get(string.Concat(_dbUrl, "/index/node/", indexName, "/", key, "/", value.ToString()), out response);
 		}
 
-		public static HttpStatusCode GetNode(string dbUrl, string indexName, string searchQuery, out string response)
+		public HttpStatusCode GetNode(string indexName, string searchQuery, out string response)
 		{
-			return HttpRest.Get(string.Concat(dbUrl, "/index/node/", indexName, "?query=", searchQuery), out response);
+			return HttpRest.Get(string.Concat(_dbUrl, "/index/node/", indexName, "?query=", searchQuery), out response);
 		}
 
 		public static HttpStatusCode GetRelationship(string dbUrl, string indexName, string key, object value, out string response)
@@ -252,7 +258,7 @@ namespace Neo4jRestNet.Rest
 			return HttpRest.Get(string.Concat(dbUrl, "/index/relationship/", indexName, "?query=", searchQuery), out response);
 		}
 
-		public static HttpStatusCode Traverse(string dbUrl, long nodeId, Order order, Uniqueness uniqueness,
+		public HttpStatusCode Traverse(long nodeId, Order order, Uniqueness uniqueness,
 											  IEnumerable<TraverseRelationship> relationships,
 											  PruneEvaluator pruneEvaluator, ReturnFilter returnFilter, int? maxDepth,
 											  ReturnType returnType, out string response)
@@ -283,7 +289,7 @@ namespace Neo4jRestNet.Rest
 
 			return
 				HttpRest.Post(
-					string.Concat(dbUrl, "/node/", nodeId, "/traverse/",
+					string.Concat(_dbUrl, "/node/", nodeId, "/traverse/",
 								  returnType == null ? ReturnType.Node.ToString() : returnType.ToString()),
 					jo.ToString(Formatting.None), out response);
 		}

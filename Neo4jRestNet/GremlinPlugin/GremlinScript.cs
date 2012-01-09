@@ -1,11 +1,16 @@
-﻿using System.Text;
+﻿using System.Linq;
+using System.Text;
 using Neo4jRestNet.Core;
+using System.Collections.Generic;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Neo4jRestNet.GremlinPlugin
 {
 	public class GremlinScript : IJavaObject
 	{
 		private StringBuilder _sb = new StringBuilder();
+		private List<object> _parameters = new List<object>();
 
 		public GremlinScript()
 		{
@@ -13,12 +18,14 @@ namespace Neo4jRestNet.GremlinPlugin
 
 		public GremlinScript(Node node)
 		{
-			_sb.AppendFormat("g.v({0})", node.Id);
+			Append("g.v({0})", node.Id);
+			// _sb.AppendFormat("g.v({0})", node.Id);
 		}
 
 		public GremlinScript(Relationship relationship)
 		{
-			_sb.AppendFormat("g.e({0})", relationship.Id);
+			Append("g.e({0})", relationship.Id);
+			//_sb.AppendFormat("g.e({0})", relationship.Id);
 		}
 
 		public GremlinScript(IJavaObject javaObject)
@@ -50,16 +57,41 @@ namespace Neo4jRestNet.GremlinPlugin
 			return this; 
 		}
 
-		public GremlinScript Append(string format, params object[] args)
+		public GremlinScript Append(string format, params object[] parameters)
 		{
-			_sb.Append(string.Format(format, args));
+			var startIndex = _parameters.Count;
+
+			_parameters.AddRange(parameters);
+
+			var parameterNames = parameters.Select((p, index) => string.Concat("p", startIndex + index)).ToArray<object>();
+
+			_sb.Append(string.Format(format, parameterNames));
 
 			return this;
 		}
-
+/*
 		public override string ToString()
 		{
 			return _sb.ToString();
+		}
+*/
+		public string GetScript()
+		{
+			var joScript = new JObject{{"script", _sb.ToString()}};
+
+			if (_parameters.Any())
+			{
+				var count = 0;
+				var joParams = new JObject();
+				foreach (var p in _parameters)
+				{
+					joParams.Add(string.Format("p{0}", count++), JToken.FromObject(p));
+				}
+
+				joScript.Add("params", joParams);
+			}
+
+			return joScript.ToString(Formatting.None);
 		}
 
 		public static bool operator ==(GremlinScript gs, object other)

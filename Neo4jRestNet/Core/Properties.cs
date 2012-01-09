@@ -24,8 +24,8 @@ namespace Neo4jRestNet.Core
 		private static T Unbox<T>(object o)
 		{
 
-			Type t = typeof(T);
-			Type u = Nullable.GetUnderlyingType(t);
+			var t = typeof(T);
+			var u = Nullable.GetUnderlyingType(t);
 
 			if (u != null)
 			{
@@ -41,7 +41,7 @@ namespace Neo4jRestNet.Core
 		public T GetProperty<T>(string key)
 		{
 			if (!_properties.Keys.Contains(key)) throw new Exception(string.Format("Failed to retrieve property {0}", key));
-			object property = _properties[key];
+			var property = _properties[key];
 			if (property != null && property is ICollection)
 			{
 				throw new Exception("Do not support retrieving of arrays");
@@ -58,7 +58,7 @@ namespace Neo4jRestNet.Core
 		public object GetProperty(string key)
 		{
 			if (!_properties.Keys.Contains(key)) throw new Exception(string.Format("Failed to retrieve property {0}", key));
-			object property = _properties[key];
+			var property = _properties[key];
 			if (property != null && property is ICollection)
 			{
 				throw new Exception("Do not support retrieving of arrays");
@@ -72,7 +72,7 @@ namespace Neo4jRestNet.Core
 			return GetProperty(key.ToString());
 		}
 
-		private object DefaultTypeValue<T>()
+		private static object DefaultTypeValue<T>()
 		{
 			if (typeof(T) == typeof(string))
 			{

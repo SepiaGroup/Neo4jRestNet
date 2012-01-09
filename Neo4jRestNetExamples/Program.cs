@@ -70,10 +70,7 @@ namespace Example
 
 			// Gremlin 
 
-			// Get Like relationships from the Root Node
-			
-			var likeNodes = Gremlin.Post<Node>(rootNode.Id, "out('Likes')");
-			
+		
 			// Same as above
 			var sameLikeNodes = Gremlin.Post<Node>(new GremlinScript(rootNode).Out(RelationshipType.Likes.ToString()));
 
@@ -84,7 +81,7 @@ namespace Example
 				.OutE()
 				.Filter("it.getProperty('{0}') == '{1}'", RelationshipProperty.Name, "MyRelationship");
 
-			var myRelationship = Gremlin.Post<Relationship>(script.ToString());
+			var myRelationship = Gremlin.Post<Relationship>(script);
 
 			// More Gremlin example
 			var script1 = new GremlinScript(rootNode);
@@ -93,7 +90,7 @@ namespace Example
 				.OutE()
 				.Filter(it => it.GetProperty(RelationshipProperty.Name.ToString()) == "MyRelationship");
 
-			IEnumerable<Relationship> myRelationship1 = Gremlin.Post<Relationship>(script1.ToString());
+			IEnumerable<Relationship> myRelationship1 = Gremlin.Post<Relationship>(script1);
 
 			// Gremlin returning a datatable
 			var tblScript = new GremlinScript();

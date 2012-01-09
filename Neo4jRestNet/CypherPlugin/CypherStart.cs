@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text;
 
 namespace Neo4jRestNet.CypherPlugin
@@ -14,6 +15,16 @@ namespace Neo4jRestNet.CypherPlugin
 		{
 			var comma = _sb.Length == 0 ? string.Empty : ",";
 			_sb.AppendFormat("{2} {0}=node({1})", name, id, comma);
+
+			return this;
+		}
+
+		public CypherStart Node(string name, IEnumerable<long> ids)
+		{
+			var strIds = string.Join(",", ids);
+			var comma = _sb.Length == 0 ? string.Empty : ",";
+
+			_sb.AppendFormat("{2} {0}=node({1})", name, strIds, comma);
 
 			return this;
 		}
