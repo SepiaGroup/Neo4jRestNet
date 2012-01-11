@@ -17,6 +17,14 @@ namespace Neo4jRestNet.Test
 	{
 
 		[TestMethod]
+		public void GetNode()
+		{
+			var node = Node.GetNode(0);
+
+			Assert.AreEqual(node.Id, 0);
+		}
+
+		[TestMethod]
 		public void NewGEIDFromLong()
 		{
 			EncryptId geid = new EncryptId(123);

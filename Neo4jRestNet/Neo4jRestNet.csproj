@@ -114,6 +114,7 @@
     <Compile Include="GremlinPlugin\ParseJavaLambda.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Core\Relationship.cs" />
+    <Compile Include="Rest\INeo4jRestApi.cs" />
     <Compile Include="Rest\Neo4jRestApi.cs" />
     <Compile Include="Rest\HttpRest.cs" />
     <Compile Include="Rest\PathAlgorithm.cs" />

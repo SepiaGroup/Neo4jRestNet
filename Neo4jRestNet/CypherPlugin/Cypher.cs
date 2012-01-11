@@ -21,8 +21,8 @@ namespace Neo4jRestNet.CypherPlugin
 		readonly List<Expression<Func<CypherWhere, object>>> _where = new List<Expression<Func<CypherWhere, object>>>();
 		readonly List<Func<CypherReturn, object>> _return = new List<Func<CypherReturn, object>>();
 		readonly List<Func<CypherOrderBy, object>> _orderBy = new List<Func<CypherOrderBy, object>>();
-		String _skip = string.Empty;
-		String _limit = string.Empty;
+		string _skip = string.Empty;
+		string _limit = string.Empty;
 
 		public DataTable Post()
 		{
@@ -177,7 +177,7 @@ namespace Neo4jRestNet.CypherPlugin
 			{
 				var sbToString = new StringBuilder();
 
-				string label = "START";
+				var label = "START";
 				foreach (var s in _start)
 				{
 					sbToString.AppendFormat("{1}{0}", s.Invoke(new CypherStart()), label);

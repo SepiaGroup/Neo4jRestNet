@@ -17,8 +17,6 @@ namespace Neo4jRestNet.GremlinPlugin
 
 		public static HttpStatusCode Post(GremlinScript script)
 		{
-			//return Post(string.Concat(DefaultDbUrl, DefaultGremlinExtensionPath), script);
-
 			// Remove trailing /
 			var gremlinUrl = string.Concat(DefaultDbUrl, DefaultGremlinExtensionPath).TrimEnd('/');
 
@@ -29,44 +27,7 @@ namespace Neo4jRestNet.GremlinPlugin
 
 			return status;
 		}
-/*	
-		public static HttpStatusCode Post(string script)
-		{
-			 return Post(string.Concat(DefaultDbUrl, DefaultGremlinExtensionPath), script);
-		}
-*/
-/*
-		public static HttpStatusCode Post(string gremlinUrl, GremlinScript script)
-		{
-			return Post(gremlinUrl, script.ToString());
-		}
-*/
-/*
-		public static HttpStatusCode Post(string gremlinUrl, string script)
-		{
-			// Remove trailing /
-			gremlinUrl = gremlinUrl.TrimEnd('/');
 
-			var jo = new JObject {{"script", script}};
-
-			string response;
-			HttpStatusCode status = Rest.HttpRest.Post(gremlinUrl, jo.ToString(Formatting.None), out response);
-
-			return status;
-		}
-*/
-/*
-		public static IEnumerable<T> Post<T>(EncryptId startNodeId, string script) where T : IGraphObject
-		{
-			return Post<T>(string.Concat(DefaultDbUrl, DefaultGremlinExtensionPath), string.Format("g.v({0}).{1}", (long)startNodeId, script)); 
-		}
-*/ 
-/*		
-		public static IEnumerable<T> Post<T>(string script) where T : IGraphObject
-		{
-			return Post<T>(string.Concat(DefaultDbUrl, DefaultGremlinExtensionPath), script);
-		}
-*/
 		public static IEnumerable<T> Post<T>(GremlinScript script) where T : IGraphObject
 		{
 			return Post<T>(string.Concat(DefaultDbUrl, DefaultGremlinExtensionPath), script);
@@ -74,8 +35,6 @@ namespace Neo4jRestNet.GremlinPlugin
 
 		public static IEnumerable<T> Post<T>(string gremlinUrl, GremlinScript script) where T : IGraphObject
 		{
-//			return Post<T>(gremlinUrl, script.ToString());
-
 			// Remove trailing /
 			gremlinUrl = gremlinUrl.TrimEnd('/');
 
@@ -103,37 +62,7 @@ namespace Neo4jRestNet.GremlinPlugin
 
 
 		}
-/*
-		public static IEnumerable<T> Post<T>(string gremlinUrl, string script) where T : IGraphObject
-		{
-			// Remove trailing /
-			gremlinUrl = gremlinUrl.TrimEnd('/');
 
-			var typeParameterType = typeof(T);
-
-			var jo = new JObject {{"script", script}};
-
-			string response;
-			HttpStatusCode status = Rest.HttpRest.Post(gremlinUrl, jo.ToString(Formatting.None), out response);
-
-			if (typeParameterType == typeof(Node))
-			{
-				return (IEnumerable<T>)Node.ParseJson(response);
-			}
-			
-			if (typeParameterType == typeof(Relationship))
-			{
-				return (IEnumerable<T>)Relationship.ParseJson(response);
-			}
-			
-			if (typeParameterType == typeof(Path))
-			{
-				return (IEnumerable<T>)Path.ParseJson(response);
-			}
-
-			throw new Exception("Return type " + typeParameterType.ToString() + " not implemented");
-		}
-*/
 		public static DataTable GetTable(string script)
 		{
 			return GetTable(string.Concat(DefaultDbUrl, DefaultGremlinExtensionPath), script);
@@ -157,7 +86,7 @@ namespace Neo4jRestNet.GremlinPlugin
 			var joScript = new JObject {{"script", script}};
 
 			string response;
-			HttpStatusCode status = Rest.HttpRest.Post(gremlinUrl, joScript.ToString(Formatting.None), out response);
+			var status = Rest.HttpRest.Post(gremlinUrl, joScript.ToString(Formatting.None), out response);
 
 			var joResponse = JObject.Parse(response);
 			var jaColumns =(JArray)joResponse["columns"];
@@ -196,8 +125,8 @@ namespace Neo4jRestNet.GremlinPlugin
 							}
 							else
 							{
-								string self = jCol["self"].ToString();
-								string[] selfArray = self.Split('/');
+								var self = jCol["self"].ToString();
+								var selfArray = self.Split('/');
 								if (selfArray.Length > 2 && selfArray[selfArray.Length - 2] == "node"  )
 								{
 									row.Add(Node.InitializeFromNodeJson((JObject)jCol));
@@ -281,7 +210,7 @@ namespace Neo4jRestNet.GremlinPlugin
 				}
 
 				initColumns = false;
-				DataRow dtRow = dt.NewRow();
+				var dtRow = dt.NewRow();
 				dtRow.ItemArray = row.ToArray();
 				dt.Rows.Add(dtRow);
 			}

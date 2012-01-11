@@ -1,30 +1,24 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Configuration;
-using System.Linq;
-using System.Text;
 using Neo4jRestNet.Rest;
 
 namespace Neo4jRestNet.Core
 {
 
-	public enum DbStore
-	{
-		Default,
-		InMemory
-	}
 	public class StoreFactory
 	{
-		private static readonly string DefaultDbUrl = ConfigurationManager.ConnectionStrings["neo4j"].ConnectionString.TrimEnd('/');
-
-		public Neo4jRestApi Create(DbStore dbStore)
+		public INeo4jRestApi CreateNeo4jRestApi(string connectionName)
 		{
-			switch (dbStore)
-			{
-				case DbStore.Default:
-					return new Neo4jRestApi(DefaultDbUrl);
+			var dbUrl = ConfigurationManager.ConnectionStrings[connectionName].ConnectionString.TrimEnd('/');
+			var provider = ConfigurationManager.ConnectionStrings[connectionName].ProviderName.ToLower();
 
-				case DbStore.InMemory:
+			switch (provider)
+			{
+				case "":
+				case "neo4j" :
+					return new Neo4jRestApi(dbUrl);
+
+				case "inmemory":
 					throw new NotImplementedException();
 
 				default:

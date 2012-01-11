@@ -7,7 +7,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Neo4jRestNet.Rest
 {
-	public class Neo4jRestApi
+	public class Neo4jRestApi : INeo4jRestApi
 	{
 		private readonly string _dbUrl;
 		public Neo4jRestApi(string dbUrl)
@@ -40,23 +40,23 @@ namespace Neo4jRestNet.Rest
 			return HttpRest.Get(string.Concat(_dbUrl, "/node/", nodeId.ToString(), "/properties"), out response);
 		}
 
-		public static HttpStatusCode RemovePropertiesFromNode(string dbUrl, long nodeId)
+		public HttpStatusCode RemovePropertiesFromNode(string dbUrl, long nodeId)
 		{
 			return HttpRest.Delete(string.Concat(dbUrl, "/node/", nodeId.ToString(), "/properties"));
 		}
 
-		public static HttpStatusCode SetPropertyOnNode(string dbUrl, long nodeId, string propertyName, object value)
+		public HttpStatusCode SetPropertyOnNode(string dbUrl, long nodeId, string propertyName, object value)
 		{
 			return HttpRest.Put(string.Concat(dbUrl, "/node/", nodeId.ToString(), "/properties/", propertyName),
 								JToken.FromObject(value).ToString(Formatting.None));
 		}
 
-		public static HttpStatusCode GetPropertyOnNode(string dbUrl, long nodeId, string propertyName, out string response)
+		public HttpStatusCode GetPropertyOnNode(string dbUrl, long nodeId, string propertyName, out string response)
 		{
 			return HttpRest.Get(string.Concat(dbUrl, "/node/", nodeId.ToString(), "/properties/", propertyName), out response);
 		}
 
-		public static HttpStatusCode RemovePropertyFromNode(string dbUrl, long nodeId, string propertyName)
+		public HttpStatusCode RemovePropertyFromNode(string dbUrl, long nodeId, string propertyName)
 		{
 			return HttpRest.Delete(string.Concat(dbUrl, "/node/", nodeId.ToString(), "/properties/", propertyName));
 		}
@@ -78,22 +78,22 @@ namespace Neo4jRestNet.Rest
 			return HttpRest.Post(string.Concat(_dbUrl, "/node/", fromNodeId.ToString(), "/relationships"), jo.ToString(Formatting.None), out response);
 		}
 
-		public static HttpStatusCode SetPropertiesOnRelationship(string dbUrl, long relationshipId, string jsonProperties)
+		public HttpStatusCode SetPropertiesOnRelationship(string dbUrl, long relationshipId, string jsonProperties)
 		{
 			return HttpRest.Put(string.Concat(dbUrl, "/relationship/", relationshipId.ToString(), "/properties"), jsonProperties);
 		}
 
-		public static HttpStatusCode GetPropertiesOnRelationship(string dbUrl, long relationshipId, out string response)
+		public HttpStatusCode GetPropertiesOnRelationship(string dbUrl, long relationshipId, out string response)
 		{
 			return HttpRest.Get(string.Concat(dbUrl, "/relationship/", relationshipId.ToString(), "/properties"), out response);
 		}
 
-		public static HttpStatusCode RemovePropertiesFromRelationship(string dbUrl, long relationshipId)
+		public HttpStatusCode RemovePropertiesFromRelationship(string dbUrl, long relationshipId)
 		{
 			return HttpRest.Delete(string.Concat(dbUrl, "/node/", relationshipId.ToString(), "/properties"));
 		}
 
-		public static HttpStatusCode SetPropertyOnRelationship(string dbUrl, long relationshipId, string propertyName, object value)
+		public HttpStatusCode SetPropertyOnRelationship(string dbUrl, long relationshipId, string propertyName, object value)
 		{
 			return
 				HttpRest.Put(
@@ -101,7 +101,7 @@ namespace Neo4jRestNet.Rest
 					JToken.FromObject(value).ToString());
 		}
 
-		public static HttpStatusCode GetPropertyOnRelationship(string dbUrl, long relationshipId, string propertyName, out string response)
+		public HttpStatusCode GetPropertyOnRelationship(string dbUrl, long relationshipId, string propertyName, out string response)
 		{
 			return
 				HttpRest.Get(
@@ -109,13 +109,13 @@ namespace Neo4jRestNet.Rest
 					out response);
 		}
 
-		public static HttpStatusCode RemovePropertyFromRelationship(string dbUrl, long relationshipId, string propertyName)
+		public HttpStatusCode RemovePropertyFromRelationship(string dbUrl, long relationshipId, string propertyName)
 		{
 			return HttpRest.Delete(string.Concat(dbUrl, "/relationship/", relationshipId.ToString(), "/properties/",
 											  propertyName));
 		}
 
-		public static HttpStatusCode DeleteRelationship(string dbUrl, long relationshipId)
+		public HttpStatusCode DeleteRelationship(string dbUrl, long relationshipId)
 		{
 			return HttpRest.Delete(string.Concat(dbUrl, "/relationship/", relationshipId.ToString()));
 		}
@@ -141,39 +141,39 @@ namespace Neo4jRestNet.Rest
 								  string.Join("&", relationships)), out response);
 		}
 
-		public static HttpStatusCode GetRelationshipTypes(string dbUrl, out string response)
+		public HttpStatusCode GetRelationshipTypes(string dbUrl, out string response)
 		{
 			return HttpRest.Get(string.Concat(dbUrl, "/relationship/types"), out response);
 		}
 
-		public static HttpStatusCode CreateNodeIndex(string dbUrl, string indexName, string jsonConfig, out string response)
+		public HttpStatusCode CreateNodeIndex(string dbUrl, string indexName, string jsonConfig, out string response)
 		{
 			var jo = new JObject { { "name", indexName }, { "config", jsonConfig } };
 			return HttpRest.Post(string.Concat(dbUrl, "/index/node"), jo.ToString(Formatting.None), out response);
 		}
 
-		public static HttpStatusCode CreateRelationshipIndex(string dbUrl, string indexName, string jsonConfig, out string response)
+		public HttpStatusCode CreateRelationshipIndex(string dbUrl, string indexName, string jsonConfig, out string response)
 		{
 			var jo = new JObject { { "name", indexName }, { "config", jsonConfig } };
 			return HttpRest.Post(string.Concat(dbUrl, "/index/relationship"), jo.ToString(Formatting.None), out response);
 		}
 
-		public static HttpStatusCode DeleteNodeIndex(string dbUrl, string indexName)
+		public HttpStatusCode DeleteNodeIndex(string dbUrl, string indexName)
 		{
 			return HttpRest.Delete(string.Concat(dbUrl, "/index/node/", indexName));
 		}
 
-		public static HttpStatusCode DeleteRelationshipIndex(string dbUrl, string indexName)
+		public HttpStatusCode DeleteRelationshipIndex(string dbUrl, string indexName)
 		{
 			return HttpRest.Delete(string.Concat(dbUrl, "/index/relationship/", indexName));
 		}
 
-		public static HttpStatusCode ListNodeIndexes(string dbUrl, out string response)
+		public HttpStatusCode ListNodeIndexes(string dbUrl, out string response)
 		{
 			return HttpRest.Get(string.Concat(dbUrl, "/index/node"), out response);
 		}
 
-		public static HttpStatusCode ListRelationshipIndexes(string dbUrl, out string response)
+		public HttpStatusCode ListRelationshipIndexes(string dbUrl, out string response)
 		{
 			return HttpRest.Get(string.Concat(dbUrl, "/index/relationship"), out response);
 		}
@@ -191,13 +191,13 @@ namespace Neo4jRestNet.Rest
 								 JToken.FromObject(obj).ToString(Formatting.None), out response);
 		}
 
-		public static HttpStatusCode AddRelationshipToIndex(string dbUrl, long relationshipId, string indexName, string key, object value, out string response)
+		public HttpStatusCode AddRelationshipToIndex(string dbUrl, long relationshipId, string indexName, string key, object value, out string response)
 		{
 			var self = string.Concat(dbUrl, "/", relationshipId.ToString());
 			return AddRelationshipToIndex(dbUrl, self, indexName, key, value, out response);
 		}
 
-		public static HttpStatusCode AddRelationshipToIndex(string dbUrl, string relationshipself, string indexName, string key, object value, out string response)
+		public HttpStatusCode AddRelationshipToIndex(string dbUrl, string relationshipself, string indexName, string key, object value, out string response)
 		{
             var obj = new { value, uri = relationshipself, key };
 			return HttpRest.Post(string.Concat(dbUrl, "/index/relationship/", indexName),
@@ -221,19 +221,19 @@ namespace Neo4jRestNet.Rest
 			return HttpRest.Delete(string.Concat(_dbUrl, "/index/node/", indexName, "/", nodeId));
 		}
 
-		public static HttpStatusCode RemoveRelationshipFromIndex(string dbUrl, long relationshipId, string indexName, string key, object value)
+		public HttpStatusCode RemoveRelationshipFromIndex(string dbUrl, long relationshipId, string indexName, string key, object value)
 		{
 			return
 				HttpRest.Delete(string.Concat(dbUrl, "/index/relationship/", indexName, "/", key, "/",
 											  JToken.FromObject(value).ToString(Formatting.None), "/", relationshipId));
 		}
 
-		public static HttpStatusCode RemoveRelationshipFromIndex(string dbUrl, long relationshipId, string indexName, string key)
+		public HttpStatusCode RemoveRelationshipFromIndex(string dbUrl, long relationshipId, string indexName, string key)
 		{
 			return HttpRest.Delete(string.Concat(dbUrl, "/index/relationship/", indexName, "/", key, "/", relationshipId));
 		}
 
-		public static HttpStatusCode RemoveRelationshipFromIndex(string dbUrl, long relationshipId, string indexName)
+		public HttpStatusCode RemoveRelationshipFromIndex(string dbUrl, long relationshipId, string indexName)
 		{
 			return HttpRest.Delete(string.Concat(dbUrl, "/index/relationship/", indexName, "/", relationshipId));
 		}
@@ -248,12 +248,12 @@ namespace Neo4jRestNet.Rest
 			return HttpRest.Get(string.Concat(_dbUrl, "/index/node/", indexName, "?query=", searchQuery), out response);
 		}
 
-		public static HttpStatusCode GetRelationship(string dbUrl, string indexName, string key, object value, out string response)
+		public HttpStatusCode GetRelationship(string dbUrl, string indexName, string key, object value, out string response)
 		{
 			return HttpRest.Get(string.Concat(dbUrl, "/index/relationship/", indexName, "/", key, "/", value.ToString()), out response);
 		}
 
-		public static HttpStatusCode GetRelationship(string dbUrl, string indexName, string searchQuery, out string response)
+		public HttpStatusCode GetRelationship(string dbUrl, string indexName, string searchQuery, out string response)
 		{
 			return HttpRest.Get(string.Concat(dbUrl, "/index/relationship/", indexName, "?query=", searchQuery), out response);
 		}
@@ -294,7 +294,7 @@ namespace Neo4jRestNet.Rest
 					jo.ToString(Formatting.None), out response);
 		}
 
-		public static HttpStatusCode PathBetweenNodes(string dbUrl, long fromNodeId, long toNodeId,
+		public HttpStatusCode PathBetweenNodes(string dbUrl, long fromNodeId, long toNodeId,
 													  IEnumerable<TraverseRelationship> relationships, int maxDepth,
 													  PathAlgorithm algorithm, bool returnAllPaths, out string response)
 		{
