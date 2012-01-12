@@ -88,6 +88,8 @@
     <Compile Include="Core\IGraphObject.cs" />
     <Compile Include="Core\RelationshipDirection.cs" />
     <Compile Include="Core\StoreFactory.cs" />
+    <Compile Include="CypherPlugin\CypherNeo4j.cs" />
+    <Compile Include="CypherPlugin\ICypher.cs" />
     <Compile Include="CypherPlugin\CypherOrderBy.cs" />
     <Compile Include="CypherPlugin\CypherWhere.cs" />
     <Compile Include="CypherPlugin\CypherReturn.cs" />

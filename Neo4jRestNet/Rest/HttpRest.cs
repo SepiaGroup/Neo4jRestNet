@@ -8,7 +8,6 @@ namespace Neo4jRestNet.Rest
     {
 		private static HttpStatusCode BaseRestRequest(string url, string method, string body)
 		{
-
 			var w = (HttpWebRequest)WebRequest.Create(url);
 			w.Proxy = null;
 			w.Method = method;
@@ -16,17 +15,17 @@ namespace Neo4jRestNet.Rest
 
 			if (!string.IsNullOrEmpty(body))
 			{
-				Stream dataStream = w.GetRequestStream();
+				var dataStream = w.GetRequestStream();
 
 				byte[] b = Encoding.UTF8.GetBytes(body);
 				dataStream.Write(b, 0, b.Length);
 				dataStream.Close();
 			}
 
-			WebResponse resp = w.GetResponse();
+			var resp = w.GetResponse();
 			resp.Close();
 
-			HttpStatusCode statusCode = ((HttpWebResponse)resp).StatusCode;
+			var statusCode = ((HttpWebResponse)resp).StatusCode;
 
 			return statusCode;
 		}
