@@ -60,7 +60,7 @@ namespace Example
 			var prop = new Properties();
 			prop.SetProperty(NodeProperty.FirstName.ToString(), "Joe");
 			prop.SetProperty(NodeProperty.LastName.ToString(), "Smith");
-
+			 
 			var nodeUserWithName = GraphFactory.CreateNode().CreateNode(NodeType.User.ToString(), prop);
 
 			// Create a User Node with Properties - using passedin implementation (using default implementation for tesing) 
@@ -188,7 +188,7 @@ namespace Example
 							});
 
 			tbl = c6.Post();
-
+/*
 			// Alt Syntax
 			var c7 = CypherFactory.CreateCypher();
 			c7.Start(s => s.Node("MyNode", "Index-Name", "QueryString"));
@@ -199,7 +199,7 @@ namespace Example
 			c7.Return(r => r.Node("B"));
 
 			tbl = c7.Post();
-
+*/
 
 		 }
  

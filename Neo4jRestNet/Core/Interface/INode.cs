@@ -74,7 +74,7 @@ namespace Neo4jRestNet.Core.Interface
 		HttpStatusCode RemoveNodeFromIndex(long nodeId, Enum indexName, string key, object value);
 		HttpStatusCode RemoveNodeFromIndex(long nodeId, string indexName, Enum key, object value);
 		HttpStatusCode RemoveNodeFromIndex(long nodeId, Enum indexName, Enum key, object value);
-
+		 
 		IEnumerable<INode> ParseJson(string jsonNodes);
 	}
 }

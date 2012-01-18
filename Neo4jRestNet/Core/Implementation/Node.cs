@@ -639,7 +639,7 @@ namespace Neo4jRestNet.Core.Implementation
 		        case JTokenType.Object:
 					nodes.Add(InitializeFromNodeJson(jo["root"].ToString(Formatting.None)));
 		            break;
-
+ 
 		        case JTokenType.Array:
 					nodes.AddRange(from JObject jsonNode in jo["root"] select InitializeFromNodeJson(jsonNode));
 		            break;
