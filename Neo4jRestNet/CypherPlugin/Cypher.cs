@@ -3,26 +3,27 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Linq.Expressions;
 using System.Data;
+using Neo4jRestNet.Core.Implementation;
+using Neo4jRestNet.Core.Interface;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
-using Neo4jRestNet.Core;
 using System.Collections.ObjectModel;
 using System.Text;
 
 namespace Neo4jRestNet.CypherPlugin
 {
-	public class Cypher
+	public class Cypher : ICypher
 	{
 		private static readonly string DefaultDbUrl = ConfigurationManager.ConnectionStrings["neo4j"].ConnectionString.TrimEnd('/');
 		private static readonly string DefaultCypherExtensionPath = ConfigurationManager.ConnectionStrings["neo4jCypherExtension"].ConnectionString.TrimEnd('/');
 
-		readonly List<Func<CypherStart, object>> _start = new List<Func<CypherStart, object>>();
-		readonly List<Func<CypherMatch, object>> _match = new List<Func<CypherMatch, object>>();
-		readonly List<Expression<Func<CypherWhere, object>>> _where = new List<Expression<Func<CypherWhere, object>>>();
-		readonly List<Func<CypherReturn, object>> _return = new List<Func<CypherReturn, object>>();
-		readonly List<Func<CypherOrderBy, object>> _orderBy = new List<Func<CypherOrderBy, object>>();
-		String _skip = string.Empty;
-		String _limit = string.Empty;
+		private readonly List<Func<CypherStart, object>> _start = new List<Func<CypherStart, object>>();
+		private readonly List<Func<CypherMatch, object>> _match = new List<Func<CypherMatch, object>>();
+		private readonly List<Expression<Func<CypherWhere, object>>> _where = new List<Expression<Func<CypherWhere, object>>>();
+		private readonly List<Func<CypherReturn, object>> _return = new List<Func<CypherReturn, object>>();
+		private readonly List<Func<CypherOrderBy, object>> _orderBy = new List<Func<CypherOrderBy, object>>();
+		private String _skip = string.Empty;
+		private String _limit = string.Empty;
 
 		public DataTable Post()
 		{
@@ -60,17 +61,17 @@ namespace Neo4jRestNet.CypherPlugin
 						dt.Columns.Add(jaColumns[colIndex].ToString(), returnTypes[colIndex]);
 					}
 
-					if (returnTypes[colIndex] == typeof (Node))
+					if (returnTypes[colIndex] == typeof (INode))
 					{
-						row.Add(jCol.Type == JTokenType.Null ? null : Node.InitializeFromNodeJson((JObject)jCol));
+						row.Add(jCol.Type == JTokenType.Null ? null : new Node().InitializeFromNodeJson((JObject)jCol));
 					}
-					else if (returnTypes[colIndex] == typeof (Relationship))
+					else if (returnTypes[colIndex] == typeof (IRelationship))
 					{
-						row.Add(jCol.Type == JTokenType.Null ? null : Relationship.InitializeFromRelationshipJson((JObject) jCol));
+						row.Add(jCol.Type == JTokenType.Null ? null : new Relationship().InitializeFromRelationshipJson((JObject) jCol));
 					}
-					else if (returnTypes[colIndex] == typeof (Path))
+					else if (returnTypes[colIndex] == typeof (IPath))
 					{
-						row.Add(jCol.Type == JTokenType.Null ? null : Path.ParseJson((JArray)jCol));
+						row.Add(jCol.Type == JTokenType.Null ? null : new Path().ParseJson((JArray)jCol));
 					}
 					else if (returnTypes[colIndex] == typeof(string))
 					{
@@ -177,7 +178,7 @@ namespace Neo4jRestNet.CypherPlugin
 			{
 				var sbToString = new StringBuilder();
 
-				string label = "START";
+				var label = "START";
 				foreach (var s in _start)
 				{
 					sbToString.AppendFormat("{1}{0}", s.Invoke(new CypherStart()), label);

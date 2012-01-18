@@ -1,21 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Neo4jRestNet.Core.Interface;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 
-namespace Neo4jRestNet.Core
+namespace Neo4jRestNet.Core.Implementation
 {
-	public class Path : IGraphObject
+	public class Path : IPath
 	{
 		public string Self { get; set; }
-		public Node StartNode { get; private set; }
-		public Node EndNode { get; private set; }
-		public List<Node> Nodes { get; private set; }
-		public List<Relationship> Relationships { get; private set; }
+		public INode StartNode { get; private set; }
+		public INode EndNode { get; private set; }
+		public List<INode> Nodes { get; private set; }
+		public List<IRelationship> Relationships { get; private set; }
 		public string OriginalPathJson { get; private set; }
+		
+		public Path ()
+		{
+			
+		}
 
-		private Path(JObject path)
+		public Path(JObject path)
 		{
 			JToken startNode;
 			if (!path.TryGetValue("start", out startNode))
@@ -26,11 +32,11 @@ namespace Neo4jRestNet.Core
 			switch (startNode.Type)
 			{
 				case JTokenType.String:
-					StartNode = Node.InitializeFromSelf(startNode.Value<string>());
+					StartNode = new Node().InitializeFromSelf(startNode.Value<string>());
 					break;
 
 				case JTokenType.Object:
-					StartNode = Node.InitializeFromNodeJson((JObject)startNode);
+					StartNode = new Node().InitializeFromNodeJson((JObject)startNode);
 					break;
 
 				default:
@@ -46,18 +52,18 @@ namespace Neo4jRestNet.Core
 			switch (endNode.Type)
 			{
 				case JTokenType.String:
-					EndNode = Node.InitializeFromSelf(endNode.Value<string>());
+					EndNode = new Node().InitializeFromSelf(endNode.Value<string>());
 					break;
 
 				case JTokenType.Object:
-					EndNode = Node.InitializeFromNodeJson((JObject)endNode);
+					EndNode = new Node().InitializeFromNodeJson((JObject)endNode);
 					break;
 
 				default:
 					throw new Exception("Invalid path json");
 			}
-			
-			Nodes = new List<Node>();
+
+			Nodes = new List<INode>();
 			JToken nodes;
 			if (!path.TryGetValue("nodes", out nodes) || nodes.Type != JTokenType.Array)
 			{
@@ -69,11 +75,11 @@ namespace Neo4jRestNet.Core
 				switch (node.Type)
 				{
 					case JTokenType.String:
-						Nodes.Add(Node.InitializeFromSelf(node.Value<string>()));
+						Nodes.Add(new Node().InitializeFromSelf(node.Value<string>()));
 						break;
 
 					case JTokenType.Object:
-						Nodes.Add(Node.InitializeFromNodeJson((JObject)node));
+						Nodes.Add(new Node().InitializeFromNodeJson((JObject)node));
 						break;
 
 					default:
@@ -81,23 +87,23 @@ namespace Neo4jRestNet.Core
 				}
 			}
 
-			Relationships = new List<Relationship>();
+			Relationships = new List<IRelationship>();
 			JToken relationships;
 			if (!path.TryGetValue("relationships", out relationships) || relationships.Type != JTokenType.Array)
 			{
 				throw new Exception("Invalid path json");
 			}
 
-			foreach (JToken relationship in relationships)
+			foreach (var relationship in relationships)
 			{
 				switch (relationship.Type)
 				{
 					case JTokenType.String:
-						Relationships.Add(Relationship.InitializeFromSelf(relationship.Value<string>()));
+						Relationships.Add(new Relationship().InitializeFromSelf(relationship.Value<string>()));
 						break;
 
 					case JTokenType.Object:
-						Relationships.Add(Relationship.InitializeFromRelationshipJson((JObject)relationship));
+						Relationships.Add(new Relationship().InitializeFromRelationshipJson((JObject)relationship));
 						break;
 
 					default:
@@ -108,7 +114,7 @@ namespace Neo4jRestNet.Core
 			OriginalPathJson = path.ToString(Formatting.None);
 		}
 
-		public static List<Path> ParseJson(string jsonPaths)
+		public List<IPath> ParseJson(string jsonPaths)
 		{
 			if (String.IsNullOrEmpty(jsonPaths))
 			{
@@ -119,7 +125,7 @@ namespace Neo4jRestNet.Core
 			return ParseJson(jaPaths);
 		}
 
-		public static List<Path> ParseJson(JArray jsonPaths)
+		public List<IPath> ParseJson(JArray jsonPaths)
 		{
 			if (jsonPaths == null)
 			{
@@ -128,7 +134,7 @@ namespace Neo4jRestNet.Core
 
 			var jaPaths = jsonPaths;
 
-			return (from JObject joPath in jaPaths select new Path(joPath)).ToList();
+			return (from JObject joPath in jaPaths select (IPath) new Path(joPath)).ToList();
 		}
 	}
 }

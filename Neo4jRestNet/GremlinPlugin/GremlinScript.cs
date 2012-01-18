@@ -2,6 +2,7 @@
 using System.Text;
 using Neo4jRestNet.Core;
 using System.Collections.Generic;
+using Neo4jRestNet.Core.Interface;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -16,13 +17,13 @@ namespace Neo4jRestNet.GremlinPlugin
 		{
 		}
 
-		public GremlinScript(Node node)
+		public GremlinScript(INode node)
 		{
 			Append("g.v({0})", node.Id);
 			// _sb.AppendFormat("g.v({0})", node.Id);
 		}
 
-		public GremlinScript(Relationship relationship)
+		public GremlinScript(IRelationship relationship)
 		{
 			Append("g.e({0})", relationship.Id);
 			//_sb.AppendFormat("g.e({0})", relationship.Id);
@@ -69,12 +70,12 @@ namespace Neo4jRestNet.GremlinPlugin
 
 			return this;
 		}
-/*
+
 		public override string ToString()
 		{
 			return _sb.ToString();
 		}
-*/
+
 		public string GetScript()
 		{
 			var joScript = new JObject{{"script", _sb.ToString()}};

@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
-using Neo4jRestNet.Core;
-using Neo4jRestNet.GremlinPlugin;
-using Neo4jRestNet.CypherPlugin;
 using System.Data;
+using Neo4jRestNet.Core;
+using Neo4jRestNet.Core.Implementation;
+using Neo4jRestNet.Core.Interface;
+using Neo4jRestNet.CypherPlugin;
+using Neo4jRestNet.GremlinPlugin;
 
 namespace Example
 {
@@ -39,18 +41,35 @@ namespace Example
 		static void Main(string[] args)
 		{
 
-			// Get Root Node from graphDB
-			var rootNode = Node.GetRootNode();
+			// Get Root Node from graphDB - default implementation
+			var rootNode = GraphFactory.CreateNode().GetRootNode();
 
-			// Create a User Node with no Properties 
-			var nodeUser = Node.CreateNode(NodeType.User.ToString());
+			// Get Root Node from graphDB - using passedin implementation (using default implementation for tesing)
+			rootNode = GraphFactory.CreateNode<Node>().GetRootNode();
 
-			// Create a User Node with Properties
+
+
+			// Create a User Node with no Properties - default implementation  
+			var nodeUser = GraphFactory.CreateNode().CreateNode(NodeType.User.ToString());
+
+			// Create a User Node with no Properties - using passedin implementation (using default implementation for tesing) 
+			nodeUser = GraphFactory.CreateNode<Node>().CreateNode(NodeType.User.ToString());
+
+
+			// Create a User Node with Properties - default implementation
 			var prop = new Properties();
 			prop.SetProperty(NodeProperty.FirstName.ToString(), "Joe");
 			prop.SetProperty(NodeProperty.LastName.ToString(), "Smith");
 
-			var nodeUserWithName = Node.CreateNode(NodeType.User.ToString(), prop);
+			var nodeUserWithName = GraphFactory.CreateNode().CreateNode(NodeType.User.ToString(), prop);
+
+			// Create a User Node with Properties - using passedin implementation (using default implementation for tesing) 
+			prop = new Properties();
+			prop.SetProperty(NodeProperty.FirstName.ToString(), "Joe");
+			prop.SetProperty(NodeProperty.LastName.ToString(), "Smith");
+
+			nodeUserWithName = GraphFactory.CreateNode<Node>().CreateNode(NodeType.User.ToString(), prop);
+			
 
 			// Create Relationships to Nodes
 			rootNode.CreateRelationshipTo(nodeUser, RelationshipType.Likes.ToString());
@@ -72,7 +91,9 @@ namespace Example
 
 		
 			// Same as above
-			var sameLikeNodes = Gremlin.Post<Node>(new GremlinScript(rootNode).Out(RelationshipType.Likes.ToString()));
+			var sameLikeNodes = GremlinFactory.CreateGremlin().GetNodes(new GremlinScript(rootNode).Out(RelationshipType.Likes.ToString()));
+
+			sameLikeNodes = GremlinFactory.CreateGremlin<Gremlin>().GetNodes<Node>(new GremlinScript(rootNode).Out(RelationshipType.Likes.ToString()));
 
 			// More Gremlin example
 			var script = new GremlinScript(rootNode);
@@ -81,7 +102,9 @@ namespace Example
 				.OutE()
 				.Filter("it.getProperty('{0}') == '{1}'", RelationshipProperty.Name, "MyRelationship");
 
-			var myRelationship = Gremlin.Post<Relationship>(script);
+			var myRelationship = GremlinFactory.CreateGremlin().GetRelationships(script);
+
+			myRelationship = GremlinFactory.CreateGremlin().GetRelationships<Relationship>(script);
 
 			// More Gremlin example
 			var script1 = new GremlinScript(rootNode);
@@ -90,7 +113,9 @@ namespace Example
 				.OutE()
 				.Filter(it => it.GetProperty(RelationshipProperty.Name.ToString()) == "MyRelationship");
 
-			IEnumerable<Relationship> myRelationship1 = Gremlin.Post<Relationship>(script1);
+			IEnumerable<IRelationship> myRelationship1 = GremlinFactory.CreateGremlin().GetRelationships(script1);
+
+			myRelationship1 = GremlinFactory.CreateGremlin().GetRelationships<Relationship>(script1);
 
 			// Gremlin returning a datatable
 			var tblScript = new GremlinScript();
@@ -101,17 +126,24 @@ namespace Example
 				.Table("t", "Like")
 				.Append(" >> -1; t;");
 
-			DataTable dt = Gremlin.GetTable(tblScript.ToString());
+			DataTable dt = GremlinFactory.CreateGremlin().GetTable(tblScript);
 
 			// Basic Cypher query
-			var c1 = new Cypher();
+			var c1 = CypherFactory.CreateCypher();
 			c1.Start(s => s.Node("A", 0));
 			c1.Return( r => r.Node("A"));
 
 			DataTable tbl = c1.Post();
 
+			var c1i = CypherFactory.CreateCypher<Cypher>();
+			c1i.Start(s => s.Node("A", 0));
+			c1i.Return(r => r.Node("A"));
+
+			tbl = c1i.Post();
+
+
 			// Cypher with Match clause
-			var c2 = new Cypher();
+			var c2 = CypherFactory.CreateCypher();
 			c2.Start(s => s.Node("A", 0));
 			c2.Match(m => m.Node("A").To("r", "Likes").Node("B"));
 			c2.Return(r => r.Node("A").Relationship("r").Node("B"));
@@ -119,7 +151,7 @@ namespace Example
 			tbl = c2.Post();
 
 			// Cypher with multi start and return optional property
-			var c3 = new Cypher();
+			var c3 = CypherFactory.CreateCypher();
 			c3.Start(s => s.Node("A", 0, 1));
 			c3.Match(m => m.Node("A").Any("r", "Likes").Node("C"));
 			c3.Return(r => r.Node("C").Node("C").Property("Name?"));
@@ -127,14 +159,14 @@ namespace Example
 			tbl = c3.Post();
 
 			// Multi Start
-			var c4 = new Cypher();
+			var c4 = CypherFactory.CreateCypher();
 			c4.Start(s => s.Node("A", 0).Node("B",1));
 			c4.Return(r => r.Node("A").Node("B"));
 
 			tbl = c4.Post();
 
 			// Cypher with Where clause
-			var c5 = new Cypher();
+			var c5 = CypherFactory.CreateCypher();
 			c5.Start(s => s.Node("A", 0, 1));
 			c5.Where(w => w.Node("A").Property("Age?") < 30 && w.Node("A").Property("Name?") == "Tobias" || !(w.Node("A").Property("Name?") == "Tobias"));
 			c5.Return(r => r.Node("A"));
@@ -142,7 +174,7 @@ namespace Example
 			tbl = c5.Post();
 
 			// Alt Syntax
-			var c6 = new Cypher();
+			var c6 = CypherFactory.CreateCypher();
 			c6.Start(s =>	{
 								s.Node("A", 0);
 								s.Node("B", 1);
@@ -158,7 +190,7 @@ namespace Example
 			tbl = c6.Post();
 
 			// Alt Syntax
-			var c7 = new Cypher();
+			var c7 = CypherFactory.CreateCypher();
 			c7.Start(s => s.Node("MyNode", "Index-Name", "QueryString"));
 			c7.Start(s => s.Node("A", 0));
 			c7.Start(s => s.Node("B", 1));
@@ -168,6 +200,8 @@ namespace Example
 
 			tbl = c7.Post();
 
-		}
+
+		 }
+ 
 	}
 }

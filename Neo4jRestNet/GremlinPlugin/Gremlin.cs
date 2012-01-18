@@ -3,161 +3,90 @@ using System.Net;
 using System.Data;
 using System.Configuration;
 using System.Collections.Generic;
+using Neo4jRestNet.Core.Interface;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Neo4jRestNet.Core;
+using Neo4jRestNet.Core.Implementation;
 
 
 namespace Neo4jRestNet.GremlinPlugin
 {
-	public class Gremlin
+	public class Gremlin : IGremlin
 	{
 		private static readonly string DefaultDbUrl = ConfigurationManager.ConnectionStrings["neo4j"].ConnectionString.TrimEnd('/');
 		private static readonly string DefaultGremlinExtensionPath = ConfigurationManager.ConnectionStrings["neo4jGremlinExtension"].ConnectionString.TrimEnd('/');
 
-		public static HttpStatusCode Post(GremlinScript script)
+		private readonly string _gremlinUrl;
+
+		public Gremlin()
 		{
-			//return Post(string.Concat(DefaultDbUrl, DefaultGremlinExtensionPath), script);
+			_gremlinUrl = string.Concat(DefaultDbUrl, DefaultGremlinExtensionPath).TrimEnd('/'); 
+		}
 
-			// Remove trailing /
-			var gremlinUrl = string.Concat(DefaultDbUrl, DefaultGremlinExtensionPath).TrimEnd('/');
+		public Gremlin(string connectionString)
+		{
+			_gremlinUrl = string.Concat(ConfigurationManager.ConnectionStrings[connectionString].ConnectionString.TrimEnd('/'), DefaultGremlinExtensionPath).TrimEnd('/'); 
+		}
 
+		public HttpStatusCode Post(GremlinScript script)
+		{
 			var jo = new JObject { { "script", script.GetScript() } };
 
 			string response;
-			var status = Rest.HttpRest.Post(gremlinUrl, jo.ToString(Formatting.None), out response);
+			var status = Rest.HttpRest.Post(_gremlinUrl, jo.ToString(Formatting.None), out response);
 
 			return status;
 		}
-/*	
-		public static HttpStatusCode Post(string script)
-		{
-			 return Post(string.Concat(DefaultDbUrl, DefaultGremlinExtensionPath), script);
-		}
-*/
-/*
-		public static HttpStatusCode Post(string gremlinUrl, GremlinScript script)
-		{
-			return Post(gremlinUrl, script.ToString());
-		}
-*/
-/*
-		public static HttpStatusCode Post(string gremlinUrl, string script)
-		{
-			// Remove trailing /
-			gremlinUrl = gremlinUrl.TrimEnd('/');
 
-			var jo = new JObject {{"script", script}};
-
+		public IEnumerable<INode>GetNodes(GremlinScript script)
+		{
 			string response;
-			HttpStatusCode status = Rest.HttpRest.Post(gremlinUrl, jo.ToString(Formatting.None), out response);
-
-			return status;
+			var status = Rest.HttpRest.Post(_gremlinUrl, script.GetScript(), out response);
+			return GraphFactory.CreateNode().ParseJson(response);
 		}
-*/
-/*
-		public static IEnumerable<T> Post<T>(EncryptId startNodeId, string script) where T : IGraphObject
+		
+		public IEnumerable<INode> GetNodes<T>(GremlinScript script) where T : class, INode, new()
 		{
-			return Post<T>(string.Concat(DefaultDbUrl, DefaultGremlinExtensionPath), string.Format("g.v({0}).{1}", (long)startNodeId, script)); 
-		}
-*/ 
-/*		
-		public static IEnumerable<T> Post<T>(string script) where T : IGraphObject
-		{
-			return Post<T>(string.Concat(DefaultDbUrl, DefaultGremlinExtensionPath), script);
-		}
-*/
-		public static IEnumerable<T> Post<T>(GremlinScript script) where T : IGraphObject
-		{
-			return Post<T>(string.Concat(DefaultDbUrl, DefaultGremlinExtensionPath), script);
-		}
-
-		public static IEnumerable<T> Post<T>(string gremlinUrl, GremlinScript script) where T : IGraphObject
-		{
-//			return Post<T>(gremlinUrl, script.ToString());
-
-			// Remove trailing /
-			gremlinUrl = gremlinUrl.TrimEnd('/');
-
-			var typeParameterType = typeof(T);
-
 			string response;
-			var status = Rest.HttpRest.Post(gremlinUrl, script.GetScript(), out response);
-
-			if (typeParameterType == typeof(Node))
-			{
-				return (IEnumerable<T>)Node.ParseJson(response);
-			}
-
-			if (typeParameterType == typeof(Relationship))
-			{
-				return (IEnumerable<T>)Relationship.ParseJson(response);
-			}
-
-			if (typeParameterType == typeof(Path))
-			{
-				return (IEnumerable<T>)Path.ParseJson(response);
-			}
-
-			throw new Exception("Return type " + typeParameterType + " not implemented");
-
-
+			var status = Rest.HttpRest.Post(_gremlinUrl, script.GetScript(), out response);
+			return GraphFactory.CreateNode<T>().ParseJson(response);
 		}
-/*
-		public static IEnumerable<T> Post<T>(string gremlinUrl, string script) where T : IGraphObject
+
+		public IEnumerable<IRelationship> GetRelationships(GremlinScript script)
 		{
-			// Remove trailing /
-			gremlinUrl = gremlinUrl.TrimEnd('/');
-
-			var typeParameterType = typeof(T);
-
-			var jo = new JObject {{"script", script}};
-
 			string response;
-			HttpStatusCode status = Rest.HttpRest.Post(gremlinUrl, jo.ToString(Formatting.None), out response);
+			var status = Rest.HttpRest.Post(_gremlinUrl, script.GetScript(), out response);
+			return GraphFactory.CreateRelationship().ParseJson(response);
+		}
 
-			if (typeParameterType == typeof(Node))
-			{
-				return (IEnumerable<T>)Node.ParseJson(response);
-			}
+		public IEnumerable<IRelationship> GetRelationships<T>(GremlinScript script) where T : class, IRelationship, new()
+		{
+			string response;
+			var status = Rest.HttpRest.Post(_gremlinUrl, script.GetScript(), out response);
+			return GraphFactory.CreateRelationship<T>().ParseJson(response);
+		}
+
+		public IEnumerable<IPath> GetPaths(GremlinScript script)
+		{
+			string response;
+			var status = Rest.HttpRest.Post(_gremlinUrl, script.GetScript(), out response);
+			return GraphFactory.CreatePath().ParseJson(response);
+		}
+
+		public IEnumerable<IPath> GetPaths<T>(GremlinScript script) where T : class, IPath, new()
+		{
+			string response;
+			var status = Rest.HttpRest.Post(_gremlinUrl, script.GetScript(), out response);
+			return GraphFactory.CreatePath<T>().ParseJson(response);
+		}
+
+		public DataTable GetTable(GremlinScript script)
+		{
 			
-			if (typeParameterType == typeof(Relationship))
-			{
-				return (IEnumerable<T>)Relationship.ParseJson(response);
-			}
-			
-			if (typeParameterType == typeof(Path))
-			{
-				return (IEnumerable<T>)Path.ParseJson(response);
-			}
-
-			throw new Exception("Return type " + typeParameterType.ToString() + " not implemented");
-		}
-*/
-		public static DataTable GetTable(string script)
-		{
-			return GetTable(string.Concat(DefaultDbUrl, DefaultGremlinExtensionPath), script);
-		}
-
-		public static DataTable GetTable(GremlinScript script)
-		{
-			return GetTable(string.Concat(DefaultDbUrl, DefaultGremlinExtensionPath), script.ToString());
-		}
-
-		public static DataTable GetTable(string gremlinUrl, GremlinScript script)
-		{
-			return GetTable(gremlinUrl, script.ToString());
-		}
-
-		public static DataTable GetTable(string gremlinUrl, string script) 
-		{
-			// Remove trailing /
-			gremlinUrl = gremlinUrl.TrimEnd('/');
-
-			var joScript = new JObject {{"script", script}};
 
 			string response;
-			HttpStatusCode status = Rest.HttpRest.Post(gremlinUrl, joScript.ToString(Formatting.None), out response);
+			var status = Rest.HttpRest.Post(_gremlinUrl, script.GetScript(), out response);
 
 			var joResponse = JObject.Parse(response);
 			var jaColumns =(JArray)joResponse["columns"];
@@ -196,21 +125,21 @@ namespace Neo4jRestNet.GremlinPlugin
 							}
 							else
 							{
-								string self = jCol["self"].ToString();
-								string[] selfArray = self.Split('/');
+								var self = jCol["self"].ToString();
+								var selfArray = self.Split('/');
 								if (selfArray.Length > 2 && selfArray[selfArray.Length - 2] == "node"  )
 								{
-									row.Add(Node.InitializeFromNodeJson((JObject)jCol));
+									row.Add(new Node().InitializeFromNodeJson((JObject)jCol));
 
 									if (initColumns)
 									{
-										dt.Columns.Add(jaColumns[colIndex].ToString(), typeof(Node));
+										dt.Columns.Add(jaColumns[colIndex].ToString(), typeof(INode));
 										colIndex++;
 									}
 								}
 								else if (selfArray.Length > 2 && selfArray[selfArray.Length - 2] == "relationship")
 								{
-									row.Add(Relationship.InitializeFromRelationshipJson((JObject)jCol));
+									row.Add(new Relationship().InitializeFromRelationshipJson((JObject)jCol));
 
 									if (initColumns)
 									{
@@ -281,7 +210,7 @@ namespace Neo4jRestNet.GremlinPlugin
 				}
 
 				initColumns = false;
-				DataRow dtRow = dt.NewRow();
+				var dtRow = dt.NewRow();
 				dtRow.ItemArray = row.ToArray();
 				dt.Rows.Add(dtRow);
 			}

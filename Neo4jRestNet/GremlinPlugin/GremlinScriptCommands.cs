@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Neo4jRestNet.Core;
 using System.Linq.Expressions;
+using Neo4jRestNet.Core.Interface;
 
 namespace Neo4jRestNet.GremlinPlugin
 {
@@ -11,12 +12,12 @@ namespace Neo4jRestNet.GremlinPlugin
 	{
 		#region g()
 
-		public static GremlinScript g(this GremlinScript query, Node node)
+		public static GremlinScript g(this GremlinScript query, INode node)
 		{
 			return query.Append("g.v({0})", node.Id);
 		}
 
-		public static GremlinScript g(this GremlinScript query, Relationship relationship)
+		public static GremlinScript g(this GremlinScript query, IRelationship relationship)
 		{
 			return query.Append("g.e({0})", relationship.Id);
 		}
@@ -26,7 +27,7 @@ namespace Neo4jRestNet.GremlinPlugin
 			return query.Append("g.v({0})", Id);
 		}
 
-		public static GremlinScript gV(this GremlinScript query, Node node)
+		public static GremlinScript gV(this GremlinScript query, INode node)
 		{
 			return gV(query, node.Id);
 		}
@@ -36,7 +37,7 @@ namespace Neo4jRestNet.GremlinPlugin
 			return query.Append("g.e({0})", Id);
 		}
 
-		public static GremlinScript gE(this GremlinScript query, Relationship relationship)
+		public static GremlinScript gE(this GremlinScript query, IRelationship relationship)
 		{
 			return gE(query, relationship.Id);
 		}

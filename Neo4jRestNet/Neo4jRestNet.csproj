@@ -9,7 +9,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Neo4jRestNet</RootNamespace>
-    <AssemblyName>Neo4Net</AssemblyName>
+    <AssemblyName>Neo4jRestNet</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <StartupObject>
@@ -82,12 +82,18 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CleanDbPlugin\CleanDbPlugin.cs" />
+    <Compile Include="Core\Implementation\Node.cs" />
+    <Compile Include="Core\Implementation\Path.cs" />
+    <Compile Include="Core\Implementation\Relationship.cs" />
+    <Compile Include="Core\Interface\INode.cs" />
     <Compile Include="Core\EncryptId.cs" />
-    <Compile Include="Core\Path.cs" />
+    <Compile Include="Core\Interface\IRelationship.cs" />
+    <Compile Include="Core\Interface\IPath.cs" />
     <Compile Include="Core\Properties.cs" />
     <Compile Include="Core\IGraphObject.cs" />
     <Compile Include="Core\RelationshipDirection.cs" />
-    <Compile Include="Core\StoreFactory.cs" />
+    <Compile Include="CypherPlugin\CypherFactory.cs" />
+    <Compile Include="CypherPlugin\ICypher.cs" />
     <Compile Include="CypherPlugin\CypherOrderBy.cs" />
     <Compile Include="CypherPlugin\CypherWhere.cs" />
     <Compile Include="CypherPlugin\CypherReturn.cs" />
@@ -98,11 +104,13 @@
     <Compile Include="CypherPlugin\ICypherObject.cs" />
     <Compile Include="CypherPlugin\ParseWhereLambda.cs" />
     <Compile Include="ExpressionTreeParser\ExpressionParser.cs" />
+    <Compile Include="GremlinPlugin\GremlinFactory.cs" />
+    <Compile Include="GremlinPlugin\IGremlin.cs" />
     <Compile Include="GremlinPlugin\GremlinScriptCommands.cs" />
     <Compile Include="GremlinPlugin\JavaIntCommands.cs" />
     <Compile Include="GremlinPlugin\JavaInt.cs" />
     <Compile Include="GremlinPlugin\Gremlin.cs" />
-    <Compile Include="Core\Node.cs" />
+    <Compile Include="Core\GraphFactory.cs" />
     <Compile Include="GremlinPlugin\GremlinScript.cs" />
     <Compile Include="GremlinPlugin\IJavaObject.cs" />
     <Compile Include="GremlinPlugin\JavaBoolean.cs" />
@@ -113,7 +121,6 @@
     <Compile Include="GremlinPlugin\JavaStringCommands.cs" />
     <Compile Include="GremlinPlugin\ParseJavaLambda.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Core\Relationship.cs" />
     <Compile Include="Rest\Neo4jRestApi.cs" />
     <Compile Include="Rest\HttpRest.cs" />
     <Compile Include="Rest\PathAlgorithm.cs" />

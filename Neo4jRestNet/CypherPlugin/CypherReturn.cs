@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System;
 using Neo4jRestNet.Core;
+using Neo4jRestNet.Core.Interface;
 
 namespace Neo4jRestNet.CypherPlugin
 {
@@ -20,7 +21,7 @@ namespace Neo4jRestNet.CypherPlugin
 			
 			_isStringEmpty = false;
 
-			_returnTypes.Add(typeof(Node));
+			_returnTypes.Add(typeof(INode));
 
 			return this;
 		}
@@ -51,7 +52,7 @@ namespace Neo4jRestNet.CypherPlugin
 
 			_isStringEmpty = false;
 
-			_returnTypes.Add(typeof(Relationship));
+			_returnTypes.Add(typeof(IRelationship));
 
 			return this;
 		}
@@ -82,7 +83,7 @@ namespace Neo4jRestNet.CypherPlugin
 
 			_isStringEmpty = false;
 
-			_returnTypes.Add(typeof(Path));
+			_returnTypes.Add(typeof(IPath));
 
 			return this;
 		}
