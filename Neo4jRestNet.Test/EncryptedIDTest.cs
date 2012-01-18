@@ -5,6 +5,7 @@ using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Neo4jRestNet.Core;
 using System.Security.Cryptography;
+using Neo4jRestNet.Core.Implementation;
 using Neo4jRestNet.GremlinPlugin;
 
 namespace Neo4jRestNet.Test
@@ -15,6 +16,14 @@ namespace Neo4jRestNet.Test
 	[TestClass]
 	public class EncryptedIDTest
 	{
+
+		[TestMethod]
+		public void GetNode()
+		{
+			var node = Node.GetNode(0);
+
+			Assert.AreEqual(node.Id, 0);
+		}
 
 		[TestMethod]
 		public void NewGEIDFromLong()
