@@ -69,12 +69,12 @@ namespace Neo4jRestNet.GremlinPlugin
 
 			return this;
 		}
-/*
+
 		public override string ToString()
 		{
 			return _sb.ToString();
 		}
-*/
+
 		public string GetScript()
 		{
 			var joScript = new JObject{{"script", _sb.ToString()}};

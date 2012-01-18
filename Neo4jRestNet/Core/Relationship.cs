@@ -12,9 +12,9 @@ namespace Neo4jRestNet.Core
 {
 	public class Relationship : IGraphObject
 	{
-		private static readonly string _defaultDbUrl = ConfigurationManager.ConnectionStrings["neo4j"].ConnectionString.TrimEnd('/');
+		private static readonly string DefaultDbUrl = ConfigurationManager.ConnectionStrings["neo4j"].ConnectionString.TrimEnd('/');
 
-		private string _dbUrl;
+		private string _selfDbUrl;
 		private string _self;
 		public Node StartNode { get; private set; }
 		public Node EndNode { get; private set; }
@@ -30,22 +30,22 @@ namespace Neo4jRestNet.Core
 
 		public static IEnumerable<Relationship> GetRelationship(string indexName, string key, object value)
 		{
-			return GetRelationship(_defaultDbUrl, indexName, key, value);
+			return GetRelationship(DefaultDbUrl, indexName, key, value);
 		}
 		
 		public static IEnumerable<Relationship> GetRelationship(Enum indexName, string key, object value)
 		{
-			return GetRelationship(_defaultDbUrl, indexName.ToString(), key, value);
+			return GetRelationship(DefaultDbUrl, indexName.ToString(), key, value);
 		}
 
 		public static IEnumerable<Relationship> GetRelationship(string indexName, Enum key, object value)
 		{
-			return GetRelationship(_defaultDbUrl, indexName, key.ToString(), value);
+			return GetRelationship(DefaultDbUrl, indexName, key.ToString(), value);
 		}
 		
 		public static IEnumerable<Relationship> GetRelationship(Enum indexName, Enum key, object value)
 		{
-			return GetRelationship(_defaultDbUrl, indexName.ToString(), key.ToString(), value);
+			return GetRelationship(DefaultDbUrl, indexName.ToString(), key.ToString(), value);
 		}
 
 		public static IEnumerable<Relationship> GetRelationship(string dbUrl, Enum indexName, Enum key, object value)
@@ -56,7 +56,7 @@ namespace Neo4jRestNet.Core
 		public static IEnumerable<Relationship> GetRelationship(string dbUrl, string indexName, string key, object value)
 		{
 			string response;
-			HttpStatusCode status = Neo4jRestApi.GetRelationship(dbUrl, indexName, key, value, out response);
+			var status = Neo4jRestApi.GetRelationship(dbUrl, indexName, key, value, out response);
 			if (status != HttpStatusCode.OK)
 			{
 				throw new Exception(string.Format("Index not found in (index:{0})", indexName));
@@ -67,12 +67,12 @@ namespace Neo4jRestNet.Core
 
 		public static IEnumerable<Relationship> GetRelationship(string indexName, string searchQuery)
 		{
-			return GetRelationship(_defaultDbUrl, indexName, searchQuery);
+			return GetRelationship(DefaultDbUrl, indexName, searchQuery);
 		}
 
 		public static IEnumerable<Relationship> GetRelationship(Enum indexName, string searchQuery)
 		{
-			return GetRelationship(_defaultDbUrl, indexName.ToString(), searchQuery);
+			return GetRelationship(DefaultDbUrl, indexName.ToString(), searchQuery);
 		}
 
 		public static IEnumerable<Relationship> GetRelationship(string dbUrl, Enum indexName, string searchQuery)
@@ -83,7 +83,7 @@ namespace Neo4jRestNet.Core
 		public static IEnumerable<Relationship> GetRelationship(string dbUrl, string indexName, string searchQuery)
 		{
 			string response;
-			HttpStatusCode status = Neo4jRestApi.GetRelationship(dbUrl, indexName, searchQuery, out response);
+			var status = Neo4jRestApi.GetRelationship(dbUrl, indexName, searchQuery, out response);
 			if (status != HttpStatusCode.OK)
 			{
 				throw new Exception(string.Format("Index not found in (index:{0})", indexName));
@@ -234,7 +234,7 @@ namespace Neo4jRestNet.Core
 					throw new Exception(string.Format("Invalid Self id ({0})", value));
 				}
 
-				_dbUrl = self.Substring(0, self.LastIndexOf("/relationship"));
+				_selfDbUrl = self.Substring(0, self.LastIndexOf("/relationship"));
 				_self = self;
 				Id = relationshipId;
 			}
@@ -257,7 +257,7 @@ namespace Neo4jRestNet.Core
 			}
 
 			string response;
-			HttpStatusCode status = Neo4jRestApi.GetPropertiesOnRelationship(_dbUrl, Id, out response);
+			var status = Neo4jRestApi.GetPropertiesOnRelationship(_selfDbUrl, Id, out response);
 			if (status != HttpStatusCode.OK)
 			{
 				throw new Exception(string.Format("Error retrieving properties on relationship (relationship id:{0} http response:{1})", Id, status));
@@ -282,7 +282,7 @@ namespace Neo4jRestNet.Core
 
 		public void SaveProperties(Properties properties)
 		{
-			HttpStatusCode status = Neo4jRestApi.SetPropertiesOnRelationship(_dbUrl, Id, properties.ToString());
+			HttpStatusCode status = Neo4jRestApi.SetPropertiesOnRelationship(_selfDbUrl, Id, properties.ToString());
 			if (status != HttpStatusCode.NoContent)
 			{
 				throw new Exception(string.Format("Error setting properties on relationship (relationship id:{0} http response:{1})", Id, status));
@@ -297,22 +297,22 @@ namespace Neo4jRestNet.Core
 
 		public static Relationship AddRelationshipToIndex(long relationshipId, string indexName, string key, object value)
 		{
-			return AddRelationshipToIndex(_defaultDbUrl, relationshipId, indexName, key, value);
+			return AddRelationshipToIndex(DefaultDbUrl, relationshipId, indexName, key, value);
 		}
 
 		public static Relationship AddRelationshipToIndex(long relationshipId, Enum indexName, string key, object value)
 		{
-			return AddRelationshipToIndex(_defaultDbUrl, relationshipId, indexName.ToString(), key, value);
+			return AddRelationshipToIndex(DefaultDbUrl, relationshipId, indexName.ToString(), key, value);
 		}
 
 		public static Relationship AddRelationshipToIndex(long relationshipId, string indexName, Enum key, object value)
 		{
-			return AddRelationshipToIndex(_defaultDbUrl, relationshipId, indexName, key.ToString(), value);
+			return AddRelationshipToIndex(DefaultDbUrl, relationshipId, indexName, key.ToString(), value);
 		}
 
 		public static Relationship AddRelationshipToIndex(long relationshipId, Enum indexName, Enum key, object value)
 		{
-			return AddRelationshipToIndex(_defaultDbUrl, relationshipId, indexName.ToString(), key.ToString(), value);
+			return AddRelationshipToIndex(DefaultDbUrl, relationshipId, indexName.ToString(), key.ToString(), value);
 		}
 
 		public static Relationship AddRelationshipToIndex(string dbUrl, long relationshipId, Enum indexName, Enum key, object value)
@@ -334,12 +334,12 @@ namespace Neo4jRestNet.Core
 
 		public HttpStatusCode RemoveRelationshipFromIndex(long relationshipId, string indexName)
 		{
-			return RemoveRelationshipFromIndex(_defaultDbUrl, relationshipId, indexName);
+			return RemoveRelationshipFromIndex(DefaultDbUrl, relationshipId, indexName);
 		}
 
 		public HttpStatusCode RemoveRelationshipFromIndex(long relationshipId, Enum indexName)
 		{
-			return RemoveRelationshipFromIndex(_defaultDbUrl, relationshipId, indexName.ToString());
+			return RemoveRelationshipFromIndex(DefaultDbUrl, relationshipId, indexName.ToString());
 		}
 
 		public HttpStatusCode RemoveRelationshipFromIndex(string dbUrl, long relationshipId, Enum indexName)
@@ -360,22 +360,22 @@ namespace Neo4jRestNet.Core
 
 		public HttpStatusCode RemoveRelationshipFromIndex(long relationshipId, string indexName, string key)
 		{
-			return RemoveRelationshipFromIndex(_defaultDbUrl, relationshipId, indexName, key);
+			return RemoveRelationshipFromIndex(DefaultDbUrl, relationshipId, indexName, key);
 		}
 
 		public HttpStatusCode RemoveRelationshipFromIndex(long relationshipId, Enum indexName, string key)
 		{
-			return RemoveRelationshipFromIndex(_defaultDbUrl, relationshipId, indexName.ToString(), key);
+			return RemoveRelationshipFromIndex(DefaultDbUrl, relationshipId, indexName.ToString(), key);
 		}
 
 		public HttpStatusCode RemoveRelationshipFromIndex(long relationshipId, string indexName, Enum key)
 		{
-			return RemoveRelationshipFromIndex(_defaultDbUrl, relationshipId, indexName, key.ToString());
+			return RemoveRelationshipFromIndex(DefaultDbUrl, relationshipId, indexName, key.ToString());
 		}
 
 		public HttpStatusCode RemoveRelationshipFromIndex(long relationshipId, Enum indexName, Enum key)
 		{
-			return RemoveRelationshipFromIndex(_defaultDbUrl, relationshipId, indexName.ToString(), key.ToString());
+			return RemoveRelationshipFromIndex(DefaultDbUrl, relationshipId, indexName.ToString(), key.ToString());
 		}
 
 		public HttpStatusCode RemoveRelationshipFromIndex(string dbUrl, long relationshipId, Enum indexName, Enum key)
@@ -396,22 +396,22 @@ namespace Neo4jRestNet.Core
 
 		public HttpStatusCode RemoveRelationshipFromIndex(long relationshipId, string indexName, string key, object value)
 		{
-			return RemoveRelationshipFromIndex(_defaultDbUrl, relationshipId, indexName, key, value);
+			return RemoveRelationshipFromIndex(DefaultDbUrl, relationshipId, indexName, key, value);
 		}
 
 		public HttpStatusCode RemoveRelationshipFromIndex(long relationshipId, Enum indexName, string key, object value)
 		{
-			return RemoveRelationshipFromIndex(_defaultDbUrl, relationshipId, indexName.ToString(), key, value);
+			return RemoveRelationshipFromIndex(DefaultDbUrl, relationshipId, indexName.ToString(), key, value);
 		}
 
 		public HttpStatusCode RemoveRelationshipFromIndex(long relationshipId, string indexName, Enum key, object value)
 		{
-			return RemoveRelationshipFromIndex(_defaultDbUrl, relationshipId, indexName, key.ToString(), value);
+			return RemoveRelationshipFromIndex(DefaultDbUrl, relationshipId, indexName, key.ToString(), value);
 		}
 
 		public HttpStatusCode RemoveRelationshipFromIndex(long relationshipId, Enum indexName, Enum key, object value)
 		{
-			return RemoveRelationshipFromIndex(_defaultDbUrl, relationshipId, indexName.ToString(), key.ToString(), value);
+			return RemoveRelationshipFromIndex(DefaultDbUrl, relationshipId, indexName.ToString(), key.ToString(), value);
 		}
 
 		public HttpStatusCode RemoveRelationshipFromIndex(string dbUrl, long relationshipId, Enum indexName, Enum key, object value)
@@ -435,7 +435,7 @@ namespace Neo4jRestNet.Core
 
 		public HttpStatusCode DeleteRelationship()
 		{
-			HttpStatusCode status = Neo4jRestApi.DeleteRelationship(_dbUrl, Id);
+			HttpStatusCode status = Neo4jRestApi.DeleteRelationship(_selfDbUrl, Id);
 			if (status != HttpStatusCode.NoContent)
 			{
 				throw new Exception(string.Format("Error deleteing relationship (relationship id:{0} http response:{1})", Id, status));
