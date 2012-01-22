@@ -101,7 +101,7 @@ namespace Example
 				.Table("t", "Like")
 				.Append(" >> -1; t;");
 
-			DataTable dt = Gremlin.GetTable(tblScript.ToString());
+			DataTable dt = Gremlin.GetTable(tblScript);
 
 			// Basic Cypher query
 			var c1 = new Cypher();

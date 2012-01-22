@@ -18,17 +18,15 @@ namespace Neo4jRestNet.GremlinPlugin
 
 		public static HttpStatusCode Post(GremlinScript script)
 		{
-			var jo = new JObject { { "script", script.GetScript() } };
-
 			string response;
-			var status = Rest.HttpRest.Post(DefaultGremlinUrl, jo.ToString(Formatting.None), out response);
+			var status = Rest.HttpRest.Post(DefaultGremlinUrl, script.GetScript(), out response);
 
 			return status;
 		}
 
 		public static IEnumerable<T> Post<T>(GremlinScript script) where T : IGraphObject
 		{
-			return Post<T>(string.Concat(DefaultDbUrl, DefaultGremlinExtensionPath), script);
+			return Post<T>(DefaultGremlinUrl, script);
 		}
 
 		public static IEnumerable<T> Post<T>(string gremlinUrl, GremlinScript script) where T : IGraphObject
@@ -58,30 +56,15 @@ namespace Neo4jRestNet.GremlinPlugin
 
 		}
 
-		public static DataTable GetTable(string script)
-		{
-			return GetTable(string.Concat(DefaultDbUrl, DefaultGremlinExtensionPath), script);
-		}
-
 		public static DataTable GetTable(GremlinScript script)
 		{
-			return GetTable(string.Concat(DefaultDbUrl, DefaultGremlinExtensionPath), script.ToString());
+			return GetTable(DefaultGremlinUrl, script);
 		}
 
 		public static DataTable GetTable(string gremlinUrl, GremlinScript script)
 		{
-			return GetTable(gremlinUrl, script.ToString());
-		}
-
-		public static DataTable GetTable(string gremlinUrl, string script) 
-		{
-			// Remove trailing /
-			gremlinUrl = gremlinUrl.TrimEnd('/');
-
-			var joScript = new JObject {{"script", script}};
-
 			string response;
-			var status = Rest.HttpRest.Post(gremlinUrl, joScript.ToString(Formatting.None), out response);
+			var status = Rest.HttpRest.Post(gremlinUrl, script.GetScript(), out response);
 
 			var joResponse = JObject.Parse(response);
 			var jaColumns =(JArray)joResponse["columns"];
