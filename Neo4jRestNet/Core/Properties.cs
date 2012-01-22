@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Collections;
+using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 
@@ -181,7 +182,7 @@ namespace Neo4jRestNet.Core
 
 			var properties = new Dictionary<string, object>(StringComparer.CurrentCultureIgnoreCase);
 
-			JObject joProperties = JObject.Parse(jsonProperties);
+			var joProperties = JObject.Parse(jsonProperties);
 
 			foreach (var kvpProperty in joProperties)
 			{
@@ -199,7 +200,7 @@ namespace Neo4jRestNet.Core
 			{
 				jo.Add(kvp.Key, JToken.FromObject(kvp.Value));
 			}
-			return jo.ToString(Formatting.None);
+			return jo.ToString(Formatting.None, new IsoDateTimeConverter());
 		}
 
 		public Dictionary<string, object> ToDictionary()

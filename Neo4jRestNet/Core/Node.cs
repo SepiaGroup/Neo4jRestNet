@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System;
+using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 using Neo4jRestNet.Rest;
@@ -210,7 +211,7 @@ namespace Neo4jRestNet.Core
 		public static Node CreateNode(string nodeType, IDictionary<string, object> properties)
 		{
 			properties.Add(NodeProperty.NodeType.ToString(), nodeType);
-			return CreateNodeFromJson(DefaultDbUrl, JObject.FromObject(properties).ToString(Formatting.None));
+			return CreateNodeFromJson(DefaultDbUrl, JObject.FromObject(properties).ToString(Formatting.None, new IsoDateTimeConverter()));
 		}
 
 		public static Node CreateNode(Enum nodeType, IDictionary<string, object> properties)
@@ -221,7 +222,7 @@ namespace Neo4jRestNet.Core
 		public static Node CreateNode(string dbUrl, string nodeType, IDictionary<string, object> properties)
 		{
 			properties.Add(NodeProperty.NodeType.ToString(), nodeType);
-			return CreateNodeFromJson(dbUrl, JObject.FromObject(properties).ToString(Formatting.None));
+			return CreateNodeFromJson(dbUrl, JObject.FromObject(properties).ToString(Formatting.None, new IsoDateTimeConverter()));
 		}
 
 		public static Node CreateNode(string dbUrl, Enum nodeType, IDictionary<string, object> properties)
@@ -293,8 +294,8 @@ namespace Neo4jRestNet.Core
 			var node = new Node
 			               {
 			                   Self = self.Value<string>(),
-			                   _properties = Properties.ParseJson(properties.ToString(Formatting.None)),
-			                   OriginalNodeJson = nodeJson.ToString(Formatting.None)
+							   _properties = Properties.ParseJson(properties.ToString(Formatting.None, new IsoDateTimeConverter())),
+							   OriginalNodeJson = nodeJson.ToString(Formatting.None, new IsoDateTimeConverter())
 			               };
 
 		    return node;
@@ -398,7 +399,7 @@ namespace Neo4jRestNet.Core
 				properties.SetProperty(NodeProperty.NodeType.ToString(), Properties.GetProperty<string>(NodeProperty.NodeType.ToString()));
 			}
 
-			HttpStatusCode status = Neo4jRestApi.SetPropertiesOnNode(DefaultDbUrl, (long)EncryptedId, properties.ToString());
+			var status = Neo4jRestApi.SetPropertiesOnNode(DefaultDbUrl, (long)EncryptedId, properties.ToString());
 			if (status != HttpStatusCode.NoContent)
 			{
 				throw new Exception(string.Format("Error setting properties on node (node id:{0} http response:{1})", (long)EncryptedId, status));
@@ -695,7 +696,7 @@ namespace Neo4jRestNet.Core
 		    switch (jo["root"].Type)
 		    {
 		        case JTokenType.Object:
-		            nodes.Add(InitializeFromNodeJson(jo["root"].ToString(Formatting.None)));
+		            nodes.Add(InitializeFromNodeJson(jo["root"].ToString(Formatting.None, new IsoDateTimeConverter())));
 		            break;
 
 		        case JTokenType.Array:

@@ -41,7 +41,10 @@ namespace Neo4jRestNet.CypherPlugin
 
 				case ExpressionType.Convert:
 					var convert = (UnaryExpression)body;
-					sbFilter.Append(Parse(convert.Operand));
+					
+					sbFilter.Append( convert.Operand.Type == typeof(DateTime) ? 
+										string.Format("'{0:s}'", Expression.Lambda(body).Compile().DynamicInvoke()) : // Format DateTime to ISO8601 
+										Parse(convert.Operand) );
 					break;
 
 				case ExpressionType.Not:

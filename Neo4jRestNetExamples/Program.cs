@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Neo4jRestNet.Core;
 using Neo4jRestNet.GremlinPlugin;
 using Neo4jRestNet.CypherPlugin;
@@ -38,6 +39,15 @@ namespace Example
 
 		static void Main(string[] args)
 		{
+
+			//var dnode = Node.GetNode(81);
+
+			//var node = Node.CreateNode("MyType");
+			//node.Properties.SetProperty("myDate", new DateTime(2011, 12, 15));
+
+			//node.SaveProperties();
+
+			
 
 			// Get Root Node from graphDB
 			var rootNode = Node.GetRootNode();
@@ -167,6 +177,19 @@ namespace Example
 			c7.Return(r => r.Node("B"));
 
 			tbl = c7.Post();
+
+			// Test Cypher Dates
+			var date = new DateTime(2011, 12, 15);
+
+			//// Basic Cypher query
+			//var c1 = new Cypher();
+			//c1.Start(s => s.Node("A", 81));
+			//c1.Where(w => w.Node("A").Property("myDate") < date.AddDays(2)
+			//    && w.Node("A").Property("myDate") == new DateTime(2011, 12, 15));
+
+			//c1.Return(r => r.Node("A"));
+
+			//tbl = c1.Post();
 
 		}
 	}

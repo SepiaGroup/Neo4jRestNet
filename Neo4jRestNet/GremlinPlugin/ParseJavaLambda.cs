@@ -7,7 +7,7 @@ namespace Neo4jRestNet.GremlinPlugin
 {
 	public class ParseJavaLambda
 	{
-		ExpressionParser ep = new ExpressionParser();
+		readonly ExpressionParser _ep = new ExpressionParser();
 
 		public string Parse(Expression expression)
 		{
@@ -18,35 +18,31 @@ namespace Neo4jRestNet.GremlinPlugin
 			switch (body.NodeType)
 			{
 				case ExpressionType.Constant:
-					sbFilter.Append(Expression.Lambda(ep.ParseExpression(body)).Compile().DynamicInvoke().ToString());
+					sbFilter.Append(Expression.Lambda(_ep.ParseExpression(body)).Compile().DynamicInvoke().ToString());
 					break;
 
 				case ExpressionType.Call:
 					if (body.Type == typeof(string)) // Quote String values ie. Enums are strings
 					{
-						sbFilter.AppendFormat("'{0}'", Expression.Lambda(body).Compile().DynamicInvoke().ToString());
+						sbFilter.AppendFormat("'{0}'", Expression.Lambda(body).Compile().DynamicInvoke());
 					}
 					else
 					{
-						sbFilter.Append(Expression.Lambda(ep.ParseExpression(body)).Compile().DynamicInvoke().ToString());
+						sbFilter.Append(Expression.Lambda(_ep.ParseExpression(body)).Compile().DynamicInvoke().ToString());
 					}
 
 					break;
 
 				case ExpressionType.MemberAccess:
-					//if (body.Type == typeof(string)) // Quote String values ie. Enums are strings
-					//{
-					//    sbFilter.AppendFormat("'{0}'", Expression.Lambda(body).Compile().DynamicInvoke().ToString());
-					//}
-					//else
-					//{
-						sbFilter.AppendFormat("{0}", Expression.Lambda(body).Compile().DynamicInvoke().ToString());
-					//}
+						sbFilter.AppendFormat("{0}", Expression.Lambda(body).Compile().DynamicInvoke());
 					break; 
 
 				case ExpressionType.Convert:
 					var convert = (UnaryExpression)body;
-					sbFilter.Append(Parse(convert.Operand));
+					
+					sbFilter.Append( convert.Operand.Type == typeof(DateTime) ? 
+										string.Format("'{0:s}'", Expression.Lambda(body).Compile().DynamicInvoke()) : // Format DateTime to ISO8601 
+										Parse(convert.Operand) );
 					break;
 
 				case ExpressionType.Not:
