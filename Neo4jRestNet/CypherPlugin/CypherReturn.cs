@@ -24,10 +24,20 @@ namespace Neo4jRestNet.CypherPlugin
 
 			return this;
 		}
-		
+
+		public CypherReturn Node(string name, Enum property)
+		{
+			return Node(name, property.ToString(), typeof(string));
+		}
+
 		public CypherReturn Node(string name, string property)
 		{
-			return Node(name, property, typeof (object));
+			return Node(name, property, typeof (string));
+		}
+
+		public CypherReturn Node(string name, Enum property, Type propertyType)
+		{
+			return Node(name, property.ToString(), propertyType);
 		}
 
 		public CypherReturn Node(string name, string property, Type propertyType)
@@ -109,6 +119,19 @@ namespace Neo4jRestNet.CypherPlugin
 		public CypherReturn Distinct()
 		{
 			_sb.Append(" distinct ");
+
+			return this;
+		}
+
+		#endregion
+
+		#region As
+
+		public CypherReturn As(string alias)
+		{
+			_sb.AppendFormat(" as {0}", alias);
+
+			_isStringEmpty = false;
 
 			return this;
 		}

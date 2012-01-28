@@ -393,10 +393,11 @@ namespace Neo4jRestNet.Core
 
 		public void SaveProperties(Properties properties)
 		{
-			LoadProperties(false);
-			if (Properties.HasProperty(NodeProperty.NodeType.ToString()))
+//			LoadProperties(false);
+	
+			if (Properties.HasProperty(NodeProperty.NodeType))
 			{
-				properties.SetProperty(NodeProperty.NodeType.ToString(), Properties.GetProperty<string>(NodeProperty.NodeType.ToString()));
+				properties.SetProperty(NodeProperty.NodeType, Properties.GetProperty<string>(NodeProperty.NodeType));
 			}
 
 			var status = Neo4jRestApi.SetPropertiesOnNode(DefaultDbUrl, (long)EncryptedId, properties.ToString());
@@ -405,7 +406,7 @@ namespace Neo4jRestNet.Core
 				throw new Exception(string.Format("Error setting properties on node (node id:{0} http response:{1})", (long)EncryptedId, status));
 			}
 
-			LoadProperties(true);
+//			LoadProperties(true);
 		}
 
 		#endregion

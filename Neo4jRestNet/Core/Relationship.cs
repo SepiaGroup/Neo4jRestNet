@@ -282,13 +282,13 @@ namespace Neo4jRestNet.Core
 
 		public void SaveProperties(Properties properties)
 		{
-			HttpStatusCode status = Neo4jRestApi.SetPropertiesOnRelationship(_selfDbUrl, Id, properties.ToString());
+			var status = Neo4jRestApi.SetPropertiesOnRelationship(_selfDbUrl, Id, properties.ToString());
 			if (status != HttpStatusCode.NoContent)
 			{
 				throw new Exception(string.Format("Error setting properties on relationship (relationship id:{0} http response:{1})", Id, status));
 			}
 
-			LoadProperties(true);
+//			LoadProperties(true);
 		}
 
 		#endregion
