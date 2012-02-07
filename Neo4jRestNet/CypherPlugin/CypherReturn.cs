@@ -139,7 +139,18 @@ namespace Neo4jRestNet.CypherPlugin
 		#endregion
 
 		#region Count
-		
+
+		public CypherReturn Count()
+		{
+			_sb.AppendFormat("{0} count('*')", _isStringEmpty ? string.Empty : ",");
+
+			_isStringEmpty = false;
+
+			_returnTypes.Add(typeof(int));
+
+			return this;
+		}
+
 		public CypherReturn Count(string name)
 		{
 			_sb.AppendFormat("{1} count({0})", name, _isStringEmpty ? string.Empty : ",");
@@ -150,7 +161,18 @@ namespace Neo4jRestNet.CypherPlugin
 
 			return this;
 		}
-		
+
+		public CypherReturn Count(string name, bool distinct)
+		{
+			_sb.AppendFormat("{1} count({2}{0})", name, _isStringEmpty ? string.Empty : ",", distinct ? "distinct " : string.Empty);
+
+			_isStringEmpty = false;
+
+			_returnTypes.Add(typeof(int));
+
+			return this;
+		}
+
 		#endregion
 
 		#region Type

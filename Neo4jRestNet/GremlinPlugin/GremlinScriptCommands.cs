@@ -16,19 +16,39 @@ namespace Neo4jRestNet.GremlinPlugin
 			return query.Append("g.v({0})", node.Id);
 		}
 
+		public static GremlinScript g(this GremlinScript query, IEnumerable<Node> nodes)
+		{
+			return query.Append("g.v({0})", string.Join(",", nodes.Select(s => s.Id).ToArray()));
+		}
+
 		public static GremlinScript g(this GremlinScript query, Relationship relationship)
 		{
 			return query.Append("g.e({0})", relationship.Id);
 		}
 
+		public static GremlinScript g(this GremlinScript query, IEnumerable<Relationship> relationships)
+		{
+			return query.Append("g.e({0})", string.Join(",", relationships.Select(s => s.Id).ToArray()));
+		}
+		
 		public static GremlinScript gV(this GremlinScript query, long Id)
 		{
 			return query.Append("g.v({0})", Id);
 		}
 
+		public static GremlinScript gV(this GremlinScript query, IEnumerable<long> Ids)
+		{
+			return query.Append("g.v({0})", string.Join(",", Ids));
+		}
+		
 		public static GremlinScript gV(this GremlinScript query, Node node)
 		{
 			return gV(query, node.Id);
+		}
+
+		public static GremlinScript gV(this GremlinScript query, IEnumerable<Node> nodes)
+		{
+			return gV(query, nodes.Select(s => s.Id));
 		}
 
 		public static GremlinScript gE(this GremlinScript query, long Id)
@@ -36,11 +56,21 @@ namespace Neo4jRestNet.GremlinPlugin
 			return query.Append("g.e({0})", Id);
 		}
 
+		public static GremlinScript gE(this GremlinScript query, IEnumerable<long> Ids)
+		{
+			return query.Append("g.e({0})", string.Join(",", Ids));
+		}
+		
 		public static GremlinScript gE(this GremlinScript query, Relationship relationship)
 		{
 			return gE(query, relationship.Id);
 		}
 
+		public static GremlinScript gE(this GremlinScript query, IEnumerable<Relationship> relationships)
+		{
+			return gE(query, relationships.Select(s => s.Id));
+		}
+	
 		#endregion
 
 		#region In()

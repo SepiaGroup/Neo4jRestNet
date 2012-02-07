@@ -9,6 +9,13 @@ namespace Neo4jRestNet.CypherPlugin
 
 		#region Node
 
+		public CypherWhere Node()
+		{
+			_sb.Append("()");
+
+			return this;
+		}
+
 		public CypherWhere Node(string name) 
 		{
 			_sb.AppendFormat("{0}", name);
@@ -49,10 +56,63 @@ namespace Neo4jRestNet.CypherPlugin
 			return this;
 		}
 
+		public CypherWhere RegEx(string regEx, bool caseInsensitive)
+		{
+			_sb.AppendFormat(" =~ /{0}{1}/", caseInsensitive ? "(?i)" : string.Empty, regEx);
+
+			return this;
+		}
+
+		#endregion
+
+		#region To
+
+		public CypherWhere To()
+		{
+			_sb.Append("-->");
+
+			return this;
+		}
+
+		public CypherWhere To(string relationship)
+		{
+			_sb.AppendFormat("-[:{0}]->", relationship);
+
+			return this;
+		}
+
+		public CypherWhere To(Enum relationship)
+		{
+			return To(relationship.ToString());
+		}
+
+		#endregion
+
+		#region From
+
+		public CypherWhere From()
+		{
+			_sb.Append("<--");
+
+			return this;
+		}
+
+		public CypherWhere From(string relationship)
+		{
+			_sb.AppendFormat("<-[:{0}]-", relationship);
+
+			return this;
+		}
+
+		public CypherWhere From(Enum relationship)
+		{
+			return From(relationship.ToString());
+		}
+
 		#endregion
 
 		#region Boolean Operators
-		
+
 		public CypherWhere And()
 		{
 			_sb.AppendFormat(" and ");
@@ -115,7 +175,16 @@ namespace Neo4jRestNet.CypherPlugin
 		public static bool operator >(CypherWhere o1, object o2)
 		{
 			return false;
-		}  
+		}
+
+		public static bool operator <=(CypherWhere o1, object o2)
+		{
+			return false;
+		}
+		public static bool operator >=(CypherWhere o1, object o2)
+		{
+			return false;
+		}
 
 		public override bool Equals(object obj)
 		{
