@@ -75,10 +75,40 @@ namespace Neo4jRestNet.Core
 
 		private static object DefaultTypeValue<T>()
 		{
-			if (typeof(T) == typeof(string))
+			if (typeof(T) == typeof(bool))
 			{
-				return string.Empty;
+				return false;
 			}
+
+			if (typeof(T) == typeof(byte))
+			{
+				return (byte)0;
+			} 
+			
+			if (typeof(T) == typeof(char))
+			{
+				return '\0';
+			}
+
+			if (typeof(T) == typeof(DateTime))
+			{
+				return DateTime.MinValue;
+			}
+
+			if (typeof(T) == typeof(decimal))
+			{
+				return 0M;
+			}
+
+			if (typeof(T) == typeof(double))
+			{
+				return 0D;
+			}
+
+			if (typeof(T) == typeof(float))
+			{
+				return 0F;
+			} 
 			
 			if (typeof(T) == typeof(int))
 			{
@@ -89,22 +119,37 @@ namespace Neo4jRestNet.Core
 			{
 				return 0L;
 			}
-			
-			if (typeof(T) == typeof(float))
+
+			if (typeof(T) == typeof(sbyte))
 			{
-				return 0F;
-			}
-			
-			if (typeof(T) == typeof(decimal))
-			{
-				return 0D;
-			}
-			
-			if (typeof(T) == typeof(bool))
-			{
-				return false;
+				return (sbyte)0;
 			}
 
+			if (typeof(T) == typeof(short))
+			{
+				return (short)0;
+			}
+
+			if (typeof(T) == typeof(string))
+			{
+				return string.Empty;
+			}
+
+			if (typeof(T) == typeof(uint))
+			{
+				return 0U;
+			}
+
+			if (typeof(T) == typeof(ulong))
+			{
+				return 0UL;
+			}
+			
+			if (typeof(T) == typeof(ushort))
+			{
+				return (ushort)0;
+			}
+			
 			return null;
 		}
 

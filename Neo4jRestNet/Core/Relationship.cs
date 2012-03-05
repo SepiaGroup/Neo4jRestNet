@@ -237,6 +237,7 @@ namespace Neo4jRestNet.Core
 				_selfDbUrl = self.Substring(0, self.LastIndexOf("/relationship"));
 				_self = self;
 				Id = relationshipId;
+				EncryptedId = relationshipId;
 			}
 		}
 

@@ -201,12 +201,12 @@ namespace Neo4jRestNet.GremlinPlugin
 
 		public static GremlinScript Back(this GremlinScript query, string label)
 		{
-			return query.Append(".back('{0}')", label);
+			return query.Append(string.Format(".back('{0}')", label));
 		}
 
 		public static GremlinScript Back(this GremlinScript query, int steps)
 		{
-			return query.Append(".back({0})", steps);
+			return query.Append(string.Format(".back({0})", steps));
 		}
 
 		#endregion

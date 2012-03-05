@@ -92,9 +92,11 @@
     <Compile Include="CypherPlugin\CypherReturn.cs" />
     <Compile Include="CypherPlugin\CypherMatch.cs" />
     <Compile Include="CypherPlugin\Cypher.cs" />
-    <Compile Include="CypherPlugin\CypherObject.cs" />
+    <Compile Include="CypherPlugin\CypherProperty.cs" />
     <Compile Include="CypherPlugin\CypherStart.cs" />
-    <Compile Include="CypherPlugin\ICypherObject.cs" />
+    <Compile Include="CypherPlugin\ICypherObject.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="CypherPlugin\ParseWhereLambda.cs" />
     <Compile Include="ExpressionTreeParser\ExpressionParser.cs" />
     <Compile Include="GremlinPlugin\GremlinScriptCommands.cs" />

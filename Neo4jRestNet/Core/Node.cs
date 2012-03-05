@@ -368,10 +368,10 @@ namespace Neo4jRestNet.Core
 			}
 
 			string response;
-			var status = Neo4jRestApi.GetPropertiesOnNode(DefaultDbUrl, (long)EncryptedId, out response);
+			var status = Neo4jRestApi.GetPropertiesOnNode(DefaultDbUrl, Id, out response);
 			if (status != HttpStatusCode.OK)
 			{
-				throw new Exception(string.Format("Error retrieving properties on node (node id:{0} http response:{1})", (long)EncryptedId, status));
+				throw new Exception(string.Format("Error retrieving properties on node (node id:{0} http response:{1})", Id, status));
 			}
 
 			_properties = Properties.ParseJson(response);
@@ -400,10 +400,10 @@ namespace Neo4jRestNet.Core
 				properties.SetProperty(NodeProperty.NodeType, Properties.GetProperty<string>(NodeProperty.NodeType));
 			}
 
-			var status = Neo4jRestApi.SetPropertiesOnNode(DefaultDbUrl, (long)EncryptedId, properties.ToString());
+			var status = Neo4jRestApi.SetPropertiesOnNode(DefaultDbUrl, Id, properties.ToString());
 			if (status != HttpStatusCode.NoContent)
 			{
-				throw new Exception(string.Format("Error setting properties on node (node id:{0} http response:{1})", (long)EncryptedId, status));
+				throw new Exception(string.Format("Error setting properties on node (node id:{0} http response:{1})", Id, status));
 			}
 
 //			LoadProperties(true);
@@ -461,10 +461,10 @@ namespace Neo4jRestNet.Core
 		public IEnumerable<Relationship> GetRelationships(RelationshipDirection direction, IEnumerable<string> names)
 		{
 			string response;
-			var status = Neo4jRestApi.GetRelationshipsOnNode(DefaultDbUrl, (long)EncryptedId, direction, names, out response);
+			var status = Neo4jRestApi.GetRelationshipsOnNode(DefaultDbUrl, Id, direction, names, out response);
 			if (status != HttpStatusCode.OK)
 			{
-				throw new Exception(string.Format("Error retrieving relationships on node (node id:{0} http response:{1})", (long)EncryptedId, status));
+				throw new Exception(string.Format("Error retrieving relationships on node (node id:{0} http response:{1})", Id, status));
 			}
 
 			return Relationship.ParseJson(response);
@@ -489,14 +489,14 @@ namespace Neo4jRestNet.Core
 		{
 			string response;
 			var status = Neo4jRestApi.CreateRelationship( DefaultDbUrl,
-														(long)EncryptedId, 
+														Id, 
 														toNode.Self, 
 														relationshipType, 
 														relationshipProperties == null ? null : relationshipProperties.ToString(), 
 														out response);
 			if (status != HttpStatusCode.Created)
 			{
-				throw new Exception(string.Format("Error creationg relationship on node (node id:{0} http response:{1})", (long)EncryptedId, status));
+				throw new Exception(string.Format("Error creationg relationship on node (node id:{0} http response:{1})", Id, status));
 			}
 
 			return Relationship.ParseJson(response).First();
@@ -509,10 +509,10 @@ namespace Neo4jRestNet.Core
 		public IEnumerable<IGraphObject> Traverse(Order order, Uniqueness uniqueness, IEnumerable<TraverseRelationship> relationships, PruneEvaluator pruneEvaluator, ReturnFilter returnFilter, int? maxDepth, ReturnType returnType)
 		{
 			string response;
-			var status = Neo4jRestApi.Traverse(DefaultDbUrl, (long)EncryptedId, order, uniqueness, relationships, pruneEvaluator, returnFilter, maxDepth, returnType, out response);
+			var status = Neo4jRestApi.Traverse(DefaultDbUrl, Id, order, uniqueness, relationships, pruneEvaluator, returnFilter, maxDepth, returnType, out response);
 			if (status != HttpStatusCode.OK)
 			{
-				throw new Exception(string.Format("Error traversing nodes (node id:{0} status code:{1})", (long)EncryptedId, status));
+				throw new Exception(string.Format("Error traversing nodes (node id:{0} status code:{1})", Id, status));
 			}
 
 			if (returnType.ToString() == ReturnType.Node.ToString())
@@ -736,7 +736,7 @@ namespace Neo4jRestNet.Core
 
 		public override int GetHashCode()
 		{
-			return (int)EncryptedId;
+			return (int)Id;
 		}
 
 		public static bool operator ==(Node value1, Node value2)

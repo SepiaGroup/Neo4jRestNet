@@ -10,7 +10,7 @@ namespace Neo4jRestNet.CypherPlugin
 
 		private readonly StringBuilder _sb = new StringBuilder();
 		private bool _isStringEmpty = true; // used becuase string could contain Distinct 
-		private readonly List<Type> _returnTypes = new List<Type>();
+		internal readonly List<Type> ReturnTypes = new List<Type>();
 
 		#region Node
 
@@ -20,33 +20,7 @@ namespace Neo4jRestNet.CypherPlugin
 			
 			_isStringEmpty = false;
 
-			_returnTypes.Add(typeof(Node));
-
-			return this;
-		}
-
-		public CypherReturn Node(string name, Enum property)
-		{
-			return Node(name, property.ToString(), typeof(string));
-		}
-
-		public CypherReturn Node(string name, string property)
-		{
-			return Node(name, property, typeof (string));
-		}
-
-		public CypherReturn Node(string name, Enum property, Type propertyType)
-		{
-			return Node(name, property.ToString(), propertyType);
-		}
-
-		public CypherReturn Node(string name, string property, Type propertyType)
-		{
-			_sb.AppendFormat("{2} {0}.{1}", name, property, _isStringEmpty ? string.Empty : ",");
-
-			_isStringEmpty = false;
-
-			_returnTypes.Add(propertyType);
+			ReturnTypes.Add(typeof(Node));
 
 			return this;
 		}
@@ -61,23 +35,7 @@ namespace Neo4jRestNet.CypherPlugin
 
 			_isStringEmpty = false;
 
-			_returnTypes.Add(typeof(Relationship));
-
-			return this;
-		}
-
-		public CypherReturn Relationship(string name, string property)
-		{
-			return Relationship(name, property, typeof(object));
-		}
-
-		public CypherReturn Relationship(string name, string property, Type propertyType)
-		{
-			_sb.AppendFormat("{2} {0}.{1}", name, property, _isStringEmpty ? string.Empty : ",");
-
-			_isStringEmpty = false;
-
-			_returnTypes.Add(propertyType);
+			ReturnTypes.Add(typeof(Relationship));
 
 			return this;
 		}
@@ -92,7 +50,7 @@ namespace Neo4jRestNet.CypherPlugin
 
 			_isStringEmpty = false;
 
-			_returnTypes.Add(typeof(Path));
+			ReturnTypes.Add(typeof(Path));
 
 			return this;
 		}
@@ -107,7 +65,7 @@ namespace Neo4jRestNet.CypherPlugin
 
 			_isStringEmpty = false;
 
-			_returnTypes.Add(typeof(int));
+			ReturnTypes.Add(typeof(int));
 
 			return this;
 		}
@@ -146,7 +104,7 @@ namespace Neo4jRestNet.CypherPlugin
 
 			_isStringEmpty = false;
 
-			_returnTypes.Add(typeof(int));
+			ReturnTypes.Add(typeof(int));
 
 			return this;
 		}
@@ -157,7 +115,7 @@ namespace Neo4jRestNet.CypherPlugin
 
 			_isStringEmpty = false;
 
-			_returnTypes.Add(typeof(int));
+			ReturnTypes.Add(typeof(int));
 
 			return this;
 		}
@@ -168,7 +126,7 @@ namespace Neo4jRestNet.CypherPlugin
 
 			_isStringEmpty = false;
 
-			_returnTypes.Add(typeof(int));
+			ReturnTypes.Add(typeof(int));
 
 			return this;
 		}
@@ -183,7 +141,7 @@ namespace Neo4jRestNet.CypherPlugin
 
 			_isStringEmpty = false;
 
-			_returnTypes.Add(typeof(string));
+			ReturnTypes.Add(typeof(string));
 
 			return this;
 		}
@@ -198,7 +156,7 @@ namespace Neo4jRestNet.CypherPlugin
 
 			_isStringEmpty = false;
 
-			_returnTypes.Add(typeof(long));
+			ReturnTypes.Add(typeof(long));
 
 			return this;
 		}
@@ -213,7 +171,7 @@ namespace Neo4jRestNet.CypherPlugin
 
 			_isStringEmpty = false;
 
-			_returnTypes.Add(typeof(string));
+			ReturnTypes.Add(typeof(string));
 
 			return this;
 		}
@@ -228,7 +186,7 @@ namespace Neo4jRestNet.CypherPlugin
 
 			_isStringEmpty = false;
 
-			_returnTypes.Add(typeof(float));
+			ReturnTypes.Add(typeof(float));
 
 			return this;
 		}
@@ -243,7 +201,7 @@ namespace Neo4jRestNet.CypherPlugin
 
 			_isStringEmpty = false;
 
-			_returnTypes.Add(typeof(float));
+			ReturnTypes.Add(typeof(float));
 
 			return this;
 		}
@@ -258,7 +216,7 @@ namespace Neo4jRestNet.CypherPlugin
 
 			_isStringEmpty = false;
 
-			_returnTypes.Add(typeof(float));
+			ReturnTypes.Add(typeof(float));
 
 			return this;
 		}
@@ -267,7 +225,7 @@ namespace Neo4jRestNet.CypherPlugin
 
 		public IEnumerable<Type> GetReturnTypes
 		{
-			get { return _returnTypes; }
+			get { return ReturnTypes; }
 		}
 
 		public ICypherObject Append(string value)

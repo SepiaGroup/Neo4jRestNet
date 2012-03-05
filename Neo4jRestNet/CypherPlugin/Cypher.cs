@@ -34,7 +34,7 @@ namespace Neo4jRestNet.CypherPlugin
 			// Remove trailing /
 			cypherUrl = cypherUrl.TrimEnd('/');
 
-			var joScript = new JObject {{"query", Query}};
+			var joScript = new JObject { { "query", Query } };
 
 			string response;
 			Rest.HttpRest.Post(cypherUrl, joScript.ToString(Formatting.None), out response);
@@ -47,7 +47,7 @@ namespace Neo4jRestNet.CypherPlugin
 			var dt = new DataTable();
 
 			var initColumns = true;
-			
+
 			foreach (JArray jRow in jaData)
 			{
 				var colIndex = 0;
@@ -57,50 +57,49 @@ namespace Neo4jRestNet.CypherPlugin
 				{
 					if (initColumns)
 					{
+						// NOTE: DataTable does NOT support nullable data types
 						dt.Columns.Add(jaColumns[colIndex].ToString(), returnTypes[colIndex]);
 					}
 
-					if (returnTypes[colIndex] == typeof (Node))
+					if (returnTypes[colIndex] == typeof(Node))
 					{
 						row.Add(jCol.Type == JTokenType.Null ? null : Node.InitializeFromNodeJson((JObject)jCol));
 					}
-					else if (returnTypes[colIndex] == typeof (Relationship))
+					else if (returnTypes[colIndex] == typeof(Relationship))
 					{
-						row.Add(jCol.Type == JTokenType.Null ? null : Relationship.InitializeFromRelationshipJson((JObject) jCol));
+						row.Add(jCol.Type == JTokenType.Null ? null : Relationship.InitializeFromRelationshipJson((JObject)jCol));
 					}
-					else if (returnTypes[colIndex] == typeof (Path))
+					else if (returnTypes[colIndex] == typeof(Path))
 					{
 						row.Add(jCol.Type == JTokenType.Null ? null : Path.ParseJson((JArray)jCol));
 					}
-					else if (returnTypes[colIndex] == typeof(string))
+	
+					// Handle the Null case for all Types
+					else if (jCol.Type == JTokenType.Null)
 					{
-						row.Add(jCol.Type == JTokenType.Null ? null : (string)jCol);
+						row.Add(DBNull.Value);
 					}
-					else if (returnTypes[colIndex] == typeof (int))
-					{
-						if(jCol.Type == JTokenType.Null)
-						{
-							throw new ArgumentNullException(string.Format("Value for column {0} of type {1} can not be null", jaColumns[colIndex], returnTypes[colIndex].Name));
-						}
 
-						row.Add((int) jCol);
-					}
-					else if (returnTypes[colIndex] == typeof(int?))
+					// Explicitly cast to correct data type
+					else if (returnTypes[colIndex] == typeof(DateTime))
 					{
-						row.Add(jCol.Type == JTokenType.Null ? null : (int?)jCol);
+						row.Add(jCol.Value<DateTime>());
+					}			
+					else if (returnTypes[colIndex] == typeof(double))
+					{
+						row.Add(jCol.Value<double>());
+					}
+					else if (returnTypes[colIndex] == typeof(int))
+					{
+						row.Add(jCol.Value<int>());
 					}
 					else if (returnTypes[colIndex] == typeof(long))
 					{
-						if (jCol.Type == JTokenType.Null)
-						{
-							throw new ArgumentNullException(string.Format("Value for column {0} of type {1} can not be null", jaColumns[colIndex], returnTypes[colIndex].Name));
-						}
-
-						row.Add((long)jCol);
+						row.Add(jCol.Value<long>());
 					}
-					else if (returnTypes[colIndex] == typeof(long?))
+					else if (returnTypes[colIndex] == typeof(string))
 					{
-						row.Add(jCol.Type == JTokenType.Null ? null : (long?)jCol);
+						row.Add(jCol.Value<string>());
 					}
 					else
 					{
@@ -119,7 +118,7 @@ namespace Neo4jRestNet.CypherPlugin
 			return dt;
 		}
 
-				public void Start(Func<CypherStart, object> start)
+		public void Start(Func<CypherStart, object> start)
 		{
 			_start.Add(start);
 		}
@@ -148,7 +147,7 @@ namespace Neo4jRestNet.CypherPlugin
 		{
 			_skip = string.Format(" SKIP {0}", skip);
 		}
-		
+
 		public void Limit(int limit)
 		{
 			_limit = string.Format(" LIMIT {0}", limit);

@@ -127,6 +127,13 @@ namespace Neo4jRestNet.CypherPlugin
 			return this;
 		}
 
+		public CypherWhere NullOp()
+		{
+			_sb.AppendFormat(" ");
+
+			return this;
+		}
+
 		#endregion
 
 		public ICypherObject Append(string value)
