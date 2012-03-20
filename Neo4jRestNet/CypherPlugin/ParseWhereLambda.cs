@@ -99,11 +99,7 @@ namespace Neo4jRestNet.CypherPlugin
 		
 					if (be.Left.NodeType == ExpressionType.OrElse)
 					{
-						// Check to see if NullOp 
-						if (!IsNullOp(((BinaryExpression)be.Left).Left))
-						{
-							leftParens = true;
-						}
+						leftParens = true;
 					}
 
 					if (be.Right.NodeType == ExpressionType.OrElse)
@@ -119,11 +115,7 @@ namespace Neo4jRestNet.CypherPlugin
 		
 					if (be.Left.NodeType == ExpressionType.AndAlso)
 					{
-						// Check to see if NullOp 
-						if (!IsNullOp(((BinaryExpression)be.Left).Left))
-						{
 							leftParens = true;
-						}
 					}
 
 					if (be.Right.NodeType == ExpressionType.AndAlso)
@@ -187,25 +179,6 @@ namespace Neo4jRestNet.CypherPlugin
 			}
 
 			return sb.ToString();
-		}
-
-		private bool IsNullOp(Expression expression)
-		{
-			if(expression.NodeType != ExpressionType.Convert)
-			{
-				return false;
-			}
-
-			var ue = (UnaryExpression)expression;
-
-			if(ue.Operand.NodeType != ExpressionType.Call)
-			{
-				return false;
-			}
-
-			var val = Expression.Lambda(_ep.ParseExpression(ue.Operand)).Compile().DynamicInvoke().ToString();
-			
-			return string.IsNullOrWhiteSpace(val);
 		}
 	}
 }

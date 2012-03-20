@@ -18,7 +18,7 @@ namespace Neo4jRestNet.CypherPlugin
 
 		readonly List<Func<CypherStart, object>> _start = new List<Func<CypherStart, object>>();
 		readonly List<Func<CypherMatch, object>> _match = new List<Func<CypherMatch, object>>();
-		readonly List<Expression<Func<CypherWhere, object>>> _where = new List<Expression<Func<CypherWhere, object>>>();
+		readonly List<Tuple<string, Expression<Func<CypherWhere, object>>>> _where = new List<Tuple<string, Expression<Func<CypherWhere, object>>>>();
 		readonly List<Func<CypherReturn, object>> _return = new List<Func<CypherReturn, object>>();
 		readonly List<Func<CypherOrderBy, object>> _orderBy = new List<Func<CypherOrderBy, object>>();
 		String _skip = string.Empty;
@@ -130,7 +130,22 @@ namespace Neo4jRestNet.CypherPlugin
 
 		public void Where(Expression<Func<CypherWhere, object>> where)
 		{
-			_where.Add(where);
+			_where.Add(new Tuple<string, Expression<Func<CypherWhere, object>>>(string.Empty, where));
+		}
+
+		public void Where<T>(Expression<Func<CypherWhere, object>> where) where T : ICypherWhereType
+		{
+			var joinString = string.Empty;
+			if (typeof(T) == typeof(And))
+			{
+				joinString = " and ";
+			}
+			else if (typeof(T) == typeof(Or))
+			{
+				joinString = " or ";
+			}
+
+			_where.Add(new Tuple<string, Expression<Func<CypherWhere, object>>>(joinString, where));
 		}
 
 		public void Return(Func<CypherReturn, object> cypherReturn)
@@ -175,6 +190,8 @@ namespace Neo4jRestNet.CypherPlugin
 			get
 			{
 				var sbToString = new StringBuilder();
+				var leftParen = string.Empty;
+				var rightParen = string.Empty;
 
 				string label = "START";
 				foreach (var s in _start)
@@ -196,10 +213,15 @@ namespace Neo4jRestNet.CypherPlugin
 				if (_where != null)
 				{
 					label = "WHERE";
+					leftParen = string.Empty;
+					rightParen = string.Empty;
+
 					foreach (var w in _where)
 					{
-						sbToString.AppendFormat(" {1} {0}", new ParseWhereLambda().Parse(w), label);
+						sbToString.AppendFormat(" {1}{2} {3}{0}{4}", new ParseWhereLambda().Parse(w.Item2), label, w.Item1, leftParen, rightParen);
 						label = string.Empty;
+						leftParen = "(";
+						rightParen = ")";
 					}
 				}
 

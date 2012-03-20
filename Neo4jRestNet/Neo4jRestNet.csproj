@@ -95,6 +95,7 @@
     <Compile Include="CypherPlugin\Cypher.cs" />
     <Compile Include="CypherPlugin\CypherProperty.cs" />
     <Compile Include="CypherPlugin\CypherStart.cs" />
+    <Compile Include="CypherPlugin\CypherWhereType.cs" />
     <Compile Include="CypherPlugin\ICypherObject.cs">
       <SubType>Code</SubType>
     </Compile>
