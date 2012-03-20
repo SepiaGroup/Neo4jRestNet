@@ -130,22 +130,12 @@ namespace Neo4jRestNet.CypherPlugin
 
 		public void Where(Expression<Func<CypherWhere, object>> where)
 		{
-			_where.Add(new Tuple<string, Expression<Func<CypherWhere, object>>>(string.Empty, where));
+			_where.Add(new Tuple<string, Expression<Func<CypherWhere, object>>>(" and ", where));
 		}
 
-		public void Where<T>(Expression<Func<CypherWhere, object>> where) where T : ICypherWhereType
+		public void OrWhere(Expression<Func<CypherWhere, object>> where) 
 		{
-			var joinString = string.Empty;
-			if (typeof(T) == typeof(And))
-			{
-				joinString = " and ";
-			}
-			else if (typeof(T) == typeof(Or))
-			{
-				joinString = " or ";
-			}
-
-			_where.Add(new Tuple<string, Expression<Func<CypherWhere, object>>>(joinString, where));
+			_where.Add(new Tuple<string, Expression<Func<CypherWhere, object>>>(" or ", where));
 		}
 
 		public void Return(Func<CypherReturn, object> cypherReturn)
@@ -218,7 +208,7 @@ namespace Neo4jRestNet.CypherPlugin
 
 					foreach (var w in _where)
 					{
-						sbToString.AppendFormat(" {1}{2} {3}{0}{4}", new ParseWhereLambda().Parse(w.Item2), label, w.Item1, leftParen, rightParen);
+						sbToString.AppendFormat(" {1} {2}{0}{3}", new ParseWhereLambda().Parse(w.Item2), label == string.Empty ?  w.Item1 : label, leftParen, rightParen);
 						label = string.Empty;
 						leftParen = "(";
 						rightParen = ")";
