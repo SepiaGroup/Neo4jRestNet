@@ -87,7 +87,14 @@ namespace Neo4jRestNet.GremlinPlugin
 
 		public static GremlinScript In(this GremlinScript query, params string[] relationshipName)
 		{
-			return query.Append(".in({0})", string.Join(",", relationshipName));
+			if (relationshipName.Count() == 1)
+			{
+				return query.Append(".in({0})", relationshipName[0]);
+			}
+
+			// Can not send more then one element via parameters
+			var relationships = relationshipName.Aggregate(new StringBuilder(), (sb, item) => sb.AppendFormat("{1}'{0}'", item, sb.Length == 0 ? string.Empty : ","));
+			return query.Append(string.Format(".in({0})", relationships));
 		}
 
 		#endregion
@@ -108,7 +115,14 @@ namespace Neo4jRestNet.GremlinPlugin
 
 		public static GremlinScript InE(this GremlinScript query, params string[] relationshipName)
 		{
-			return query.Append(".inE({0})", string.Join(",", relationshipName));
+			if (relationshipName.Count() == 1)
+			{
+				return query.Append(".inE({0})", relationshipName[0]);
+			}
+			
+			// Can not send more then one element via parameters
+			var relationships = relationshipName.Aggregate(new StringBuilder(), (sb, item) => sb.AppendFormat("{1}'{0}'", item, sb.Length == 0 ? string.Empty : ","));
+			return query.Append(string.Format(".inE({0})", relationships));
 		}
 
 		#endregion
@@ -129,7 +143,14 @@ namespace Neo4jRestNet.GremlinPlugin
 
 		public static GremlinScript InV(this GremlinScript query, params string[] relationshipName)
 		{
-			return query.Append(".inV({0})",  string.Join(",", relationshipName));
+			if (relationshipName.Count() == 1)
+			{
+				return query.Append(".inV({0})", relationshipName[0]);
+			}
+
+			// Can not send more then one element via parameters
+			var relationships = relationshipName.Aggregate(new StringBuilder(), (sb, item) => sb.AppendFormat("{1}'{0}'", item, sb.Length == 0 ? string.Empty : ","));
+			return query.Append(string.Format(".inV({0})", relationships));
 		}
 
 		#endregion
@@ -150,7 +171,14 @@ namespace Neo4jRestNet.GremlinPlugin
 
 		public static GremlinScript Out(this GremlinScript query, params string[] relationshipName)
 		{
-			return query.Append(".out({0})", string.Join(",", relationshipName));
+			if (relationshipName.Count() == 1)
+			{
+				return query.Append(".out({0})", relationshipName[0]);
+			}
+
+			// Can not send more then one element via parameters
+			var relationships = relationshipName.Aggregate(new StringBuilder(), (sb, item) => sb.AppendFormat("{1}'{0}'", item, sb.Length == 0 ? string.Empty : ","));
+			return query.Append(string.Format(".out({0})", relationships));
 		}
 
 		#endregion
@@ -171,7 +199,14 @@ namespace Neo4jRestNet.GremlinPlugin
 
 		public static GremlinScript OutE(this GremlinScript query, params string[] relationshipName)
 		{
-			return query.Append(".outE({0})", string.Join(",", relationshipName));
+			if (relationshipName.Count() == 1)
+			{
+				return query.Append(".outE({0})", relationshipName[0]);
+			}
+
+			// Can not send more then one element via parameters
+			var relationships = relationshipName.Aggregate(new StringBuilder(), (sb, item) => sb.AppendFormat("{1}'{0}'", item, sb.Length == 0 ? string.Empty : ","));
+			return query.Append(string.Format(".outE({0})", relationships));
 		}
 
 		#endregion
@@ -192,7 +227,14 @@ namespace Neo4jRestNet.GremlinPlugin
 
 		public static GremlinScript OutV(this GremlinScript query, params string[] relationshipName)
 		{
-			return query.Append(".outV({0})", string.Join(",", relationshipName));
+			if (relationshipName.Count() == 1)
+			{
+				return query.Append(".outV({0})", relationshipName[0]);
+			}
+
+			// Can not send more then one element via parameters
+			var relationships = relationshipName.Aggregate(new StringBuilder(), (sb, item) => sb.AppendFormat("{1}'{0}'", item, sb.Length == 0 ? string.Empty : ","));
+			return query.Append(string.Format(".outV({0})", relationships));
 		}
 
 		#endregion

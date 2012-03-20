@@ -11,6 +11,9 @@ namespace Neo4jRestNet.CypherPlugin
 
 		public string Parse(Expression expression)
 		{
+			var leftParens = false;
+			var rightParens = false;
+
 			var sbFilter = new StringBuilder();
 			var body = expression.NodeType == ExpressionType.Lambda ? ((LambdaExpression)expression).Body : expression;
 			BinaryExpression be;
@@ -93,12 +96,42 @@ namespace Neo4jRestNet.CypherPlugin
 
 				case ExpressionType.AndAlso:
 					be = (BinaryExpression)body;
-					sbFilter.Append(InvokeExpression(be.Left, "and", be.Right));
+		
+					if (be.Left.NodeType == ExpressionType.OrElse)
+					{
+						// Check to see if NullOp 
+						if (!string.IsNullOrWhiteSpace(Parse(((BinaryExpression)be.Left).Left)))
+						{
+							leftParens = true;
+						}
+					}
+
+					if (be.Right.NodeType == ExpressionType.OrElse)
+					{
+						rightParens = true;
+					}
+
+					sbFilter.Append(InvokeExpression(be.Left, "and", be.Right, leftParens, rightParens));
 					break;
 
 				case ExpressionType.OrElse:
 					be = (BinaryExpression)body;
-					sbFilter.Append(InvokeExpression(be.Left, "or", be.Right));
+		
+					if (be.Left.NodeType == ExpressionType.AndAlso)
+					{
+						// Check to see if NullOp 
+						if(!string.IsNullOrWhiteSpace(Parse(((BinaryExpression)be.Left).Left)))
+						{
+							leftParens = true;
+						}
+					}
+
+					if (be.Right.NodeType == ExpressionType.AndAlso)
+					{
+						rightParens = true;
+					}
+
+					sbFilter.Append(InvokeExpression(be.Left, "or", be.Right, leftParens, rightParens));
 					break;
 
 				case ExpressionType.LessThan:
@@ -129,13 +162,29 @@ namespace Neo4jRestNet.CypherPlugin
 			return sbFilter.ToString();
 		}
 
-		private string InvokeExpression(Expression leftExpression, string strOperator, Expression rightExpression)
+		private string InvokeExpression(Expression leftExpression, string strOperator, Expression rightExpression, bool leftParens = false, bool rightParens = false)
 		{
 			var sb = new StringBuilder();
 
-			sb.Append(Parse(leftExpression));
+			if (leftParens)
+			{
+				sb.AppendFormat("({0})", Parse(leftExpression));
+			}
+			else
+			{
+				sb.Append(Parse(leftExpression));
+			}
+
 			sb.AppendFormat(" {0} ", strOperator);
-			sb.Append(Parse(rightExpression));
+
+			if (rightParens)
+			{
+				sb.AppendFormat("({0})", Parse(rightExpression));
+			}
+			else
+			{
+				sb.Append(Parse(rightExpression));
+			}
 
 			return sb.ToString();
 		}

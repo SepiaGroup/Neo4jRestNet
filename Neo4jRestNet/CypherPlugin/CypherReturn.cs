@@ -131,6 +131,17 @@ namespace Neo4jRestNet.CypherPlugin
 			return this;
 		}
 
+		public CypherReturn Coalesce<T>(string elements)
+		{
+			_sb.AppendFormat("{1} Coalesce({0})", elements, _isStringEmpty ? string.Empty : ",");
+
+			_isStringEmpty = false;
+
+			ReturnTypes.Add(typeof(T));
+
+			return this;
+		}
+
 		#endregion
 
 		#region Type
