@@ -89,7 +89,7 @@ namespace Neo4jRestNet.CypherPlugin
 					}
 					else
 					{
-						sbFilter.Append(InvokeExpression(be.Left, "!=", be.Right));
+						sbFilter.Append(InvokeExpression(be.Left, "<>", be.Right));
 					}
 
 					break;

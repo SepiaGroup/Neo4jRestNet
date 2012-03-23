@@ -366,6 +366,43 @@ namespace Neo4jRestNet.GremlinPlugin
 
 		#endregion
 
+		#region Array
+
+		public static GremlinScript Array(this GremlinScript query, IEnumerable<long> arrayItems)
+		{
+			var items = new StringBuilder();
+			foreach (var item in arrayItems)
+			{
+				items.AppendFormat("{1}{0}", item, items.Length == 0 ? string.Empty : ",");
+			}
+
+			return query.Append(string.Format("[{0}]", items));
+		}
+
+		public static GremlinScript Array(this GremlinScript query, IEnumerable<int> arrayItems)
+		{
+			var items = new StringBuilder();
+			foreach (var item in arrayItems)
+			{
+				items.AppendFormat("{1}{0}", item, items.Length == 0 ? string.Empty : ",");
+			}
+
+			return query.Append(string.Format("[{0}]", items));
+		}
+
+		public static GremlinScript Array(this GremlinScript query, IEnumerable<string> arrayItems)
+		{
+			var items = new StringBuilder();
+			foreach (var item in arrayItems)
+			{
+				items.AppendFormat("{1}'{0}'", item, items.Length == 0 ? string.Empty : ",");
+			}
+
+			return query.Append(string.Format("[{0}]", items));
+		}
+
+		#endregion
+
 		#region Misc
 
 		public static GremlinScript As(this GremlinScript query, string label)
