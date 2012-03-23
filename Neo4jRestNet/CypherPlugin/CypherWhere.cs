@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Text;
 
 namespace Neo4jRestNet.CypherPlugin
@@ -107,6 +108,18 @@ namespace Neo4jRestNet.CypherPlugin
 		public CypherWhere From(Enum relationship)
 		{
 			return From(relationship.ToString());
+		}
+
+		#endregion
+
+		#region In
+
+		public CypherWhere In<T>(params T[] items)
+		{
+			_sb.Append(string.Format(" IN [{0}]", 
+				items.Aggregate(new StringBuilder(), (sb, item) => sb.AppendFormat("{1}{2}{0}{2}", item, sb.Length > 0 ? "," : string.Empty, typeof(T) == typeof(string) ? "'" : string.Empty))));
+			
+			return this;
 		}
 
 		#endregion
