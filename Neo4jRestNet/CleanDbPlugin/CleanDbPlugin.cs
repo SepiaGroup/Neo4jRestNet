@@ -1,4 +1,5 @@
-﻿using System.Configuration;
+﻿using System;
+using System.Configuration;
 using System.Net;
 
 namespace Neo4jRestNet.CleanDbPlugin
@@ -10,7 +11,9 @@ namespace Neo4jRestNet.CleanDbPlugin
 
         public static HttpStatusCode CleanDb()
         {
-            return Rest.HttpRest.Delete(string.Concat(_defaultDbUrl, _cleanDbPluginPath));
+			var uri = new Uri(_defaultDbUrl);
+			
+            return Rest.HttpRest.Delete(string.Format("{0}://{1}{2}", uri.Scheme, uri.Authority, _cleanDbPluginPath));
         }
     }
 }
