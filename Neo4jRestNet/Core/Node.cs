@@ -68,21 +68,31 @@ namespace Neo4jRestNet.Core
 
 		#region GetNode
 
-		public static Node GetNode(EncryptId nodeId)
+		public static Node GetNode(long nodeId)
 		{
 			return GetNode(DefaultDbUrl, nodeId);
 		}
 
-		public static Node GetNode(string dbUrl, EncryptId nodeId)
+		public static Node GetNode(string dbUrl, long nodeId)
 		{
 			string response;
-			var status = Neo4jRestApi.GetNode(dbUrl, (long)nodeId, out response);
+			var status = Neo4jRestApi.GetNode(dbUrl, nodeId, out response);
 			if (status != HttpStatusCode.OK)
 			{
 				throw new Exception(string.Format("Node not found (node id:{0})", (long)nodeId));
 			}
 
 			return InitializeFromNodeJson(response);
+		}
+		
+		public static Node GetNode(EncryptId nodeId)
+		{
+			return GetNode(DefaultDbUrl, (long)nodeId);
+		}
+
+		public static Node GetNode(string dbUrl, EncryptId nodeId)
+		{
+			return GetNode(DefaultDbUrl, (long)nodeId);
 		}
 
 		public static IEnumerable<Node> GetNode(string indexName, string key, object value)

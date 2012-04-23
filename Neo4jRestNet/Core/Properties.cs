@@ -237,6 +237,14 @@ namespace Neo4jRestNet.Core
 			return new Properties(properties);
 		}
 
+		public void Add(Properties properties)
+		{
+			foreach (var p in properties._properties)
+			{
+				_properties.Add(p);
+			}
+		}
+
 		public override string ToString()
 		{
 			var jo = new JObject();

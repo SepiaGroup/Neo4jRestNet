@@ -47,7 +47,7 @@ namespace Example
 
 			//node.SaveProperties();
 
-			
+			//Neo4jRestNet.CleanDbPlugin.CleanDbPlugin.CleanDb();
 
 			// Get Root Node from graphDB
 			var rootNode = Node.GetRootNode();
@@ -132,7 +132,7 @@ namespace Example
 			var c3 = new Cypher();
 			c3.Start(s => s.Node("A", 0, 1));
 			c3.Match(m => m.Node("A").Any("r", "Likes").Node("C"));
-			c3.Return(r => r.Node("C").Node("C").Property("Name?"));
+		//	c3.Return(r => r.Node("C").Node("C").Property("Name?"));
 
 			tbl = c3.Post();
 
