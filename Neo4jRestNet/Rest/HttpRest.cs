@@ -6,37 +6,58 @@ namespace Neo4jRestNet.Rest
 {
     public class HttpRest
     {
-		private static HttpStatusCode BaseRestRequest(string url, string method, string body)
+		public enum Method
+		{
+			Delete,
+			Get,
+			Post,
+			Put
+		}
+
+		private static HttpStatusCode BaseRestRequest(string url, Method method, string body)
 		{
 
 			var w = (HttpWebRequest)WebRequest.Create(url);
 			w.Proxy = null;
-			w.Method = method;
+			w.Method = method.ToString();
 			w.ContentType = "application/json";
 
 			if (!string.IsNullOrEmpty(body))
 			{
-				Stream dataStream = w.GetRequestStream();
+				var dataStream = w.GetRequestStream();
 
 				byte[] b = Encoding.UTF8.GetBytes(body);
 				dataStream.Write(b, 0, b.Length);
 				dataStream.Close();
 			}
 
-			WebResponse resp = w.GetResponse();
-			resp.Close();
+			HttpStatusCode statusCode;
+			try
+			{
+				var resp = w.GetResponse();
 
-			HttpStatusCode statusCode = ((HttpWebResponse)resp).StatusCode;
+				resp.Close();
+
+				statusCode = ((HttpWebResponse) resp).StatusCode;
+			}
+			catch (WebException ex)
+			{
+				var webResponse = ex.Response;
+				
+				webResponse.Close();
+				
+				statusCode = ((HttpWebResponse)webResponse).StatusCode;
+			}
 
 			return statusCode;
 		}
 
-		private static HttpStatusCode BaseRestRequest(string url, string method, string body, out string response)
+		private static HttpStatusCode BaseRestRequest(string url, Method method, string body, out string response)
         {
 
 			var w = (HttpWebRequest)WebRequest.Create(url);
 			w.Proxy = null;
-			w.Method = method;
+			w.Method = method.ToString();
 			w.ContentType = "application/json";
 			w.Accept = "application/json";
 
@@ -49,16 +70,34 @@ namespace Neo4jRestNet.Rest
 				dataStream.Close();
 			}
 
-			var resp = w.GetResponse();
+			HttpStatusCode statusCode;
+			try
+			{
+				var resp = w.GetResponse();
 
-			var reader = new StreamReader(resp.GetResponseStream());
+				var reader = new StreamReader(resp.GetResponseStream());
 
-			response = reader.ReadToEnd();
+				response = reader.ReadToEnd();
 
-			reader.Close();
-			resp.Close();
+				reader.Close();
+				resp.Close();
 
-			var statusCode = ((HttpWebResponse)resp).StatusCode;
+				statusCode = ((HttpWebResponse) resp).StatusCode;
+			}
+			catch (WebException ex)
+			{
+				
+				var webResponse = ex.Response;
+
+				var reader = new StreamReader(webResponse.GetResponseStream());
+
+				response = reader.ReadToEnd();
+
+				reader.Close();
+				webResponse.Close();
+
+				statusCode = ((HttpWebResponse)webResponse).StatusCode;
+			}
 
 			return statusCode;
         }
@@ -71,7 +110,7 @@ namespace Neo4jRestNet.Rest
     	/// <returns>Response body from server</returns>
     	public static HttpStatusCode Get(string url, out string response)
         {
-            return BaseRestRequest(url, "GET", null, out response);
+            return BaseRestRequest(url, Method.Get, null, out response);
         }
 
     	/// <summary>
@@ -83,7 +122,7 @@ namespace Neo4jRestNet.Rest
     	/// <returns>Response body from server</returns>
     	public static HttpStatusCode Post(string url, string body, out string response)
         {
-            return BaseRestRequest(url, "POST", body, out response);
+            return BaseRestRequest(url, Method.Post, body, out response);
         }
 
         /// <summary>
@@ -94,7 +133,7 @@ namespace Neo4jRestNet.Rest
         /// <returns></returns>
 		public static HttpStatusCode Put(string url, string body)
         {
-            return BaseRestRequest(url, "PUT", body);
+            return BaseRestRequest(url, Method.Put, body);
         }
 
         /// <summary>
@@ -104,7 +143,7 @@ namespace Neo4jRestNet.Rest
         /// <returns>Response body from server</returns>
 		public static HttpStatusCode Delete(string url)
         {
-            return BaseRestRequest(url, "DELETE", null);
+            return BaseRestRequest(url, Method.Delete, null);
         }
     }
 }

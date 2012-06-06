@@ -1,16 +1,17 @@
 ﻿using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Resources;
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Neo4Net")]
+[assembly: AssemblyTitle("Neo4jRestNet")]
 [assembly: AssemblyDescription("Neo4j NoSql Manager")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Lidan Hifi")]
-[assembly: AssemblyProduct("Neo4Net")]
-[assembly: AssemblyCopyright("Copyright © Lidan Hifi 2011")]
+[assembly: AssemblyCompany("SepiaGroup")]
+[assembly: AssemblyProduct("Neo4jRestNet")]
+[assembly: AssemblyCopyright("Copyright © SepiaGroup 2012")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -20,7 +21,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("2e0e8e63-2496-423a-8d30-af6fa10c8bc3")]
+[assembly: Guid("f24ef57c-c7b1-46d6-a475-f78665df168d")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -34,3 +35,4 @@ using System.Runtime.InteropServices;
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
+[assembly: NeutralResourcesLanguageAttribute("en-US")]

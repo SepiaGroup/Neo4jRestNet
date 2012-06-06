@@ -1,4 +1,4 @@
-﻿namespace Neo4jRestNet.CypherPlugin
+﻿namespace Neo4jRestNet.Cypher
 {
 	public interface ICypherObject
 	{

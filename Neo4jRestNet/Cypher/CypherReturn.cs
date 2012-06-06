@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System;
 using Neo4jRestNet.Core;
 
-namespace Neo4jRestNet.CypherPlugin
+namespace Neo4jRestNet.Cypher
 {
 	public class CypherReturn : ICypherObject
 	{

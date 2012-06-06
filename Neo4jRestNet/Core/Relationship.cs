@@ -1,244 +1,205 @@
 ﻿using System;
 using System.Net;
-using System.Linq;
-using System.Configuration;
 using System.Collections.Generic;
-using Neo4jRestNet.Rest;
-using Newtonsoft.Json.Linq;
-using Newtonsoft.Json;
+using Neo4jRestNet.Configuration;
 
 
 namespace Neo4jRestNet.Core
 {
-	public class Relationship : IGraphObject
+	public class Relationship : IGraphObject, IEquatable<Relationship>
 	{
-		private static readonly string DefaultDbUrl = ConfigurationManager.ConnectionStrings["neo4j"].ConnectionString.TrimEnd('/');
+		private static readonly ConnectionElement DefaultConnection = ConnectionManager.Connection();
 
-		private string _selfDbUrl;
-		private string _self;
-		public Node StartNode { get; private set; }
-		public Node EndNode { get; private set; }
-		public string Name { get; private set; }
+		private readonly IRelationshipStore _relationshipGraphStore;
 		private Properties _properties;
-		public long Id { get; private set; }
-		public EncryptId EncryptedId { get; private set; }
-		public string OriginalRelationshipJson { get; private set; }
 
-		private Relationship() { }
-
-		#region GetRelationship
-
-		public static IEnumerable<Relationship> GetRelationship(string indexName, string key, object value)
+		private Relationship(Properties properties = null) 
 		{
-			return GetRelationship(DefaultDbUrl, indexName, key, value);
-		}
-		
-		public static IEnumerable<Relationship> GetRelationship(Enum indexName, string key, object value)
-		{
-			return GetRelationship(DefaultDbUrl, indexName.ToString(), key, value);
+			_properties = properties ?? new Properties();
+			_relationshipGraphStore = new RestRelationshipStore();
 		}
 
-		public static IEnumerable<Relationship> GetRelationship(string indexName, Enum key, object value)
+		public Relationship(IRelationshipStore relationshipStore, Properties properties = null)
 		{
-			return GetRelationship(DefaultDbUrl, indexName, key.ToString(), value);
-		}
-		
-		public static IEnumerable<Relationship> GetRelationship(Enum indexName, Enum key, object value)
-		{
-			return GetRelationship(DefaultDbUrl, indexName.ToString(), key.ToString(), value);
+
+			_properties = properties ?? new Properties();
+			_relationshipGraphStore = relationshipStore;
 		}
 
-		public static IEnumerable<Relationship> GetRelationship(string dbUrl, Enum indexName, Enum key, object value)
+		public long Id
 		{
-			return GetRelationship(dbUrl, indexName.ToString(), key.ToString(), value);
-		}
-
-		public static IEnumerable<Relationship> GetRelationship(string dbUrl, string indexName, string key, object value)
-		{
-			string response;
-			var status = Neo4jRestApi.GetRelationship(dbUrl, indexName, key, value, out response);
-			if (status != HttpStatusCode.OK)
+			get
 			{
-				throw new Exception(string.Format("Index not found in (index:{0})", indexName));
+				return _relationshipGraphStore.Id;
 			}
-
-			return ParseJson(response);
 		}
 
-		public static IEnumerable<Relationship> GetRelationship(string indexName, string searchQuery)
+		public string DbUrl
 		{
-			return GetRelationship(DefaultDbUrl, indexName, searchQuery);
+			get
+			{
+				return _relationshipGraphStore.DbUrl;
+			}
 		}
 
-		public static IEnumerable<Relationship> GetRelationship(Enum indexName, string searchQuery)
+		public EncryptId EncryptedId
 		{
-			return GetRelationship(DefaultDbUrl, indexName.ToString(), searchQuery);
+			get
+			{
+				return new EncryptId(_relationshipGraphStore.Id);
+			}
 		}
-
-		public static IEnumerable<Relationship> GetRelationship(string dbUrl, Enum indexName, string searchQuery)
-		{
-			return GetRelationship(dbUrl, indexName.ToString(), searchQuery);
-		}
-
-		public static IEnumerable<Relationship> GetRelationship(string dbUrl, string indexName, string searchQuery)
-		{
-			string response;
-			var status = Neo4jRestApi.GetRelationship(dbUrl, indexName, searchQuery, out response);
-			if (status != HttpStatusCode.OK)
-			{
-				throw new Exception(string.Format("Index not found in (index:{0})", indexName));
-			}
-
-			return ParseJson(response);
-		}
-
-		#endregion
-
-		#region Initializers 
-
-		public static Relationship InitializeFromRelationshipJson(string relationshipJson)
-		{
-			JObject jo;
-
-			try
-			{
-				jo = JObject.Parse(relationshipJson);
-			}
-			catch (Exception e)
-			{
-				throw new Exception("Invalid relationship json", e);
-			}
-
-			return InitializeFromRelationshipJson(jo);
-		}
-
-		public static Relationship InitializeFromRelationshipJson(JObject relationshipJson)
-		{
-			var relationship = new Relationship();
-			JToken self;
-			if (!relationshipJson.TryGetValue("self", out self) || self.Type != JTokenType.String)
-			{
-				throw new Exception("Invalid relationship json");
-			}
-			
-			relationship.Self = self.Value<string>();
-
-			JToken properties;
-			if (!relationshipJson.TryGetValue("data", out properties) || properties.Type != JTokenType.Object)
-			{
-				throw new Exception("Invalid relationship json");
-			}
-
-			JToken startNode;
-			if (!relationshipJson.TryGetValue("start", out startNode))
-			{
-				throw new Exception("Invalid relationship json");
-			}
-
-			switch (startNode.Type)
-			{
-				case JTokenType.String:
-					relationship.StartNode = Node.InitializeFromSelf(startNode.Value<string>());
-					break;
-
-				case JTokenType.Object:
-					relationship.StartNode = Node.InitializeFromNodeJson((JObject)startNode);
-					break;
-
-				default:
-					throw new Exception("Invalid relationship json");
-			}
-
-			JToken endNode;
-			if (!relationshipJson.TryGetValue("end", out endNode))
-			{
-				throw new Exception("Invalid relationship json");
-			}
-
-			switch (endNode.Type)
-			{
-				case JTokenType.String:
-					relationship.EndNode = Node.InitializeFromSelf(endNode.Value<string>());
-					break;
-
-				case JTokenType.Object:
-					relationship.EndNode = Node.InitializeFromNodeJson((JObject)endNode);
-					break;
-
-				default:
-					throw new Exception("Invalid relationship json");
-			}
-
-			JToken name;
-			if (!relationshipJson.TryGetValue("type", out name) || name.Type != JTokenType.String)
-			{
-				throw new Exception("Invalid relationship json");
-			}
-
-			relationship.Name = name.Value<string>();
-
-			relationship._properties = Properties.ParseJson(properties.ToString(Formatting.None));
-
-			relationship.OriginalRelationshipJson = relationshipJson.ToString(Formatting.None);
-
-			return relationship;
-		}
-
-		public static Relationship InitializeFromSelf(string self)
-		{
-			var relationship = new Relationship
-			                   	{
-			                   		Self = self,
-			                   		StartNode = null,
-			                   		EndNode = null,
-			                   		Name = null,
-			                   		_properties = null,
-			                   		OriginalRelationshipJson = null
-			                   	};
-
-
-			return relationship;
-		}
-
-		public static bool IsSelfARelationship(string self)
-		{
-			var selfArray = self.Split('/');
-			return (selfArray.Length > 2 && selfArray[selfArray.Length - 2] == "relationship");
-		}
-		#endregion
-
-		#region Self
 
 		public string Self
 		{
 			get
 			{
-				return _self;
+				return _relationshipGraphStore.Self;
 			}
+		}
 
-			private set
+		public Node StartNode
+		{
+			get
 			{
-				if (!IsSelfARelationship(value))
-				{
-					throw new Exception(string.Format("Self is not a Relationship ({0})", Self));
-				}
-
-				// Make sure there is no trailing /
-				string self = value.TrimEnd('/');
-
-				var selfArray = self.Split('/');
-
-				long relationshipId;
-				if (!long.TryParse(selfArray.Last(), out relationshipId))
-				{
-					throw new Exception(string.Format("Invalid Self id ({0})", value));
-				}
-
-				_selfDbUrl = self.Substring(0, self.LastIndexOf("/relationship"));
-				_self = self;
-				Id = relationshipId;
-				EncryptedId = relationshipId;
+				return _relationshipGraphStore.StartNode;	
 			}
+		}
+
+		public Node EndNode
+		{
+			get
+			{
+				return _relationshipGraphStore.EndNode;
+			}
+		}
+
+		public string Type
+		{
+			get
+			{
+				return _relationshipGraphStore.Type;
+			}
+		}
+
+		#region Create
+
+		public static Relationship CreateRelationship(Node startNode, Node endNode, Enum name, Properties properties = null, IRelationshipStore relationshipStore = null, ConnectionElement connection = null)
+		{
+			return CreateRelationship(startNode, endNode, name.ToString(), properties, relationshipStore, connection);
+		}
+
+		public static Relationship CreateRelationship(Node startNode, Node endNode, string name, Properties properties = null, IRelationshipStore relationshipStore = null, ConnectionElement connection = null)
+		{
+			if (properties == null)
+			{
+				properties = new Properties();
+			}
+
+			if (relationshipStore == null)
+			{
+				relationshipStore = new RestRelationshipStore();
+			}
+
+			if (connection == null)
+			{
+				connection = DefaultConnection;
+			}
+
+			return relationshipStore.CreateRelationship(connection, startNode, endNode, name, properties);
+		}
+
+		public static Relationship CreateUniqueRelationship(Node startNode, Node endNode, Enum name, Enum indexName, Enum key, object value, Properties properties = null, IRelationshipStore relationshipStore = null, ConnectionElement connection = null)
+		{
+			return CreateUniqueRelationship(startNode, endNode, name.ToString(), indexName.ToString(), key.ToString(), value, properties, relationshipStore, connection);
+		}
+
+		public static Relationship CreateUniqueRelationship(Node startNode, Node endNode, string name, string indexName, string key, object value, Properties properties = null, IRelationshipStore relationshipStore = null, ConnectionElement connection = null)
+		{
+			if (properties == null)
+			{
+				properties = new Properties();
+			}
+
+			if (relationshipStore == null)
+			{
+				relationshipStore = new RestRelationshipStore();
+			}
+
+			if (connection == null)
+			{
+				connection = DefaultConnection;
+			}
+
+			return relationshipStore.CreateUniqueRelationship(connection, startNode, endNode, name, properties, indexName, key, value);
+		}
+
+		#endregion
+
+		#region GetRelationship
+
+		public static Relationship GetRelationship(long relationshipId, IRelationshipStore relationshipStore = null, ConnectionElement connection = null)
+		{
+			if (relationshipStore == null)
+			{
+				relationshipStore = new RestRelationshipStore();
+			}
+
+			if (connection == null)
+			{
+				connection = DefaultConnection;
+			}
+
+			return relationshipStore.GetRelationship(connection, relationshipId);
+		}
+
+		public static IEnumerable<Relationship> GetRelationship(Enum indexName, Enum key, object value, IRelationshipStore relationshipStore = null, ConnectionElement connection = null)
+		{
+			return GetRelationship(indexName.ToString(), key.ToString(), value, relationshipStore, connection);
+		}
+
+		public static IEnumerable<Relationship> GetRelationship(string indexName, string key, object value, IRelationshipStore relationshipStore = null, ConnectionElement connection = null)
+		{
+			if (relationshipStore == null)
+			{
+				relationshipStore = new RestRelationshipStore();
+			}
+
+			if (connection == null)
+			{
+				connection = DefaultConnection;
+			}
+
+			return relationshipStore.GetRelationship(connection, indexName, key, value);
+		}
+
+		public static IEnumerable<Relationship> GetRelationship(Enum indexName, string searchQuery, IRelationshipStore relationshipStore = null, ConnectionElement connection = null)
+		{
+			return GetRelationship(indexName.ToString(), searchQuery, relationshipStore, connection);
+		}
+		
+		public static IEnumerable<Relationship> GetRelationship(string indexName, string searchQuery, IRelationshipStore relationshipStore = null, ConnectionElement connection = null)
+		{
+			if (relationshipStore == null)
+			{
+				relationshipStore = new RestRelationshipStore();
+			}
+
+			if (connection == null)
+			{
+				connection = DefaultConnection;
+			}
+
+			return relationshipStore.GetRelationship(connection, indexName, searchQuery);
+		}
+
+		#endregion
+
+		#region Delete
+
+		public HttpStatusCode Delete()
+		{
+			return _relationshipGraphStore.DeleteRelationship(DefaultConnection);
 		}
 
 		#endregion
@@ -252,19 +213,10 @@ namespace Neo4jRestNet.Core
 				_properties = null;
 			}
 
-			if (_properties != null)
+			if (_properties == null)
 			{
-				return;
+				_properties = _relationshipGraphStore.GetProperties();
 			}
-
-			string response;
-			var status = Neo4jRestApi.GetPropertiesOnRelationship(_selfDbUrl, Id, out response);
-			if (status != HttpStatusCode.OK)
-			{
-				throw new Exception(string.Format("Error retrieving properties on relationship (relationship id:{0} http response:{1})", Id, status));
-			}
-
-			_properties = Properties.ParseJson(response);
 		}
 
 		public Properties Properties
@@ -273,6 +225,11 @@ namespace Neo4jRestNet.Core
 			{
 				LoadProperties(false);
 				return _properties;
+			}
+
+			internal set
+			{
+				_properties = value;
 			}
 		}
 
@@ -283,199 +240,156 @@ namespace Neo4jRestNet.Core
 
 		public void SaveProperties(Properties properties)
 		{
-			var status = Neo4jRestApi.SetPropertiesOnRelationship(_selfDbUrl, Id, properties.ToString());
-			if (status != HttpStatusCode.NoContent)
-			{
-				throw new Exception(string.Format("Error setting properties on relationship (relationship id:{0} http response:{1})", Id, status));
-			}
-
-//			LoadProperties(true);
+			_relationshipGraphStore.SaveProperties(properties);
 		}
 
 		#endregion
 
 		#region Index
 
-		public static Relationship AddRelationshipToIndex(long relationshipId, string indexName, string key, object value)
+		#region Member AddToIndex
+
+		public Relationship AddToIndex(Enum indexName, Enum key, Enum propertyName, bool unique = false)
 		{
-			return AddRelationshipToIndex(DefaultDbUrl, relationshipId, indexName, key, value);
+			return AddToIndex(indexName.ToString(), key.ToString(), Properties.GetProperty(propertyName), unique);
 		}
 
-		public static Relationship AddRelationshipToIndex(long relationshipId, Enum indexName, string key, object value)
+		public  Relationship AddToIndex(Enum indexName, Enum key, object value, bool unique = false)
 		{
-			return AddRelationshipToIndex(DefaultDbUrl, relationshipId, indexName.ToString(), key, value);
+			return AddToIndex(indexName.ToString(), key.ToString(), value, unique);
 		}
 
-		public static Relationship AddRelationshipToIndex(long relationshipId, string indexName, Enum key, object value)
+		public  Relationship AddToIndex(string indexName, string key, object value, bool unique = false)
 		{
-			return AddRelationshipToIndex(DefaultDbUrl, relationshipId, indexName, key.ToString(), value);
-		}
-
-		public static Relationship AddRelationshipToIndex(long relationshipId, Enum indexName, Enum key, object value)
-		{
-			return AddRelationshipToIndex(DefaultDbUrl, relationshipId, indexName.ToString(), key.ToString(), value);
-		}
-
-		public static Relationship AddRelationshipToIndex(string dbUrl, long relationshipId, Enum indexName, Enum key, object value)
-		{
-			return AddRelationshipToIndex(dbUrl, relationshipId, indexName.ToString(), key.ToString(), value);
-		}
-
-		public static Relationship AddRelationshipToIndex(string dbUrl, long relationshipId, string indexName, string key, object value)
-		{
-			string response;
-			var status = Neo4jRestApi.AddRelationshipToIndex(dbUrl, relationshipId, indexName, key, value, out response);
-			if (status != HttpStatusCode.Created)
-			{
-				throw new Exception(string.Format("Error creating index for relationship (http response:{0})", status));
-			}
-
-			return InitializeFromRelationshipJson(response);
-		}
-
-		public HttpStatusCode RemoveRelationshipFromIndex(long relationshipId, string indexName)
-		{
-			return RemoveRelationshipFromIndex(DefaultDbUrl, relationshipId, indexName);
-		}
-
-		public HttpStatusCode RemoveRelationshipFromIndex(long relationshipId, Enum indexName)
-		{
-			return RemoveRelationshipFromIndex(DefaultDbUrl, relationshipId, indexName.ToString());
-		}
-
-		public HttpStatusCode RemoveRelationshipFromIndex(string dbUrl, long relationshipId, Enum indexName)
-		{
-			return RemoveRelationshipFromIndex(dbUrl, relationshipId, indexName.ToString());
-		}
-
-		public HttpStatusCode RemoveRelationshipFromIndex(string dbUrl, long relationshipId, string indexName)
-		{
-			var status = Neo4jRestApi.RemoveRelationshipFromIndex(dbUrl, relationshipId, indexName);
-			if (status != HttpStatusCode.NoContent)
-			{
-				throw new Exception(string.Format("Error remove relationship from index (relationship id:{0} index name:{1} http response:{2})", relationshipId, indexName, status));
-			}
-
-			return status;
-		}
-
-		public HttpStatusCode RemoveRelationshipFromIndex(long relationshipId, string indexName, string key)
-		{
-			return RemoveRelationshipFromIndex(DefaultDbUrl, relationshipId, indexName, key);
-		}
-
-		public HttpStatusCode RemoveRelationshipFromIndex(long relationshipId, Enum indexName, string key)
-		{
-			return RemoveRelationshipFromIndex(DefaultDbUrl, relationshipId, indexName.ToString(), key);
-		}
-
-		public HttpStatusCode RemoveRelationshipFromIndex(long relationshipId, string indexName, Enum key)
-		{
-			return RemoveRelationshipFromIndex(DefaultDbUrl, relationshipId, indexName, key.ToString());
-		}
-
-		public HttpStatusCode RemoveRelationshipFromIndex(long relationshipId, Enum indexName, Enum key)
-		{
-			return RemoveRelationshipFromIndex(DefaultDbUrl, relationshipId, indexName.ToString(), key.ToString());
-		}
-
-		public HttpStatusCode RemoveRelationshipFromIndex(string dbUrl, long relationshipId, Enum indexName, Enum key)
-		{
-			return RemoveRelationshipFromIndex(dbUrl, relationshipId, indexName.ToString(), key.ToString());
-		}
-
-		public HttpStatusCode RemoveRelationshipFromIndex(string dbUrl, long relationshipId, string indexName, string key)
-		{
-			var status = Neo4jRestApi.RemoveRelationshipFromIndex(dbUrl, relationshipId, indexName, key);
-			if (status != HttpStatusCode.NoContent)
-			{
-				throw new Exception(string.Format("Error remove relationship from index (relationship id:{0} index name:{1} http response:{2})", relationshipId, indexName, status));
-			}
-
-			return status;
-		}
-
-		public HttpStatusCode RemoveRelationshipFromIndex(long relationshipId, string indexName, string key, object value)
-		{
-			return RemoveRelationshipFromIndex(DefaultDbUrl, relationshipId, indexName, key, value);
-		}
-
-		public HttpStatusCode RemoveRelationshipFromIndex(long relationshipId, Enum indexName, string key, object value)
-		{
-			return RemoveRelationshipFromIndex(DefaultDbUrl, relationshipId, indexName.ToString(), key, value);
-		}
-
-		public HttpStatusCode RemoveRelationshipFromIndex(long relationshipId, string indexName, Enum key, object value)
-		{
-			return RemoveRelationshipFromIndex(DefaultDbUrl, relationshipId, indexName, key.ToString(), value);
-		}
-
-		public HttpStatusCode RemoveRelationshipFromIndex(long relationshipId, Enum indexName, Enum key, object value)
-		{
-			return RemoveRelationshipFromIndex(DefaultDbUrl, relationshipId, indexName.ToString(), key.ToString(), value);
-		}
-
-		public HttpStatusCode RemoveRelationshipFromIndex(string dbUrl, long relationshipId, Enum indexName, Enum key, object value)
-		{
-			return RemoveRelationshipFromIndex(dbUrl, relationshipId, indexName.ToString(), key.ToString(), value);
-		}
-
-		public HttpStatusCode RemoveRelationshipFromIndex(string dbUrl, long relationshipId, string indexName, string key, object value)
-		{
-			var status = Neo4jRestApi.RemoveRelationshipFromIndex(dbUrl, relationshipId, indexName, key, value);
-			if (status != HttpStatusCode.NoContent)
-			{
-				throw new Exception(string.Format("Error remove relationship from index (relationship id:{0} index name:{1} http response:{2})", relationshipId, indexName, status));
-			}
-
-			return status;
-		}
-		#endregion
-
-		#region Delete
-
-		public HttpStatusCode DeleteRelationship()
-		{
-			HttpStatusCode status = Neo4jRestApi.DeleteRelationship(_selfDbUrl, Id);
-			if (status != HttpStatusCode.NoContent)
-			{
-				throw new Exception(string.Format("Error deleteing relationship (relationship id:{0} http response:{1})", Id, status));
-			}
-
-			return status;
+			return _relationshipGraphStore.AddToIndex(DefaultConnection, this, indexName, key, value, unique);
 		}
 
 		#endregion
 
-		#region ParseJson
+		#region Static AddToIndex
 
-		public static IEnumerable<Relationship> ParseJson(string jsonRelationships)
+		public static Relationship AddToIndex(Relationship relationship, Enum indexName, Enum key, object value, bool unique = false, IRelationshipStore relationshipStore = null, ConnectionElement connection = null)
 		{
-			if (String.IsNullOrEmpty(jsonRelationships))
-				return null;
-			
-			var relationships = new List<Relationship>();
-
-			// The Json passed in can be a JObject or JArray - this is to test for that.
-			JObject jo = JObject.Parse(string.Concat("{\"root\":", jsonRelationships, "}"));
-
-			switch (jo["root"].Type)
+			return AddToIndex(relationship, indexName.ToString(), key.ToString(), value, unique, relationshipStore, connection);
+		}
+		
+		public static Relationship AddToIndex(Relationship relationship, string indexName, string key, object value, bool unique = false, IRelationshipStore relationshipStore = null, ConnectionElement connection = null)
+		{
+			if (relationshipStore == null)
 			{
-				case JTokenType.Object:
-					relationships.Add(InitializeFromRelationshipJson(jo["root"].ToString(Formatting.None)));
-					break;
-
-				case JTokenType.Array:
-					relationships.AddRange(from JObject jsonRelationship in jo["root"] select InitializeFromRelationshipJson(jsonRelationship));
-					break;
-
-				default:
-					throw new Exception("Invalid relationship json");
+				relationshipStore = new RestRelationshipStore();
 			}
 
-			return relationships;
+			if (connection == null)
+			{
+				connection = DefaultConnection;
+			}
+
+			return relationshipStore.AddToIndex(connection, relationship, indexName, key, value, unique);
 		}
 
 		#endregion
+
+		#region Member RemoveFromIndex
+
+		public bool RemoveFromIndex(Enum indexName, string key = null, object value = null)
+		{
+			return RemoveFromIndex(indexName.ToString(), key, value);
+		}
+
+		public bool RemoveFromIndex(string indexName, string key = null, object value = null)
+		{
+			return key == null ?
+				_relationshipGraphStore.RemoveFromIndex(DefaultConnection, this, indexName)
+				: value == null ?
+					_relationshipGraphStore.RemoveFromIndex(DefaultConnection, this, indexName, key)
+					: _relationshipGraphStore.RemoveFromIndex(DefaultConnection, this, indexName, key, value);
+		}
+
+		#endregion
+
+		#region Static RemoveFromIndex
+
+		public static bool RemoveFromIndex(Relationship relationship, Enum indexName, Enum key = null, object value = null, IRelationshipStore relationshipStore = null, ConnectionElement connection = null)
+		{
+			return RemoveFromIndex(relationship, indexName.ToString(), key == null ? null : key.ToString(), value, relationshipStore, connection);
+		}
+
+		public static bool RemoveFromIndex(Relationship relationship, string indexName, string key = null, object value = null, IRelationshipStore relationshipStore = null, ConnectionElement connection = null)
+		{
+			if (relationshipStore == null)
+			{
+				relationshipStore = new RestRelationshipStore();
+			}
+
+			if (connection == null)
+			{
+				connection = DefaultConnection;
+			}
+
+			return key == null ?
+				relationshipStore.RemoveFromIndex(connection, relationship, indexName)
+				: value == null ?
+					relationshipStore.RemoveFromIndex(connection, relationship, indexName, key)
+					: relationshipStore.RemoveFromIndex(connection, relationship, indexName, key, value);
+		}
+
+		#endregion
+
+		#endregion
+
+		#region IEquatable<Relationship> Members
+
+		public bool Equals(Relationship other)
+		{
+			if (ReferenceEquals(other, null))
+				return false;
+
+			if (ReferenceEquals(this, other))
+				return true;
+
+			if (Id == int.MinValue || other.Id == int.MinValue)
+				return false;
+
+			return EncryptedId.Equals(other.EncryptedId);
+		}
+
+		public override bool Equals(Object obj)
+		{
+			return Equals(obj as Relationship);
+		}
+
+		public override int GetHashCode()
+		{
+			return (int)Id;
+		}
+
+		public static bool operator ==(Relationship value1, Relationship value2)
+		{
+			if (ReferenceEquals(value1, value2))
+			{
+				return true;
+			}
+
+			return !ReferenceEquals(value1, null) && value1.Equals(value2);
+		}
+
+		public static bool operator !=(Relationship value1, Relationship value2)
+		{
+			if (ReferenceEquals(value1, value2))
+			{
+				return false;
+			}
+
+			if (ReferenceEquals(value1, null)) // Value2=null is covered by Equals
+			{
+				return false;
+			}
+
+			return !value1.Equals(value2);
+		}
+
+		#endregion
+
 	}
 }

@@ -248,6 +248,17 @@ namespace Neo4jRestNet.Core
 			return jo.ToString(Formatting.None, new IsoDateTimeConverter());
 		}
 
+		public JObject ToJObject()
+		{
+			var jo = new JObject();
+
+			foreach (var kvp in _properties.Where(kvp => kvp.Value != null))
+			{
+				jo.Add(kvp.Key, JToken.FromObject(kvp.Value));
+			}
+			return jo;
+		}
+
 		public Dictionary<string, object> ToDictionary()
 		{
 			return (Dictionary<string, object>)_properties;

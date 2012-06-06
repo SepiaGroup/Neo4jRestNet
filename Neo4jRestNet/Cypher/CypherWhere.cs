@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Text;
 
-namespace Neo4jRestNet.CypherPlugin
+namespace Neo4jRestNet.Cypher
 {
 	public class CypherWhere : ICypherObject, IComparable
 	{

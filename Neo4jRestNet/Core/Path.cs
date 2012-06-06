@@ -6,8 +6,11 @@ using Newtonsoft.Json;
 
 namespace Neo4jRestNet.Core
 {
-	public class Path : IGraphObject
+	public class Path 
 	{
+
+		public long Id { get; private set; }
+
 		public string Self { get; set; }
 		public Node StartNode { get; private set; }
 		public Node EndNode { get; private set; }
@@ -15,7 +18,7 @@ namespace Neo4jRestNet.Core
 		public List<Relationship> Relationships { get; private set; }
 		public string OriginalPathJson { get; private set; }
 
-		private Path(JObject path)
+		private Path(JObject path, INodeStore nodeGraphStore, IRelationshipStore relationshipGraphStore)
 		{
 			JToken startNode;
 			if (!path.TryGetValue("start", out startNode))
@@ -26,12 +29,12 @@ namespace Neo4jRestNet.Core
 			switch (startNode.Type)
 			{
 				case JTokenType.String:
-					StartNode = Node.InitializeFromSelf(startNode.Value<string>());
+					StartNode = nodeGraphStore.Initilize(startNode.Value<string>(), null);
 					break;
 
-				case JTokenType.Object:
-					StartNode = Node.InitializeFromNodeJson((JObject)startNode);
-					break;
+				//case JTokenType.Object:
+				//    StartNode = nodeGraphStore.CreateNodeFromJson((JObject)startNode);
+				//    break;
 
 				default:
 					throw new Exception("Invalid path json");
@@ -46,12 +49,12 @@ namespace Neo4jRestNet.Core
 			switch (endNode.Type)
 			{
 				case JTokenType.String:
-					EndNode = Node.InitializeFromSelf(endNode.Value<string>());
+					EndNode = nodeGraphStore.Initilize(endNode.Value<string>(), null);
 					break;
 
-				case JTokenType.Object:
-					EndNode = Node.InitializeFromNodeJson((JObject)endNode);
-					break;
+				//case JTokenType.Object:
+				//    EndNode = nodeGraphStore.CreateNodeFromJson((JObject)endNode);
+				//    break;
 
 				default:
 					throw new Exception("Invalid path json");
@@ -69,12 +72,12 @@ namespace Neo4jRestNet.Core
 				switch (node.Type)
 				{
 					case JTokenType.String:
-						Nodes.Add(Node.InitializeFromSelf(node.Value<string>()));
+						Nodes.Add(nodeGraphStore.Initilize(node.Value<string>(), null));
 						break;
 
-					case JTokenType.Object:
-						Nodes.Add(Node.InitializeFromNodeJson((JObject)node));
-						break;
+					//case JTokenType.Object:
+					//    Nodes.Add(nodeGraphStore.CreateNodeFromJson((JObject)node));
+					//    break;
 
 					default:
 						throw new Exception("Invalid path json");
@@ -93,12 +96,12 @@ namespace Neo4jRestNet.Core
 				switch (relationship.Type)
 				{
 					case JTokenType.String:
-						Relationships.Add(Relationship.InitializeFromSelf(relationship.Value<string>()));
+						Relationships.Add(relationshipGraphStore.Initilize(relationship.Value<string>(), null));
 						break;
 
-					case JTokenType.Object:
-						Relationships.Add(Relationship.InitializeFromRelationshipJson((JObject)relationship));
-						break;
+					//case JTokenType.Object:
+					//    Relationships.Add(relationshipGraphStore.CreateRelationshipFromJson((JObject)relationship));
+					//    break;
 
 					default:
 						throw new Exception("Invalid path json");
@@ -108,18 +111,50 @@ namespace Neo4jRestNet.Core
 			OriginalPathJson = path.ToString(Formatting.None);
 		}
 
+		#region ParseJson
+
 		public static List<Path> ParseJson(string jsonPaths)
+		{
+			return ParseJson(jsonPaths, new RestNodeStore(), new RestRelationshipStore());
+		}
+
+		public static List<Path> ParseJson(string jsonPaths, INodeStore nodeGraphStore)
+		{
+			return ParseJson(jsonPaths, nodeGraphStore, new RestRelationshipStore());
+		}
+
+		public static List<Path> ParseJson(string jsonPaths, IRelationshipStore relationshipGraphStore)
+		{
+			return ParseJson(jsonPaths, new RestNodeStore(), relationshipGraphStore);
+		}
+
+		public static List<Path> ParseJson(string jsonPaths, INodeStore nodeGraphStore, IRelationshipStore relationshipGraphStore)
 		{
 			if (String.IsNullOrEmpty(jsonPaths))
 			{
 				return null;
 			}
-			
+
 			var jaPaths = JArray.Parse(jsonPaths);
 			return ParseJson(jaPaths);
 		}
 
 		public static List<Path> ParseJson(JArray jsonPaths)
+		{
+			return ParseJson(jsonPaths, new RestNodeStore(), new RestRelationshipStore());
+		}
+
+		public static List<Path> ParseJson(JArray jsonPaths, INodeStore nodeGraphStore)
+		{
+			return ParseJson(jsonPaths, nodeGraphStore, new RestRelationshipStore());
+		}
+
+		public static List<Path> ParseJson(JArray jsonPaths, IRelationshipStore relationshipGraphStore)
+		{
+			return ParseJson(jsonPaths, new RestNodeStore(), relationshipGraphStore);
+		}
+
+		public static List<Path> ParseJson(JArray jsonPaths, INodeStore nodeGraphStore, IRelationshipStore relationshipGraphStore)
 		{
 			if (jsonPaths == null)
 			{
@@ -128,7 +163,9 @@ namespace Neo4jRestNet.Core
 
 			var jaPaths = jsonPaths;
 
-			return (from JObject joPath in jaPaths select new Path(joPath)).ToList();
+			return (from JObject joPath in jaPaths select new Path(joPath, nodeGraphStore, relationshipGraphStore)).ToList();
 		}
+
+		#endregion
 	}
 }

@@ -9,7 +9,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Neo4jRestNet</RootNamespace>
-    <AssemblyName>Neo4RestNet</AssemblyName>
+    <AssemblyName>Neo4jRestNet</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <StartupObject>
@@ -72,6 +72,7 @@
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
@@ -83,22 +84,37 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CleanDbPlugin\CleanDbPlugin.cs" />
+    <Compile Include="Configuration\ConnectionCollection.cs" />
+    <Compile Include="Configuration\ConnectionElement.cs" />
+    <Compile Include="Configuration\ConnectionManager.cs" />
+    <Compile Include="Configuration\ConnectionSettings.cs" />
+    <Compile Include="Core\BatchNodeStore.cs" />
+    <Compile Include="Core\BatchRelationshipStore.cs" />
+    <Compile Include="Core\BatchStore.cs" />
+    <Compile Include="Core\Exceptions\BatchDeleteNotSupported.cs" />
+    <Compile Include="Core\Exceptions\BatchGetRelationshipsNotSupported.cs" />
+    <Compile Include="Core\Exceptions\BatchRemoveFromIndexNotSupported.cs" />
+    <Compile Include="Core\Exceptions\NodeNotFound.cs" />
+    <Compile Include="Core\RestRelationshipStore.cs" />
+    <Compile Include="Core\IRelationshipStore.cs" />
     <Compile Include="Core\EncryptId.cs" />
+    <Compile Include="Core\INodeStore.cs" />
     <Compile Include="Core\Path.cs" />
     <Compile Include="Core\Properties.cs" />
     <Compile Include="Core\IGraphObject.cs" />
     <Compile Include="Core\RelationshipDirection.cs" />
-    <Compile Include="CypherPlugin\CypherOrderBy.cs" />
-    <Compile Include="CypherPlugin\CypherWhere.cs" />
-    <Compile Include="CypherPlugin\CypherReturn.cs" />
-    <Compile Include="CypherPlugin\CypherMatch.cs" />
-    <Compile Include="CypherPlugin\Cypher.cs" />
-    <Compile Include="CypherPlugin\CypherProperty.cs" />
-    <Compile Include="CypherPlugin\CypherStart.cs" />
-    <Compile Include="CypherPlugin\ICypherObject.cs">
+    <Compile Include="Core\RestNodeStore.cs" />
+    <Compile Include="Cypher\CypherOrderBy.cs" />
+    <Compile Include="Cypher\CypherWhere.cs" />
+    <Compile Include="Cypher\CypherReturn.cs" />
+    <Compile Include="Cypher\CypherMatch.cs" />
+    <Compile Include="Cypher\Cypher.cs" />
+    <Compile Include="Cypher\CypherProperty.cs" />
+    <Compile Include="Cypher\CypherStart.cs" />
+    <Compile Include="Cypher\ICypherObject.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="CypherPlugin\ParseWhereLambda.cs" />
+    <Compile Include="Cypher\ParseWhereLambda.cs" />
     <Compile Include="ExpressionTreeParser\ExpressionParser.cs" />
     <Compile Include="GremlinPlugin\GremlinScriptCommands.cs" />
     <Compile Include="GremlinPlugin\JavaIntCommands.cs" />

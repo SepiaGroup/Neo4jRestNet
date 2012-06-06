@@ -4,12 +4,12 @@
 	{
 		public static JavaBoolean Contains(this JavaString javaString, string value)
 		{
-			return new JavaBoolean(javaString).Append("contains({0})", value);
+			return new JavaBoolean(javaString).Append("contains('{0}')", value);
 		}
 
 		public static JavaString CompareToIgnoreCase(this JavaString javaString, string value)
 		{
-			return javaString.Append("compareToIgnoreCase({0})", value);
+			return javaString.Append("compareToIgnoreCase('{0}')", value);
 		}
 
 		public static JavaString CompareToIgnoreCase(this JavaString javaString, JavaString value)

@@ -1,10 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using Neo4jRestNet.Core;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
+using System.Web;
 
 namespace Neo4jRestNet.Rest
 {
@@ -23,6 +25,18 @@ namespace Neo4jRestNet.Rest
 		public static HttpStatusCode GetNode(string dbUrl, long nodeId, out string response)
 		{
 			return HttpRest.Get(string.Concat(dbUrl, "/node/", nodeId.ToString()), out response);
+		}
+
+		public static HttpStatusCode CreateUniqueNode(string dbUrl, string jsonProperties, string indexName, string key, object value, out string  response)
+		{
+			var jo = new JObject
+			         	{
+			         		{"key", key}, 
+							{"value", JToken.FromObject(value)}, 
+							{"properties", JToken.Parse(string.IsNullOrWhiteSpace(jsonProperties) ? "{}" : jsonProperties)}
+			         	};
+
+			return HttpRest.Post(string.Concat(dbUrl, "/index/node/", indexName, "?unique"), jo.ToString(Formatting.None, new IsoDateTimeConverter()), out response);
 		}
 
 		public static HttpStatusCode SetPropertiesOnNode(string dbUrl, long nodeId, string jsonProperties)
@@ -61,17 +75,33 @@ namespace Neo4jRestNet.Rest
 			return HttpRest.Delete(string.Concat(dbUrl, "/node/", nodeId.ToString()));
 		}
 
-		public static HttpStatusCode CreateRelationship(string dbUrl, long fromNodeId, string toNodeSelf, string name, string jsonProperties, out string response)
+		public static HttpStatusCode CreateRelationship(string dbUrl, long startNodeId, long endNodeId, string name, string jsonProperties, out string response)
 		{
 			var jo = new JObject
                          {
-                             {"to", toNodeSelf},
+                             {"to", string.Concat(dbUrl, "/node/", endNodeId)},
                              {"data", JToken.Parse(string.IsNullOrWhiteSpace(jsonProperties) ? "{}" : jsonProperties)},
                              {"type", name}
                          };
 
-			return HttpRest.Post(string.Concat(dbUrl, "/node/", fromNodeId.ToString(), "/relationships"), jo.ToString(Formatting.None, new IsoDateTimeConverter()), out response);
+			return HttpRest.Post(string.Concat(dbUrl, "/node/", startNodeId.ToString(), "/relationships"), jo.ToString(Formatting.None, new IsoDateTimeConverter()), out response);
 		}
+
+		public static HttpStatusCode CreateUniqueRelationship(string dbUrl, long startNodeId, long endNodeId, string name, string jsonProperties, string indexName, string key, object value, out string response)
+		{
+			var jo = new JObject
+                         {
+                             {"key", key},
+							 {"value", JToken.FromObject(value)},
+							 {"start", string.Concat(dbUrl, "/node/", startNodeId)},
+							 {"end", string.Concat(dbUrl, "/node/", endNodeId)},
+                             {"properties", JToken.Parse(string.IsNullOrWhiteSpace(jsonProperties) ? "{}" : jsonProperties)},
+                             {"type", name}
+                         };
+
+			return HttpRest.Post(string.Concat(dbUrl, "/index/relationship/", indexName, "?unique"), jo.ToString(), out response);
+		}
+
 
 		public static HttpStatusCode SetPropertiesOnRelationship(string dbUrl, long relationshipId, string jsonProperties)
 		{
@@ -173,37 +203,49 @@ namespace Neo4jRestNet.Rest
 			return HttpRest.Get(string.Concat(dbUrl, "/index/relationship"), out response);
 		}
 
-		public static HttpStatusCode AddNodeToIndex(string dbUrl, long nodeId, string indexName, string key, object value, out string response)
+		public static HttpStatusCode AddNodeToIndex(string dbUrl, long nodeId, string indexName, string key, object value, out string response, bool unique = false)
 		{
 			var self = string.Concat(dbUrl, "/", nodeId.ToString());
-			return AddNodeToIndex(dbUrl, self, indexName, key, value, out response);
+
+			return AddNodeToIndex(dbUrl, self, indexName, key, value, out response, unique);
 		}
 
-		public static HttpStatusCode AddNodeToIndex(string dbUrl, string nodeSelf, string indexName, string key, object value, out string response)
+		public static HttpStatusCode AddNodeToIndex(string dbUrl, string nodeSelf, string indexName, string key, object value, out string response, bool unique = false)
 		{
-			var obj = new { value, uri = nodeSelf, key };
-			return HttpRest.Post(string.Concat(dbUrl, "/index/node/", indexName),
-								 JToken.FromObject(obj).ToString(Formatting.None, new IsoDateTimeConverter()), out response);
+			var jo = new JObject
+			            {
+			             	{ "key", key }, 
+							{ "value", JToken.FromObject(value) }, 
+							{ "uri", nodeSelf }
+			            };
+
+			return HttpRest.Post(string.Concat(dbUrl, "/index/node/", indexName, unique ? "?unique" : string.Empty), jo.ToString(Formatting.None, new IsoDateTimeConverter()), out response);
 		}
 
-		public static HttpStatusCode AddRelationshipToIndex(string dbUrl, long relationshipId, string indexName, string key, object value, out string response)
+		public static HttpStatusCode AddRelationshipToIndex(string dbUrl, long relationshipId, string indexName, string key, object value, out string response, bool unique = false)
 		{
 			var self = string.Concat(dbUrl, "/", relationshipId.ToString());
-			return AddRelationshipToIndex(dbUrl, self, indexName, key, value, out response);
+			return AddRelationshipToIndex(dbUrl, self, indexName, key, value, out response, unique);
 		}
 
-		public static HttpStatusCode AddRelationshipToIndex(string dbUrl, string relationshipself, string indexName, string key, object value, out string response)
+		public static HttpStatusCode AddRelationshipToIndex(string dbUrl, string relationshipself, string indexName, string key, object value, out string response, bool unique = false)
 		{
-            var obj = new { value, uri = relationshipself, key };
-			return HttpRest.Post(string.Concat(dbUrl, "/index/relationship/", indexName),
-								  JToken.FromObject(obj).ToString(Formatting.None, new IsoDateTimeConverter()), out response);
+			var jo = new JObject
+			            {
+			             	{ "key", key }, 
+							{ "value", JToken.FromObject(value) }, 
+							{ "uri", relationshipself }
+			            };
+            
+			return HttpRest.Post(string.Concat(dbUrl, "/index/relationship/", indexName, unique ? "?unique" : string.Empty),
+								  jo.ToString(Formatting.None, new IsoDateTimeConverter()), out response);
 		}
 
 		public static HttpStatusCode RemoveNodeFromIndex(string dbUrl, long nodeId, string indexName, string key, object value)
 		{
-			return
-				HttpRest.Delete(string.Concat(dbUrl, "/index/node/", indexName, "/", key, "/",
-											  JToken.FromObject(value).ToString(Formatting.None, new IsoDateTimeConverter()), "/", nodeId));
+			var strValue = value is string ? Uri.EscapeDataString(value.ToString()) : value.ToString();
+
+			return HttpRest.Delete(string.Concat(dbUrl, "/index/node/", indexName, "/", key, "/", strValue, "/", nodeId));
 		}
 
 		public static HttpStatusCode RemoveNodeFromIndex(string dbUrl, long nodeId, string indexName, string key)
@@ -218,9 +260,9 @@ namespace Neo4jRestNet.Rest
 
 		public static HttpStatusCode RemoveRelationshipFromIndex(string dbUrl, long relationshipId, string indexName, string key, object value)
 		{
-			return
-				HttpRest.Delete(string.Concat(dbUrl, "/index/relationship/", indexName, "/", key, "/",
-											  JToken.FromObject(value).ToString(Formatting.None, new IsoDateTimeConverter()), "/", relationshipId));
+			var strValue = value is string ? Uri.EscapeDataString(value.ToString()) : value.ToString();
+
+			return HttpRest.Delete(string.Concat(dbUrl, "/index/relationship/", indexName, "/", key, "/", strValue, "/", relationshipId));
 		}
 
 		public static HttpStatusCode RemoveRelationshipFromIndex(string dbUrl, long relationshipId, string indexName, string key)
@@ -235,22 +277,31 @@ namespace Neo4jRestNet.Rest
 
 		public static HttpStatusCode GetNode(string dbUrl, string indexName, string key, object value, out string response)
 		{
-			return HttpRest.Get(string.Concat(dbUrl, "/index/node/", indexName, "/", key, "/", value.ToString()), out response);
+			var strValue = value is string ? Uri.EscapeDataString(value.ToString()) : value.ToString();
+
+			return HttpRest.Get(string.Concat(dbUrl, "/index/node/", indexName, "/", key, "/",  strValue), out response);
 		}
 
 		public static HttpStatusCode GetNode(string dbUrl, string indexName, string searchQuery, out string response)
 		{
-			return HttpRest.Get(string.Concat(dbUrl, "/index/node/", indexName, "?query=", searchQuery), out response);
+			return HttpRest.Get(string.Concat(dbUrl, "/index/node/", indexName, "?query=", Uri.EscapeDataString(searchQuery)), out response);
+		}
+
+		public static HttpStatusCode GetRelationship(string dbUrl, long id, out string response)
+		{
+			return HttpRest.Get(string.Concat(dbUrl, "/relationship/", id), out response);
 		}
 
 		public static HttpStatusCode GetRelationship(string dbUrl, string indexName, string key, object value, out string response)
 		{
-			return HttpRest.Get(string.Concat(dbUrl, "/index/relationship/", indexName, "/", key, "/", value.ToString()), out response);
+			var strValue = value is string ? Uri.EscapeDataString(value.ToString()) : value.ToString();
+
+			return HttpRest.Get(string.Concat(dbUrl, "/index/relationship/", indexName, "/", key, "/", strValue), out response);
 		}
 
 		public static HttpStatusCode GetRelationship(string dbUrl, string indexName, string searchQuery, out string response)
 		{
-			return HttpRest.Get(string.Concat(dbUrl, "/index/relationship/", indexName, "?query=", searchQuery), out response);
+			return HttpRest.Get(string.Concat(dbUrl, "/index/relationship/", indexName, "?query=", Uri.EscapeDataString(searchQuery)), out response);
 		}
 
 		public static HttpStatusCode Traverse(string dbUrl, long nodeId, Order order, Uniqueness uniqueness,

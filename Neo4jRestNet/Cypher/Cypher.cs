@@ -8,14 +8,12 @@ using Newtonsoft.Json;
 using Neo4jRestNet.Core;
 using System.Collections.ObjectModel;
 using System.Text;
+using Neo4jRestNet.Configuration;
 
-namespace Neo4jRestNet.CypherPlugin
+namespace Neo4jRestNet.Cypher
 {
 	public class Cypher
 	{
-		private static readonly string DefaultDbUrl = ConfigurationManager.ConnectionStrings["neo4j"].ConnectionString.TrimEnd('/');
-		private static readonly string DefaultCypherExtensionPath = ConfigurationManager.ConnectionStrings["neo4jCypherExtension"].ConnectionString.TrimEnd('/');
-
 		readonly List<Func<CypherStart, object>> _start = new List<Func<CypherStart, object>>();
 		readonly List<Func<CypherMatch, object>> _match = new List<Func<CypherMatch, object>>();
 		readonly List<Tuple<string, Expression<Func<CypherWhere, object>>>> _where = new List<Tuple<string, Expression<Func<CypherWhere, object>>>>();
@@ -26,18 +24,16 @@ namespace Neo4jRestNet.CypherPlugin
 
 		public DataTable Post()
 		{
-			return Post(string.Concat(DefaultDbUrl, DefaultCypherExtensionPath));
+			return Post(ConnectionManager.Connection());
 		}
 
-		public DataTable Post(string cypherUrl)
+		public DataTable Post(ConnectionElement connection)
 		{
-			// Remove trailing /
-			cypherUrl = cypherUrl.TrimEnd('/');
-
+			
 			var joScript = new JObject { { "query", Query } };
 
 			string response;
-			Rest.HttpRest.Post(cypherUrl, joScript.ToString(Formatting.None), out response);
+			Rest.HttpRest.Post(connection.CypherUrl, joScript.ToString(Formatting.None), out response);
 
 			var joResponse = JObject.Parse(response);
 			var jaColumns = (JArray)joResponse["columns"];
@@ -63,11 +59,11 @@ namespace Neo4jRestNet.CypherPlugin
 
 					if (returnTypes[colIndex] == typeof(Node))
 					{
-						row.Add(jCol.Type == JTokenType.Null ? null : Node.InitializeFromNodeJson((JObject)jCol));
+						row.Add(jCol.Type == JTokenType.Null ? null : RestNodeStore.CreateNodeFromJson((JObject)jCol));
 					}
 					else if (returnTypes[colIndex] == typeof(Relationship))
 					{
-						row.Add(jCol.Type == JTokenType.Null ? null : Relationship.InitializeFromRelationshipJson((JObject)jCol));
+						row.Add(jCol.Type == JTokenType.Null ? null : RestRelationshipStore.CreateRelationshipFromJson((JObject)jCol));
 					}
 					else if (returnTypes[colIndex] == typeof(Path))
 					{

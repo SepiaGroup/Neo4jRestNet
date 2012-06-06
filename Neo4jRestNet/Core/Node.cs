@@ -2,353 +2,306 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System;
-using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Linq;
-using Newtonsoft.Json;
-using Neo4jRestNet.Rest;
-using System.Configuration;
+using Neo4jRestNet.Configuration;
 
 namespace Neo4jRestNet.Core
 {
+	//public enum NodeProperty
+	//{
+	//    NodeType
+	//}
+
 	public class Node : IGraphObject, IEquatable<Node>
 	{
-		private static readonly string DefaultDbUrl = ConfigurationManager.ConnectionStrings["neo4j"].ConnectionString.TrimEnd('/');
+		private static readonly ConnectionElement DefaultConnection = ConnectionManager.Connection();
 
-		private enum NodeProperty
+		private readonly INodeStore _nodeGraphStore;
+		private Properties _properties;
+
+		public Node(Properties properties = null)
 		{
-			NodeType
+			_properties = properties;
+			_nodeGraphStore = new RestNodeStore();
 		}
 
-		private string _selfDbUrl;
-        private string _self;
-        private Properties _properties;
+		public Node(INodeStore nodeStore, Properties properties = null)
+		{
+			_properties = properties;
+			_nodeGraphStore = nodeStore;
+		}
 
-		public long Id { get; private set; }
-		public EncryptId EncryptedId { get; private set; }
-        public string OriginalNodeJson { get; private set; }
+		public long Id
+		{
+			get
+			{
+				return _nodeGraphStore.Id;
+			}
+		}
+
+		public string DbUrl
+		{
+			get
+			{
+				return _nodeGraphStore.DbUrl;
+			}
+		}
+
+		public EncryptId EncryptedId
+		{
+			get
+			{
+				return new EncryptId(_nodeGraphStore.Id);
+			}
+		}
+
+		public string Self
+		{
+			get
+			{
+				return _nodeGraphStore.Self;
+			}
+		}
+
+		#region CreateNode
+
+		//public static Node CreateNode(Properties properties = null, INodeStore nodeStore = null, ConnectionElement connection = null)
+		//{
+		//    return CreateNode((string)null, properties, nodeStore, connection);
+		//}
+
+		//public static Node CreateNode(Enum nodeType, Properties properties = null, INodeStore nodeStore = null, ConnectionElement connection = null)
+		//{
+		//    return CreateNode(nodeType.ToString(), properties, nodeStore, connection);
+		//}
+
+		//public static Node CreateNode(string nodeType, Properties properties = null, INodeStore nodeStore = null, ConnectionElement connection = null)
+
+		public static Node CreateNode()
+		{
+			return CreateNode(null, null, null);
+		}
+
+		public static Node CreateNode(Properties properties, ConnectionElement connection = null)
+		{
+			return CreateNode(properties, null, connection);
+		}
+
+		public static Node CreateNode(INodeStore nodeStore, ConnectionElement connection = null)
+		{
+			return CreateNode(null, nodeStore, connection);
+		}
+
+		public static Node CreateNode(Properties properties, INodeStore nodeStore, ConnectionElement connection = null)
+		{
+			if (properties == null)
+			{
+				properties = new Properties();
+			}
+			
+			//properties.SetProperty(NodeProperty.NodeType.ToString(), nodeType);
+			
+			if(nodeStore == null)
+			{
+				nodeStore = new RestNodeStore();
+			}
+
+			if(connection == null)
+			{
+				connection = DefaultConnection;
+			}
+
+			return nodeStore.CreateNode(connection, properties);
+		}
+
+		public static Node CreateUniqueNode(Enum indexName, Enum key, object value, Properties properties = null, INodeStore nodeStore = null, ConnectionElement connection = null)
+		{
+			return CreateUniqueNode(indexName.ToString(), key.ToString(), value, properties, nodeStore, connection);
+		}
+
+		//public static Node CreateUniqueNode(Enum nodeType, Enum indexName, Enum key, object value, Properties properties = null, INodeStore nodeStore = null, ConnectionElement connection = null)
+		//{
+		//    return CreateUniqueNode(nodeType.ToString(), indexName.ToString(), key.ToString(), value, properties, nodeStore, connection);
+		//}
+		//public static Node CreateUniqueNode(string indexName, string key, object value, Properties properties = null, INodeStore nodeStore = null, ConnectionElement connection = null)
+		//{
+		//    return CreateUniqueNode(null, indexName, key, value, properties, nodeStore, connection);
+		//}
+
+//		public static Node CreateUniqueNode(string nodeType, string indexName, string key, object value, Properties properties = null, INodeStore nodeStore = null, ConnectionElement connection = null)
+		public static Node CreateUniqueNode(string indexName, string key, object value, Properties properties = null, INodeStore nodeStore = null, ConnectionElement connection = null)
+		{
+			if (properties == null)
+			{
+				properties = new Properties();
+			}
+
+			//properties.SetProperty(NodeProperty.NodeType.ToString(), nodeType);
+			
+			if (nodeStore == null)
+			{
+				nodeStore = new RestNodeStore();
+			}
+
+			if (connection == null)
+			{
+				connection = DefaultConnection;
+			}
+
+			return nodeStore.CreateUniqueNode(connection, properties, indexName, key, value);
+		}
+
+		#endregion
+
+		#region Initilize
+
+		//public static Node Initilize(Properties properties = null, INodeStore nodeStore = null, ConnectionElement connection = null)
+		//{
+		//    return Initilize((string)null, properties, nodeStore, connection);
+		//}
+
+		//public static Node Initilize(Enum nodeType, Properties properties = null, INodeStore nodeStore = null, ConnectionElement connection = null)
+		//{
+		//    return Initilize(nodeType.ToString(), properties, nodeStore, connection);
+		//}
+
+		//public static Node Initilize(string nodeType, Properties properties = null, INodeStore nodeStore = null, ConnectionElement connection = null)
+		public static Node Initilize(Properties properties = null, INodeStore nodeStore = null, ConnectionElement connection = null)
+		{
+			if (properties == null)
+			{
+				properties = new Properties();
+			}
+
+			//properties.SetProperty(NodeProperty.NodeType.ToString(), nodeType);
+
+			if (nodeStore == null)
+			{
+				nodeStore = new RestNodeStore();
+			}
+
+			if (connection == null)
+			{
+				connection = DefaultConnection;
+			}
+
+			return nodeStore.Initilize(connection.DbUrl, properties);
+		}
+
+		public static Node Initilize(long id, Properties properties, INodeStore nodeStore = null, ConnectionElement connection = null)
+		{
+			if (nodeStore == null)
+			{
+				nodeStore = new RestNodeStore();
+			}
+
+			if (connection == null)
+			{
+				connection = DefaultConnection;
+			} 
+			
+			return nodeStore.Initilize(connection, id, properties);
+		}
+
+		public static Node Initilize(Properties properties, string selfUri, INodeStore nodeStore = null)
+		{
+			if (nodeStore == null)
+			{
+				nodeStore = new RestNodeStore();
+			}
+
+			return nodeStore.Initilize(selfUri, properties);
+		}
+
+		#endregion
 
 		#region GetRootNode
 
 		public static Node GetRootNode()
 		{
-			return GetRootNode(DefaultDbUrl);
+			return GetRootNode(new RestNodeStore(), DefaultConnection);
 		}
 
-		public static Node GetRootNode(string dbUrl)
+		public static Node GetRootNode(ConnectionElement connection)
 		{
-			string response;
-			var status =  Neo4jRestApi.GetRoot(dbUrl, out response);
-			if (status != HttpStatusCode.OK)
-			{
-				throw new Exception(string.Format("Error getting root node (http response:{0})", status));
-			}
+			return GetRootNode(new RestNodeStore(), connection);
+		}
 
-			JObject jo;
-			try
-			{
-				jo = JObject.Parse(response);
-			}
-			catch (Exception e)
-			{
-				throw new Exception("Invalid json", e);
-			}
+		public static Node GetRootNode(INodeStore nodeStore)
+		{
+			return GetRootNode(nodeStore, DefaultConnection);
+		}
 
-			JToken referenceNode;
-			if (!jo.TryGetValue("reference_node", out referenceNode))
-			{
-				throw new Exception("Invalid json");
-			}
-
-			var node = new Node {Self = referenceNode.Value<string>(), _properties = null};
-
-		    return node;
+		public static Node GetRootNode(INodeStore nodeStore, ConnectionElement connection)
+		{
+			return nodeStore.GetRootNode(connection);
 		}
 
 		#endregion
 
 		#region GetNode
 
-		public static Node GetNode(EncryptId nodeId)
+		public static Node GetNode(long nodeId, INodeStore nodeStore = null, ConnectionElement connection = null)
 		{
-			return GetNode(DefaultDbUrl, nodeId);
-		}
-
-		public static Node GetNode(string dbUrl, EncryptId nodeId)
-		{
-			string response;
-			var status = Neo4jRestApi.GetNode(dbUrl, (long)nodeId, out response);
-			if (status != HttpStatusCode.OK)
+			if (nodeStore == null)
 			{
-				throw new Exception(string.Format("Node not found (node id:{0})", (long)nodeId));
+				nodeStore = new RestNodeStore();
 			}
 
-			return InitializeFromNodeJson(response);
-		}
-
-		public static IEnumerable<Node> GetNode(string indexName, string key, object value)
-		{
-			return GetNode(DefaultDbUrl, indexName, key, value);
-		}
-
-		public static IEnumerable<Node> GetNode(Enum indexName, string key, object value)
-		{
-			return GetNode(DefaultDbUrl, indexName.ToString(), key, value);
-		}
-
-		public static IEnumerable<Node> GetNode(string indexName, Enum key, object value)
-		{
-			return GetNode(DefaultDbUrl, indexName, key.ToString(), value);
-		}
-
-		public static IEnumerable<Node> GetNode(Enum indexName, Enum key, object value)
-		{
-			return GetNode(DefaultDbUrl, indexName.ToString(), key.ToString(), value);
-		}
-
-		public static IEnumerable<Node> GetNode(string dbUrl, string indexName, string key, object value)
-		{
-			string response;
-			var status = Neo4jRestApi.GetNode(dbUrl, indexName, key, value, out response);
-			if (status != HttpStatusCode.OK)
+			if (connection == null)
 			{
-				throw new Exception(string.Format("Index not found in (index:{0})", indexName));
+				connection = DefaultConnection;
 			}
 
-			return ParseJson(response);
+			return nodeStore.GetNode(connection, nodeId);
 		}
 
-		public static IEnumerable<Node> GetNode(string dbUrl, Enum indexName, string key, object value)
+		public static IEnumerable<Node> GetNode(Enum indexName, Enum key, object value, INodeStore nodeStore = null, ConnectionElement connection = null)
 		{
-			return GetNode(dbUrl, indexName.ToString(), key, value);
+			return GetNode(indexName.ToString(), key.ToString(), value, nodeStore, connection);
 		}
 
-		public static IEnumerable<Node> GetNode(string dbUrl, string indexName, Enum key, object value)
+		public static IEnumerable<Node> GetNode(string indexName, string key, object value, INodeStore nodeStore = null, ConnectionElement connection = null)
 		{
-			return GetNode(dbUrl, indexName, key.ToString(), value);
-		}
-
-		public static IEnumerable<Node> GetNode(string dbUrl, Enum indexName, Enum key, object value)
-		{
-			return GetNode(dbUrl, indexName.ToString(), key.ToString(), value);
-		}
-
-		public static IEnumerable<Node> GetNode(string indexName, string searchQuery)
-		{
-			return GetNode(DefaultDbUrl, indexName, searchQuery);
-		}
-
-		public static IEnumerable<Node> GetNode(Enum indexName, string searchQuery)
-		{
-			return GetNode(DefaultDbUrl, indexName.ToString(), searchQuery);
-		}
-
-		public static IEnumerable<Node> GetNode(string dbUrl, string indexName, string searchQuery)
-		{
-			string response;
-			var status = Neo4jRestApi.GetNode(dbUrl, indexName, searchQuery, out response);
-			if (status != HttpStatusCode.OK)
+			if (nodeStore == null)
 			{
-				throw new Exception(string.Format("Index not found in (index:{0})", indexName));
+				nodeStore = new RestNodeStore();
 			}
 
-			return ParseJson(response);
+			if (connection == null)
+			{
+				connection = DefaultConnection;
+			}
+
+			return nodeStore.GetNode(connection, indexName, key, value);
 		}
 
-		public static IEnumerable<Node> GetNode(string dbUrl, Enum indexName, string searchQuery)
+		public static IEnumerable<Node> GetNode(Enum indexName, string searchQuery, INodeStore nodeStore = null, ConnectionElement connection = null)
 		{
-			return GetNode(dbUrl, indexName.ToString(), searchQuery);
+			return GetNode(indexName.ToString(), searchQuery, nodeStore, connection);
+		}
+
+		public static IEnumerable<Node> GetNode(string indexName, string searchQuery, INodeStore nodeStore = null, ConnectionElement connection = null)
+		{
+			if (nodeStore == null)
+			{
+				nodeStore = new RestNodeStore();
+			}
+
+			if (connection == null)
+			{
+				connection = DefaultConnection;
+			}
+
+			return nodeStore.GetNode(connection, indexName, searchQuery);
 		}
 
 		#endregion
 
-		#region CreateNode
+		#region Delete
 
-		public static Node CreateNode(string nodeType)
+		public HttpStatusCode Delete()
 		{
-			var properties = new Properties();
-			properties.SetProperty(NodeProperty.NodeType.ToString(), nodeType);
-			return CreateNodeFromJson(DefaultDbUrl, properties.ToString());
-		}
-
-		public static Node CreateNode(Enum nodeType)
-		{
-			return CreateNode(nodeType.ToString());
-		}
-
-		public static Node CreateNode(string dbUrl, string nodeType)
-		{
-			var properties = new Properties();
-			properties.SetProperty(NodeProperty.NodeType.ToString(), nodeType);
-			return CreateNodeFromJson(dbUrl, properties.ToString());
-		}
-		public static Node CreateNode(string dbUrl, Enum nodeType)
-		{
-			return CreateNode(dbUrl, nodeType.ToString());
-		}
-
-		public static Node CreateNode(string nodeType, Properties properties)
-		{
-			properties.SetProperty(NodeProperty.NodeType.ToString(), nodeType);
-			return CreateNodeFromJson(DefaultDbUrl, properties.ToString());
-		}
-
-		public static Node CreateNode(Enum nodeType, Properties properties)
-		{
-			return CreateNode(nodeType.ToString(), properties);
-		}
-
-		public static Node CreateNode(string dbUrl, string nodeType, Properties properties)
-		{
-			properties.SetProperty(NodeProperty.NodeType.ToString(), nodeType);
-			return CreateNodeFromJson(dbUrl, properties.ToString());
-		}
-
-		public static Node CreateNode(string dbUrl, Enum nodeType, Properties properties)
-		{
-			return CreateNode(dbUrl, nodeType.ToString(), properties);
-		}
-
-		public static Node CreateNode(string nodeType, IDictionary<string, object> properties)
-		{
-			properties.Add(NodeProperty.NodeType.ToString(), nodeType);
-			return CreateNodeFromJson(DefaultDbUrl, JObject.FromObject(properties).ToString(Formatting.None, new IsoDateTimeConverter()));
-		}
-
-		public static Node CreateNode(Enum nodeType, IDictionary<string, object> properties)
-		{
-			return CreateNode(nodeType.ToString(), properties);
-		}
-
-		public static Node CreateNode(string dbUrl, string nodeType, IDictionary<string, object> properties)
-		{
-			properties.Add(NodeProperty.NodeType.ToString(), nodeType);
-			return CreateNodeFromJson(dbUrl, JObject.FromObject(properties).ToString(Formatting.None, new IsoDateTimeConverter()));
-		}
-
-		public static Node CreateNode(string dbUrl, Enum nodeType, IDictionary<string, object> properties)
-		{
-			return CreateNode(dbUrl, nodeType.ToString(), properties);
-		}
-
-		private static Node CreateNodeFromJson(string dbUrl, string jsonProperties)
-		{
-			string response;
-			var status = Neo4jRestApi.CreateNode(dbUrl, jsonProperties, out response);
-			if (status != HttpStatusCode.Created)
-			{
-				throw new Exception(string.Format("Error creating node (http response:{0})", status));
-			}
-
-			return InitializeFromNodeJson(response);
-		}
-
-		#endregion
-
-        #region Delete
-
-        public HttpStatusCode DeleteNode()
-        {
-			var status = Neo4jRestApi.DeleteNode(DefaultDbUrl, Id);
-            if (status != HttpStatusCode.NoContent)
-            {
-                throw new Exception(string.Format("Error deleting node (node id:{0} http response:{1})", Id, status));
-            }
-
-            return status;
-        }
-
-        #endregion
-
-		#region Initializers
-
-		public static Node InitializeFromNodeJson(string nodeJson)
-		{
-			JObject jo;
-
-			try
-			{
-				jo = JObject.Parse(nodeJson);
-			}
-			catch (Exception e)
-			{
-				throw new Exception("Invalid node json", e);
-			}
-
-			return InitializeFromNodeJson(jo);
-		}
-
-		public static Node InitializeFromNodeJson(JObject nodeJson)
-		{
-			JToken self;
-			if (!nodeJson.TryGetValue("self", out self))
-			{
-				throw new Exception("Invalid node json");
-			}
-
-			JToken properties;
-			if (!nodeJson.TryGetValue("data", out properties))
-			{
-				throw new Exception("Invalid node json");
-			}
-
-			var node = new Node
-			               {
-			                   Self = self.Value<string>(),
-							   _properties = Properties.ParseJson(properties.ToString(Formatting.None, new IsoDateTimeConverter())),
-							   OriginalNodeJson = nodeJson.ToString(Formatting.None, new IsoDateTimeConverter())
-			               };
-
-		    return node;
-		}
-
-		public static Node InitializeFromSelf(string self)
-		{
-			var node = new Node {Self = self, _properties = null};
-		    return node;
-		}
-
-		public static bool IsSelfANode(string self)
-		{
-			var selfArray = self.Split('/');
-			return (selfArray.Length > 2 && selfArray[selfArray.Length - 2] == "node");
-		}
-
-		#endregion
-
-		#region Self
-
-		public string Self
-		{
-			get
-			{
-				return _self;
-			}
-
-			private set
-			{
-				if (!IsSelfANode(value))
-				{
-					throw new Exception(string.Format("Self is not a Node ({0})", Self));
-				}
-
-				// Make sure there is no trailing /
-				var self = value.TrimEnd('/');
-
-				var selfArray = self.Split('/');
-
-				long nodeId;
-				if (!long.TryParse(selfArray.Last(), out nodeId))
-				{
-					throw new Exception(string.Format("Invalid Self id ({0})", value));
-				}
-
-				_selfDbUrl = self.Substring(0, self.LastIndexOf("/node"));
-				_self = self;
-
-				// Set Id & NodeId values
-				Id = nodeId;
-				EncryptedId = nodeId;
-			}
+			return _nodeGraphStore.DeleteNode();
 		}
 
 		#endregion
@@ -362,19 +315,10 @@ namespace Neo4jRestNet.Core
 				_properties = null;
 			}
 
-			if (_properties != null)
+			if (_properties == null)
 			{
-				return;
+				_properties = _nodeGraphStore.GetProperties();
 			}
-
-			string response;
-			var status = Neo4jRestApi.GetPropertiesOnNode(DefaultDbUrl, Id, out response);
-			if (status != HttpStatusCode.OK)
-			{
-				throw new Exception(string.Format("Error retrieving properties on node (node id:{0} http response:{1})", Id, status));
-			}
-
-			_properties = Properties.ParseJson(response);
 		}
 
 		public Properties Properties
@@ -383,6 +327,11 @@ namespace Neo4jRestNet.Core
 			{
 				LoadProperties(false);
 				return _properties;
+			}
+
+			internal set
+			{
+				_properties = value;
 			}
 		}
 
@@ -393,20 +342,7 @@ namespace Neo4jRestNet.Core
 
 		public void SaveProperties(Properties properties)
 		{
-//			LoadProperties(false);
-	
-			if (Properties.HasProperty(NodeProperty.NodeType))
-			{
-				properties.SetProperty(NodeProperty.NodeType, Properties.GetProperty<string>(NodeProperty.NodeType));
-			}
-
-			var status = Neo4jRestApi.SetPropertiesOnNode(DefaultDbUrl, Id, properties.ToString());
-			if (status != HttpStatusCode.NoContent)
-			{
-				throw new Exception(string.Format("Error setting properties on node (node id:{0} http response:{1})", Id, status));
-			}
-
-//			LoadProperties(true);
+			_nodeGraphStore.SaveProperties(properties);
 		}
 
 		#endregion
@@ -432,7 +368,7 @@ namespace Neo4jRestNet.Core
 		{
 			return GetRelationships(RelationshipDirection.All, new List<string> { name.ToString() });
 		}
-		
+
 		public IEnumerable<Relationship> GetRelationships(string name)
 		{
 			return GetRelationships(RelationshipDirection.All, new List<string> { name });
@@ -460,258 +396,125 @@ namespace Neo4jRestNet.Core
 
 		public IEnumerable<Relationship> GetRelationships(RelationshipDirection direction, IEnumerable<string> names)
 		{
-			string response;
-			var status = Neo4jRestApi.GetRelationshipsOnNode(DefaultDbUrl, Id, direction, names, out response);
-			if (status != HttpStatusCode.OK)
-			{
-				throw new Exception(string.Format("Error retrieving relationships on node (node id:{0} http response:{1})", Id, status));
-			}
-
-			return Relationship.ParseJson(response);
+			return _nodeGraphStore.GetRelationships(direction, names);
 		}
 
-		public Relationship CreateRelationshipTo(Node toNode, string relationshipType)
+		public Relationship CreateRelationshipTo(Node endNode, Enum relationshipType, Properties relationshipProperties = null)
 		{
-			return CreateRelationshipTo(toNode, relationshipType, null);
+			return CreateRelationshipTo(endNode, relationshipType.ToString(), relationshipProperties);
 		}
 
-		public Relationship CreateRelationshipTo(Node toNode, Enum relationshipType)
+		public Relationship CreateRelationshipTo(Node endNode, string relationshipType, Properties properties = null)
 		{
-			return CreateRelationshipTo(toNode, relationshipType.ToString(), null);
-		}
-
-		public Relationship CreateRelationshipTo(Node toNode, Enum relationshipType, Properties relationshipProperties)
-		{
-			return CreateRelationshipTo(toNode, relationshipType.ToString(), relationshipProperties);
-		}
-
-		public Relationship CreateRelationshipTo(Node toNode, string relationshipType, Properties relationshipProperties)
-		{
-			string response;
-			var status = Neo4jRestApi.CreateRelationship( DefaultDbUrl,
-														Id, 
-														toNode.Self, 
-														relationshipType, 
-														relationshipProperties == null ? null : relationshipProperties.ToString(), 
-														out response);
-			if (status != HttpStatusCode.Created)
-			{
-				throw new Exception(string.Format("Error creationg relationship on node (node id:{0} http response:{1})", Id, status));
-			}
-
-			return Relationship.ParseJson(response).First();
-		}
-
-		#endregion
-
-		#region Traverse
-
-		public IEnumerable<IGraphObject> Traverse(Order order, Uniqueness uniqueness, IEnumerable<TraverseRelationship> relationships, PruneEvaluator pruneEvaluator, ReturnFilter returnFilter, int? maxDepth, ReturnType returnType)
-		{
-			string response;
-			var status = Neo4jRestApi.Traverse(DefaultDbUrl, Id, order, uniqueness, relationships, pruneEvaluator, returnFilter, maxDepth, returnType, out response);
-			if (status != HttpStatusCode.OK)
-			{
-				throw new Exception(string.Format("Error traversing nodes (node id:{0} status code:{1})", Id, status));
-			}
-
-			if (returnType.ToString() == ReturnType.Node.ToString())
-			{
-				return ParseJson(response);
-			}
-
-		    if (returnType.ToString() == ReturnType.Relationship.ToString())
-		    {
-		        return Relationship.ParseJson(response);
-		    }
-
-		    if (returnType.ToString() == ReturnType.Path.ToString() || returnType.ToString() == ReturnType.FullPath.ToString())
-		    {
-		        return Path.ParseJson(response);
-		    }
-
-		    throw new Exception(string.Format("Return type not implemented (type:{0})", returnType));
+			return _nodeGraphStore.CreateRelationship(this, endNode, relationshipType, properties);
 		}
 
 		#endregion
 
 		#region Index
 
-		public static Node AddNodeToIndex(long nodeId, string indexName, string key, object value)
+		#region Member AddToIndex
+
+		public Node AddToIndex(Enum indexName, Enum key, Enum propertyName, bool unique = false)
 		{
-			return AddNodeToIndex(DefaultDbUrl, nodeId, indexName, key, value);
-		}
-		
-		public static Node AddNodeToIndex(long nodeId, Enum indexName, string key, object value)
-		{
-			return AddNodeToIndex(DefaultDbUrl, nodeId, indexName.ToString(), key, value);
+			return AddToIndex(indexName.ToString(), key.ToString(), Properties.GetProperty(propertyName), unique);
 		}
 
-		public static Node AddNodeToIndex(long nodeId, string indexName, Enum key, object value)
+		public Node AddToIndex(Enum indexName, Enum key, object value, bool unique = false)
 		{
-			return AddNodeToIndex(DefaultDbUrl, nodeId, indexName, key.ToString(), value);
+			return AddToIndex(indexName.ToString(), key.ToString(), value, unique);
 		}
 
-		public static Node AddNodeToIndex(long nodeId, Enum indexName, Enum key, object value)
+		public Node AddToIndex(string indexName, string key, object value, bool unique = false)
 		{
-			return AddNodeToIndex(DefaultDbUrl, nodeId, indexName.ToString(), key.ToString(), value);
-		}
-
-		public static Node AddNodeToIndex(string dbUrl, long nodeId, Enum indexName, Enum key, object value)
-		{
-			return AddNodeToIndex(dbUrl, nodeId, indexName.ToString(), key.ToString(), value);
-		}
-
-		public static Node AddNodeToIndex(string dbUrl, long nodeId, string indexName, string key, object value)
-		{
-			string response;
-			var status = Neo4jRestApi.AddNodeToIndex(DefaultDbUrl, nodeId, indexName, key, value, out response);
-			if (status != HttpStatusCode.Created)
-			{
-				throw new Exception(string.Format("Error creating index for node (http response:{0})", status));
-			}
-
-			return InitializeFromNodeJson(response);
-		}
-
-        public static HttpStatusCode RemoveNodeFromIndex(long nodeId, string indexName)
-		{
-			return RemoveNodeFromIndex(DefaultDbUrl, nodeId, indexName);
-		}
-
-		public static HttpStatusCode RemoveNodeFromIndex(long nodeId, Enum indexName)
-		{
-			return RemoveNodeFromIndex(DefaultDbUrl, nodeId, indexName.ToString());
-		}
-
-		public static HttpStatusCode RemoveNodeFromIndex(string dbUrl, long nodeId, Enum indexName)
-		{
-			return RemoveNodeFromIndex(dbUrl, nodeId, indexName.ToString());
-		}
-
-        public static HttpStatusCode RemoveNodeFromIndex(string dbUrl, long nodeId, string indexName)
-		{
-			var status = Neo4jRestApi.RemoveNodeFromIndex(DefaultDbUrl, nodeId, indexName);
-			if (status != HttpStatusCode.NoContent)
-			{
-				throw new Exception(string.Format("Error remove node from index (node id:{0} index name:{1} http response:{2})", nodeId, indexName, status));
-			}
-
-			return status;
-		}
-
-        public static HttpStatusCode RemoveNodeFromIndex(long nodeId, string indexName, string key)
-		{
-			return RemoveNodeFromIndex(DefaultDbUrl, nodeId, indexName, key);
-		}
-		
-		public static HttpStatusCode RemoveNodeFromIndex(long nodeId, Enum indexName, string key)
-		{
-			return RemoveNodeFromIndex(DefaultDbUrl, nodeId, indexName.ToString(), key);
-		}
-
-		public static HttpStatusCode RemoveNodeFromIndex(long nodeId, string indexName, Enum key)
-		{
-			return RemoveNodeFromIndex(DefaultDbUrl, nodeId, indexName, key.ToString());
-		}
-
-		public static HttpStatusCode RemoveNodeFromIndex(long nodeId, Enum indexName, Enum key)
-		{
-			return RemoveNodeFromIndex(DefaultDbUrl, nodeId, indexName.ToString(), key.ToString());
-		}
-		
-		public static HttpStatusCode RemoveNodeFromIndex(string dbUrl, long nodeId, Enum indexName, Enum key)
-		{
-			return RemoveNodeFromIndex(dbUrl, nodeId, indexName.ToString(), key.ToString());
-		}
-
-        public static HttpStatusCode RemoveNodeFromIndex(string dbUrl, long nodeId, string indexName, string key)
-		{
-			var status = Neo4jRestApi.RemoveNodeFromIndex(DefaultDbUrl, nodeId, indexName, key);
-			if (status != HttpStatusCode.NoContent)
-			{
-				throw new Exception(string.Format("Error remove node from index (node id:{0} index name:{1} http response:{2})", nodeId, indexName, status));
-			}
-
-			return status;
-		}
-
-        public static HttpStatusCode RemoveNodeFromIndex(long nodeId, string indexName, string key, object value)
-		{
-			return RemoveNodeFromIndex(DefaultDbUrl, nodeId, indexName, key, value);
-		}
-
-		public static HttpStatusCode RemoveNodeFromIndex(long nodeId, Enum indexName, string key, object value)
-		{
-			return RemoveNodeFromIndex(DefaultDbUrl, nodeId, indexName.ToString(), key, value);
-		}
-
-		public static HttpStatusCode RemoveNodeFromIndex(long nodeId, string indexName, Enum key, object value)
-		{
-			return RemoveNodeFromIndex(DefaultDbUrl, nodeId, indexName, key.ToString(), value);
-		}
-
-		public static HttpStatusCode RemoveNodeFromIndex(long nodeId, Enum indexName, Enum key, object value)
-		{
-			return RemoveNodeFromIndex(DefaultDbUrl, nodeId, indexName.ToString(), key.ToString(), value);
-		}
-
-        public static HttpStatusCode RemoveNodeFromIndex(string dbUrl, long nodeId, string indexName, string key, object value)
-		{
-			var status = Neo4jRestApi.RemoveNodeFromIndex(DefaultDbUrl, nodeId, indexName, key, value);
-			if (status != HttpStatusCode.NoContent)
-			{
-				throw new Exception(string.Format("Error remove node from index (node id:{0} index name:{1} http response:{2})", nodeId, indexName, status));
-			}
-
-			return status;
-		}
-		#endregion
-
-		#region NodeType
-
-		public string NodeType
-		{
-			get
-			{
-			    return _properties == null ? null : _properties.GetProperty<string>(NodeProperty.NodeType.ToString());
-			}
+			return _nodeGraphStore.AddToIndex(DefaultConnection, this, indexName, key, value, unique);
 		}
 
 		#endregion
 
-		#region ParseJson
+		#region Static AddToIndex
 
-		public static IEnumerable<Node> ParseJson(string jsonNodes)
+		public static Node AddToIndex(Node node, Enum indexName, Enum key, object value, bool unique = false, INodeStore nodeStore = null, ConnectionElement connection = null)
 		{
-			if (String.IsNullOrEmpty(jsonNodes))
+			return AddToIndex(node, indexName.ToString(), key.ToString(), value, unique, nodeStore, connection);
+		}
+
+		public static Node AddToIndex(Node node, string indexName, string key, object value, bool unique = false, INodeStore nodeStore = null, ConnectionElement connection = null)
+		{
+			if (nodeStore == null)
 			{
-			    return null;
+				nodeStore = new RestNodeStore();
 			}
 
-		    var nodes = new List<Node>();
+			if (connection == null)
+			{
+				connection = DefaultConnection;
+			}
 
-		    // The Json passed in can be a JObject or JArray - this is to test for that.
-		    var jo = JObject.Parse(string.Concat("{\"root\":", jsonNodes, "}"));
-
-		    switch (jo["root"].Type)
-		    {
-		        case JTokenType.Object:
-		            nodes.Add(InitializeFromNodeJson(jo["root"].ToString(Formatting.None, new IsoDateTimeConverter())));
-		            break;
-
-		        case JTokenType.Array:
-		            nodes.AddRange(from JObject jsonNode in jo["root"] select InitializeFromNodeJson(jsonNode));
-		            break;
-
-		        default:
-		            throw new Exception("Invalid node json");
-		    }
-
-		    return nodes;
+			return nodeStore.AddToIndex(connection, node, indexName, key, value, unique);
 		}
 
 		#endregion
+
+		#region Member RemoveFromIndex
+
+		public bool RemoveFromIndex(Enum indexName, Enum key = null, object value = null)
+		{
+			return RemoveFromIndex(indexName.ToString(), key == null ? null : key.ToString(), value);
+		}
+
+		public bool RemoveFromIndex(string indexName, string key = null, object value = null)
+		{
+			return string.IsNullOrWhiteSpace(key) ?
+				_nodeGraphStore.RemoveFromIndex(DefaultConnection, this, indexName)
+				: value == null ?
+					_nodeGraphStore.RemoveFromIndex(DefaultConnection, this, indexName, key)
+					: _nodeGraphStore.RemoveFromIndex(DefaultConnection, this, indexName, key, value);
+		}
+		
+		#endregion
+
+		#region Static RemoveFromIndex
+
+		public static bool RemoveFromIndex(Node node, Enum indexName, Enum key = null, object value = null, INodeStore nodeStore = null, ConnectionElement connection = null)
+		{
+			return RemoveFromIndex(node, indexName.ToString(), key == null ? null : key.ToString(), value, nodeStore, connection);
+		}
+
+		public static bool RemoveFromIndex(Node node, string indexName, string key = null, object value = null, INodeStore nodeStore = null, ConnectionElement connection = null)
+		{
+			if (nodeStore == null)
+			{
+				nodeStore = new RestNodeStore();
+			}
+
+			if (connection == null)
+			{
+				connection = DefaultConnection;
+			}
+
+			return key == null ?
+				nodeStore.RemoveFromIndex(connection, node, indexName)
+				: value == null ?
+					nodeStore.RemoveFromIndex(connection, node, indexName, key)
+					: nodeStore.RemoveFromIndex(connection, node, indexName, key, value);
+		}
+
+		#endregion
+
+		#endregion
+
+		//#region NodeType
+
+		//public string NodeType
+		//{
+		//    get
+		//    {
+		//        return _properties == null ? null : _properties.GetProperty<string>(NodeProperty.NodeType.ToString());
+		//    }
+		//}
+
+		//#endregion
 
 		#region IEquatable<Node> Members
 
@@ -720,13 +523,13 @@ namespace Neo4jRestNet.Core
 			if (ReferenceEquals(other, null))
 				return false;
 
-		    if (ReferenceEquals(this, other))
-		        return true;
+			if (ReferenceEquals(this, other))
+				return true;
 
-		    if (EncryptedId == null || other.EncryptedId == null)
-		        return false;
+			if (Id == int.MinValue || other.Id == int.MinValue)
+				return false;
 
-		    return EncryptedId.Equals(other.EncryptedId);
+			return EncryptedId.Equals(other.EncryptedId);
 		}
 
 		public override bool Equals(Object obj)

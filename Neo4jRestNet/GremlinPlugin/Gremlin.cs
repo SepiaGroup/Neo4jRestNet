@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Net;
 using System.Data;
-using System.Configuration;
 using System.Collections.Generic;
-using Newtonsoft.Json;
+using Neo4jRestNet.Configuration;
 using Newtonsoft.Json.Linq;
 using Neo4jRestNet.Core;
 
@@ -12,38 +11,34 @@ namespace Neo4jRestNet.GremlinPlugin
 {
 	public static class Gremlin
 	{
-		private static readonly string DefaultDbUrl = ConfigurationManager.ConnectionStrings["neo4j"].ConnectionString.TrimEnd('/');
-		private static readonly string DefaultGremlinExtensionPath = ConfigurationManager.ConnectionStrings["neo4jGremlinExtension"].ConnectionString.TrimEnd('/');
-		private static readonly string DefaultGremlinUrl = string.Concat(DefaultDbUrl, DefaultGremlinExtensionPath).TrimEnd('/');
-
 		public static HttpStatusCode Post(GremlinScript script)
 		{
 			string response;
-			var status = Rest.HttpRest.Post(DefaultGremlinUrl, script.GetScript(), out response);
+			var status = Rest.HttpRest.Post(ConnectionManager.Connection().GremlinUrl, script.GetScript(), out response);
 
 			return status;
 		}
 
 		public static IEnumerable<T> Post<T>(GremlinScript script) where T : IGraphObject
 		{
-			return Post<T>(DefaultGremlinUrl, script);
+			return Post<T>(ConnectionManager.Connection(), script);
 		}
 
-		public static IEnumerable<T> Post<T>(string gremlinUrl, GremlinScript script) where T : IGraphObject
+		public static IEnumerable<T> Post<T>(ConnectionElement connection, GremlinScript script) where T : IGraphObject
 		{
 			var typeParameterType = typeof(T);
 
 			string response;
-			var status = Rest.HttpRest.Post(gremlinUrl, script.GetScript(), out response);
+			var status = Rest.HttpRest.Post(connection.GremlinUrl, script.GetScript(), out response);
 
 			if (typeParameterType == typeof(Node))
 			{
-				return (IEnumerable<T>)Node.ParseJson(response);
+				return (IEnumerable<T>)RestNodeStore.ParseNodeJson(response);
 			}
 
 			if (typeParameterType == typeof(Relationship))
 			{
-				return (IEnumerable<T>)Relationship.ParseJson(response);
+				return (IEnumerable<T>)RestRelationshipStore.ParseRelationshipJson(response);
 			}
 
 			if (typeParameterType == typeof(Path))
@@ -58,13 +53,13 @@ namespace Neo4jRestNet.GremlinPlugin
 
 		public static DataTable GetTable(GremlinScript script)
 		{
-			return GetTable(DefaultGremlinUrl, script);
+			return GetTable(ConnectionManager.Connection(), script);
 		}
 
-		public static DataTable GetTable(string gremlinUrl, GremlinScript script)
+		public static DataTable GetTable(ConnectionElement connection, GremlinScript script)
 		{
 			string response;
-			var status = Rest.HttpRest.Post(gremlinUrl, script.GetScript(), out response);
+			var status = Rest.HttpRest.Post(connection.GremlinUrl, script.GetScript(), out response);
 
 			var joResponse = JObject.Parse(response);
 			var jaColumns =(JArray)joResponse["columns"];
@@ -107,7 +102,7 @@ namespace Neo4jRestNet.GremlinPlugin
 								string[] selfArray = self.Split('/');
 								if (selfArray.Length > 2 && selfArray[selfArray.Length - 2] == "node"  )
 								{
-									row.Add(Node.InitializeFromNodeJson((JObject)jCol));
+									row.Add(RestNodeStore.CreateNodeFromJson((JObject)jCol));
 
 									if (initColumns)
 									{
@@ -117,7 +112,7 @@ namespace Neo4jRestNet.GremlinPlugin
 								}
 								else if (selfArray.Length > 2 && selfArray[selfArray.Length - 2] == "relationship")
 								{
-									row.Add(Relationship.InitializeFromRelationshipJson((JObject)jCol));
+									row.Add(RestRelationshipStore.CreateRelationshipFromJson((JObject)jCol));
 
 									if (initColumns)
 									{
