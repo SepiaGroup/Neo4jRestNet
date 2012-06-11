@@ -91,6 +91,7 @@
     <Compile Include="Core\BatchNodeStore.cs" />
     <Compile Include="Core\BatchRelationshipStore.cs" />
     <Compile Include="Core\BatchStore.cs" />
+    <Compile Include="Core\CypherQuery\CypherSet.cs" />
     <Compile Include="Core\CypherQuery\CypherDelete.cs" />
     <Compile Include="Core\CypherQuery\CypherRelate.cs" />
     <Compile Include="Core\CypherQuery\CypherCreate.cs" />

@@ -9,7 +9,7 @@ using Newtonsoft.Json;
 
 namespace Neo4jRestNet.Core
 {
-	public class Properties
+	public class Properties : IEnumerable<KeyValuePair<string, object>>
 	{
 		private readonly IDictionary<string, object> _properties;
 
@@ -328,6 +328,17 @@ namespace Neo4jRestNet.Core
 				default:
 					throw new ArgumentOutOfRangeException();
 			}
+		}
+
+		IEnumerator<KeyValuePair<string, object>> IEnumerable<KeyValuePair<string, object>>.GetEnumerator()
+		{
+			return _properties.GetEnumerator();
+		}
+
+
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			throw new NotImplementedException();
 		}
 	}
 }

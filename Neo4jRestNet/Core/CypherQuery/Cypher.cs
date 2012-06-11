@@ -16,6 +16,7 @@ namespace Neo4jRestNet.Core.CypherQuery
 		readonly List<Func<CypherCreate, object>> _create = new List<Func<CypherCreate, object>>();
 		readonly List<Func<CypherRelate, object>> _relate = new List<Func<CypherRelate, object>>();
 		readonly List<Func<CypherDelete, object>> _delete = new List<Func<CypherDelete, object>>();
+		readonly List<Func<CypherSet, object>> _set = new List<Func<CypherSet, object>>();
 		readonly List<Func<CypherMatch, object>> _match = new List<Func<CypherMatch, object>>();
 		readonly List<Tuple<string, Expression<Func<CypherWhere, object>>>> _where = new List<Tuple<string, Expression<Func<CypherWhere, object>>>>();
 		readonly List<Func<CypherReturn, object>> _return = new List<Func<CypherReturn, object>>();
@@ -140,6 +141,11 @@ namespace Neo4jRestNet.Core.CypherQuery
 			_delete.Add(delete);
 		}
 
+		public void Set(Func<CypherSet, object> set)
+		{
+			_set.Add(set);
+		}
+
 		public void Match(Func<CypherMatch, object> match)
 		{
 			_match.Add(match);
@@ -254,6 +260,16 @@ namespace Neo4jRestNet.Core.CypherQuery
 						label = string.Empty;
 						leftParen = "(";
 						rightParen = ")";
+					}
+				}
+
+				if (_set != null)
+				{
+					label = "SET";
+					foreach (var s in _set)
+					{
+						sbToString.AppendFormat("{1}{0}", s.Invoke(new CypherSet()), label);
+						label = ",";
 					}
 				}
 
