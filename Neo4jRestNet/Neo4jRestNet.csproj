@@ -91,11 +91,13 @@
     <Compile Include="Core\BatchNodeStore.cs" />
     <Compile Include="Core\BatchRelationshipStore.cs" />
     <Compile Include="Core\BatchStore.cs" />
+    <Compile Include="Core\CypherQuery\CypherDelete.cs" />
     <Compile Include="Core\CypherQuery\CypherRelate.cs" />
     <Compile Include="Core\CypherQuery\CypherCreate.cs" />
     <Compile Include="Core\Exceptions\BatchDeleteNotSupported.cs" />
     <Compile Include="Core\Exceptions\BatchGetRelationshipsNotSupported.cs" />
     <Compile Include="Core\Exceptions\BatchRemoveFromIndexNotSupported.cs" />
+    <Compile Include="Core\Exceptions\RelationshipNotFound.cs" />
     <Compile Include="Core\Exceptions\NodeNotFound.cs" />
     <Compile Include="Core\RestRelationshipStore.cs" />
     <Compile Include="Core\IRelationshipStore.cs" />

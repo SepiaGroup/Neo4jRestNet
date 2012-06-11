@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using Neo4jRestNet.Configuration;
+using Neo4jRestNet.Core.Exceptions;
 using Neo4jRestNet.Rest;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -187,9 +188,9 @@ namespace Neo4jRestNet.Core
 		{
 			string response;
 			var status = Neo4jRestApi.GetRelationship(connection.DbUrl, relationshipId, out response);
-			if (status != HttpStatusCode.OK)
+			if (status == HttpStatusCode.NotFound)
 			{
-				throw new Exception(string.Format("Relationship not found (relationship id:{0})", relationshipId));
+				throw new RelationshipNotFoundException(string.Format("Relationship({0})", relationshipId));
 			}
 
 			return CreateRelationshipFromJson(response);
