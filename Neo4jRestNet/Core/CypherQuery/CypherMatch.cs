@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 
-namespace Neo4jRestNet.Cypher
+namespace Neo4jRestNet.Core.CypherQuery
 {
 	public class CypherMatch : ICypherObject
 	{
@@ -56,17 +58,42 @@ namespace Neo4jRestNet.Cypher
 			return this;
 		}
 		
-		public CypherMatch Any(string name)
+		public CypherMatch Any(string relationship)
 		{
-			_sb.AppendFormat("-[{0}]-", name);
+			_sb.AppendFormat("-[:{0}]-", relationship);
 
 			return this;
 		}
 
-		public CypherMatch Any(Enum name)
+		public CypherMatch Any(IEnumerable<string> relationship)
 		{
-			return Any(name.ToString());
+			_sb.AppendFormat("-[:{0}]-", string.Join(" | ", relationship));
+
+			return this;
 		}
+
+		public CypherMatch Any(Enum relationship)
+		{
+			return Any(relationship.ToString());
+		}
+
+		public CypherMatch Any(IEnumerable<Enum> relationship)
+		{
+			return Any(relationship.Select(s => s.ToString()).ToList());
+		}
+
+		public CypherMatch Any(string relationship, bool optional)
+		{
+			_sb.AppendFormat("-[{1}:{0}]-", relationship, optional ? "?" : string.Empty);
+
+			return this;
+		}
+
+		public CypherMatch Any(Enum relationship, bool optional)
+		{
+			return Any(relationship.ToString(), optional);
+		}
+
 
 		public CypherMatch Any(string name, string relationship)
 		{
@@ -81,10 +108,29 @@ namespace Neo4jRestNet.Cypher
 
 			return this;
 		}
+		
+		public CypherMatch Any(string name, IEnumerable<string> relationship)
+		{
+			if (relationship == null || !relationship.Any())
+			{
+				_sb.AppendFormat("-[{0}]-", name);
+			}
+			else
+			{
+				_sb.AppendFormat("-[{0}:{1}]-", name, string.Join(" | ", relationship));
+			}
+
+			return this;
+		}
 
 		public CypherMatch Any(string name, Enum relationship)
 		{
 			return Any(name, relationship.ToString());
+		}
+
+		public CypherMatch Any(string name, IEnumerable<Enum> relationship)
+		{
+			return Any(name, relationship.Select(s => s.ToString()).ToList());
 		}
 
 		public CypherMatch Any(string name, string relationship, int minHops, int maxHops)
@@ -124,9 +170,21 @@ namespace Neo4jRestNet.Cypher
 			return this;
 		}
 
+		public CypherMatch To(IEnumerable<string> relationship)
+		{
+			_sb.AppendFormat("-[:{0}]->", string.Join(" | ", relationship));
+
+			return this;
+		}
+
 		public CypherMatch To(Enum relationship)
 		{
 			return To(relationship.ToString());
+		}
+
+		public CypherMatch To(IEnumerable<Enum> relationship)
+		{
+			return To(relationship.Select(s => s.ToString()).ToList());
 		}
 
 		public CypherMatch To(string relationship, bool optional)
@@ -135,7 +193,7 @@ namespace Neo4jRestNet.Cypher
 
 			return this;
 		}
-		
+
 		public CypherMatch To(Enum relationship, bool optional)
 		{
 			return To(relationship.ToString(), optional);
@@ -154,10 +212,29 @@ namespace Neo4jRestNet.Cypher
 
 			return this;
 		}
-		
+
+		public CypherMatch To(string name, IEnumerable<string> relationship)
+		{
+			if (relationship == null || !relationship.Any())
+			{
+				_sb.AppendFormat("-[{0}]->", name);
+			}
+			else
+			{
+				_sb.AppendFormat("-[{0}:{1}]->", name, string.Join(" | ", relationship));
+			}
+
+			return this;
+		}
+
 		public CypherMatch To(string name, Enum relationship)
 		{
 			return To(name, relationship.ToString());
+		}
+
+		public CypherMatch To(string name, IEnumerable<Enum> relationship)
+		{
+			return To(name, relationship.Select(s => s.ToString()).ToList());
 		}
 
 		public CypherMatch To(string name, string relationship, bool optional)
@@ -209,9 +286,21 @@ namespace Neo4jRestNet.Cypher
 			return this;
 		}
 
+		public CypherMatch From(IEnumerable<string> relationship)
+		{
+			_sb.AppendFormat("<-[:{0}]-", string.Join(" | ", relationship));
+
+			return this;
+		}
+
 		public CypherMatch From(Enum relationship)
 		{
 			return From(relationship.ToString());
+		}
+
+		public CypherMatch From(IEnumerable<Enum> relationship)
+		{
+			return From(relationship.Select(s => s.ToString()).ToList());
 		}
 
 		public CypherMatch From(string relationship, bool optional)
@@ -240,9 +329,28 @@ namespace Neo4jRestNet.Cypher
 			return this;
 		}
 
+		public CypherMatch From(string name, IEnumerable<string> relationship)
+		{
+			if (relationship == null || !relationship.Any())
+			{
+				_sb.AppendFormat("<-[{0}]-", name);
+			}
+			else
+			{
+				_sb.AppendFormat("<-[{0}:{1}]-", name, string.Join(" | ", relationship));
+			}
+
+			return this;
+		}
+
 		public CypherMatch From(string name, Enum relationship)
 		{
 			return From(name, relationship.ToString());
+		}
+
+		public CypherMatch From(string name, IEnumerable<Enum> relationship)
+		{
+			return From(name, relationship.Select(s => s.ToString()).ToList());
 		}
 
 		public CypherMatch From(string name, string relationship, bool optional)

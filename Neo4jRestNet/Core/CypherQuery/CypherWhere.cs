@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Text;
 
-namespace Neo4jRestNet.Cypher
+namespace Neo4jRestNet.Core.CypherQuery
 {
 	public class CypherWhere : ICypherObject, IComparable
 	{
@@ -24,6 +24,13 @@ namespace Neo4jRestNet.Cypher
 			return this;
 		}
 
+		public CypherWhere NodeHas(string name, string propertyName)
+		{
+			_sb.Append(string.Format(" has({0}.{1}) ", name, propertyName));
+
+			return this;
+		}
+
 		#endregion
 
 		#region Relationship
@@ -31,6 +38,13 @@ namespace Neo4jRestNet.Cypher
 		public CypherWhere Relationship(string name)
 		{
 			_sb.AppendFormat("{0}", name);
+
+			return this;
+		}
+
+		public CypherWhere RelationshipHas(string name, string propertyName)
+		{
+			_sb.Append(string.Format(" has({0}.{1}) ", name, propertyName));
 
 			return this;
 		}
@@ -116,7 +130,7 @@ namespace Neo4jRestNet.Cypher
 
 		public CypherWhere In<T>(params T[] items)
 		{
-			_sb.Append(string.Format(" IN [{0}]", 
+			_sb.Append(string.Format(" in [{0}]", 
 				items.Aggregate(new StringBuilder(), (sb, item) => sb.AppendFormat("{1}{2}{0}{2}", item, sb.Length > 0 ? "," : string.Empty, typeof(T) == typeof(string) ? "'" : string.Empty))));
 			
 			return this;

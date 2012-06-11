@@ -91,6 +91,8 @@
     <Compile Include="Core\BatchNodeStore.cs" />
     <Compile Include="Core\BatchRelationshipStore.cs" />
     <Compile Include="Core\BatchStore.cs" />
+    <Compile Include="Core\CypherQuery\CypherRelate.cs" />
+    <Compile Include="Core\CypherQuery\CypherCreate.cs" />
     <Compile Include="Core\Exceptions\BatchDeleteNotSupported.cs" />
     <Compile Include="Core\Exceptions\BatchGetRelationshipsNotSupported.cs" />
     <Compile Include="Core\Exceptions\BatchRemoveFromIndexNotSupported.cs" />
@@ -104,17 +106,17 @@
     <Compile Include="Core\IGraphObject.cs" />
     <Compile Include="Core\RelationshipDirection.cs" />
     <Compile Include="Core\RestNodeStore.cs" />
-    <Compile Include="Cypher\CypherOrderBy.cs" />
-    <Compile Include="Cypher\CypherWhere.cs" />
-    <Compile Include="Cypher\CypherReturn.cs" />
-    <Compile Include="Cypher\CypherMatch.cs" />
-    <Compile Include="Cypher\Cypher.cs" />
-    <Compile Include="Cypher\CypherProperty.cs" />
-    <Compile Include="Cypher\CypherStart.cs" />
-    <Compile Include="Cypher\ICypherObject.cs">
+    <Compile Include="Core\CypherQuery\CypherOrderBy.cs" />
+    <Compile Include="Core\CypherQuery\CypherWhere.cs" />
+    <Compile Include="Core\CypherQuery\CypherReturn.cs" />
+    <Compile Include="Core\CypherQuery\CypherMatch.cs" />
+    <Compile Include="Core\CypherQuery\Cypher.cs" />
+    <Compile Include="Core\CypherQuery\CypherProperty.cs" />
+    <Compile Include="Core\CypherQuery\CypherStart.cs" />
+    <Compile Include="Core\CypherQuery\ICypherObject.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Cypher\ParseWhereLambda.cs" />
+    <Compile Include="Core\CypherQuery\ParseWhereLambda.cs" />
     <Compile Include="ExpressionTreeParser\ExpressionParser.cs" />
     <Compile Include="GremlinPlugin\GremlinScriptCommands.cs" />
     <Compile Include="GremlinPlugin\JavaIntCommands.cs" />

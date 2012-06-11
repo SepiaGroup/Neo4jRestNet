@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Collections;
 using Newtonsoft.Json.Converters;
@@ -254,6 +255,34 @@ namespace Neo4jRestNet.Core
 				jo.Add(kvp.Key, JToken.FromObject(kvp.Value));
 			}
 			return jo.ToString(Formatting.None, new IsoDateTimeConverter());
+		}
+
+		public string ToString(bool quoteNames)
+		{
+			if(quoteNames)
+			{
+				return ToString();
+			}
+
+			var jo = new JObject();
+
+			foreach (var kvp in _properties.Where(kvp => kvp.Value != null))
+			{
+				jo.Add(kvp.Key, JToken.FromObject(kvp.Value));
+			}
+
+			var stringWriter = new StringWriter();
+			var jsonSerializer = new JsonSerializer();
+			using (var jsonWritter = new JsonTextWriter(stringWriter))
+			{
+				jsonWritter.QuoteName = false;
+				jsonSerializer.Converters.Add(new IsoDateTimeConverter());
+				jsonSerializer.Serialize(jsonWritter, jo);
+
+				jsonWritter.Close();
+				
+				return stringWriter.ToString();
+			}
 		}
 
 		public JObject ToJObject()

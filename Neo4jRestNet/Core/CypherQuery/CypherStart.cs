@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Neo4jRestNet.Cypher
+namespace Neo4jRestNet.Core.CypherQuery
 {
 	public class CypherStart
 	{
@@ -10,6 +10,14 @@ namespace Neo4jRestNet.Cypher
 		private readonly StringBuilder _sb = new StringBuilder();
 
 		#region Node
+
+		public CypherStart AllNodes(string name)
+		{
+			var comma = _sb.Length == 0 ? string.Empty : ",";
+			_sb.AppendFormat("{1} {0}=node(*)", name, comma);
+
+			return this;
+		}
 
 		public CypherStart Node(string name, long id)
 		{
@@ -67,7 +75,7 @@ namespace Neo4jRestNet.Cypher
 		{
 			var comma = _sb.Length == 0 ? string.Empty : ",";
 
-			_sb.AppendFormat("{3} {0}=node:{1}({2})", name, indexName, query, comma);
+			_sb.AppendFormat("{3} {0}=node:{1}(\"{2}\")", name, indexName, query, comma);
 
 			return this;
 		}

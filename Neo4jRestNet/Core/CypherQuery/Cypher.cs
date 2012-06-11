@@ -1,20 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Linq.Expressions;
 using System.Data;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
-using Neo4jRestNet.Core;
 using System.Collections.ObjectModel;
 using System.Text;
 using Neo4jRestNet.Configuration;
 
-namespace Neo4jRestNet.Cypher
+namespace Neo4jRestNet.Core.CypherQuery
 {
 	public class Cypher
 	{
 		readonly List<Func<CypherStart, object>> _start = new List<Func<CypherStart, object>>();
+		readonly List<Func<CypherCreate, object>> _create = new List<Func<CypherCreate, object>>();
+		readonly List<Func<CypherRelate, object>> _relate = new List<Func<CypherRelate, object>>();
 		readonly List<Func<CypherMatch, object>> _match = new List<Func<CypherMatch, object>>();
 		readonly List<Tuple<string, Expression<Func<CypherWhere, object>>>> _where = new List<Tuple<string, Expression<Func<CypherWhere, object>>>>();
 		readonly List<Func<CypherReturn, object>> _return = new List<Func<CypherReturn, object>>();
@@ -22,12 +22,12 @@ namespace Neo4jRestNet.Cypher
 		String _skip = string.Empty;
 		String _limit = string.Empty;
 
-		public DataTable Post()
+		public DataTable Execute()
 		{
-			return Post(ConnectionManager.Connection());
+			return Execute(ConnectionManager.Connection());
 		}
 
-		public DataTable Post(ConnectionElement connection)
+		public DataTable Execute(ConnectionElement connection)
 		{
 			
 			var joScript = new JObject { { "query", Query } };
@@ -41,6 +41,11 @@ namespace Neo4jRestNet.Cypher
 			var returnTypes = GetReturnTypes;
 
 			var dt = new DataTable();
+
+			if(jaData == null)
+			{
+				return dt;
+			}
 
 			var initColumns = true;
 
@@ -119,6 +124,16 @@ namespace Neo4jRestNet.Cypher
 			_start.Add(start);
 		}
 
+		public void Create(Func<CypherCreate, object> create)
+		{
+			_create.Add(create);
+		}
+
+		public void Relate(Func<CypherRelate, object> relate)
+		{
+			_relate.Add(relate);
+		}
+
 		public void Match(Func<CypherMatch, object> match)
 		{
 			_match.Add(match);
@@ -179,11 +194,36 @@ namespace Neo4jRestNet.Cypher
 				var leftParen = string.Empty;
 				var rightParen = string.Empty;
 
-				string label = "START";
-				foreach (var s in _start)
+				string label;
+
+				if (_create != null)
 				{
-					sbToString.AppendFormat("{1}{0}", s.Invoke(new CypherStart()), label);
-					label = ",";
+					label = "START";
+					foreach (var s in _start)
+					{
+						sbToString.AppendFormat("{1}{0}", s.Invoke(new CypherStart()), label);
+						label = ",";
+					}
+				}
+
+				if (_create != null)
+				{
+					label = "CREATE";
+					foreach (var c in _create)
+					{
+						sbToString.AppendFormat("{1}{0}", c.Invoke(new CypherCreate()), label);
+						label = ",";
+					}
+				}
+
+				if (_relate != null)
+				{
+					label = "RELATE";
+					foreach (var r in _relate)
+					{
+						sbToString.AppendFormat("{1}{0}", r.Invoke(new CypherRelate()), label);
+						label = ",";
+					}
 				}
 
 				if (_match != null)

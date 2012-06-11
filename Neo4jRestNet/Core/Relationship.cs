@@ -138,6 +138,11 @@ namespace Neo4jRestNet.Core
 
 		#region GetRelationship
 
+		public static Relationship GetRelationship(EncryptId relationshipId, IRelationshipStore relationshipStore = null, ConnectionElement connection = null)
+		{
+			return GetRelationship((long)relationshipId, relationshipStore, connection);
+		}
+
 		public static Relationship GetRelationship(long relationshipId, IRelationshipStore relationshipStore = null, ConnectionElement connection = null)
 		{
 			if (relationshipStore == null)
@@ -335,6 +340,85 @@ namespace Neo4jRestNet.Core
 		}
 
 		#endregion
+
+		#endregion
+
+		#region Property Methods
+
+		public T GetProperty<T>(string key)
+		{
+			return _properties.GetProperty<T>(key);
+		}
+
+		public T GetProperty<T>(Enum key)
+		{
+			return _properties.GetProperty<T>(key);
+		}
+
+		public object GetProperty(string key)
+		{
+			return _properties.GetProperty(key);
+		}
+
+		public object GetProperty(Enum key)
+		{
+			return _properties.GetProperty(key);
+		}
+
+		public T GetPropertyOrDefault<T>(string key)
+		{
+			return _properties.GetPropertyOrDefault<T>(key);
+		}
+
+		public T GetPropertyOrDefault<T>(Enum key)
+		{
+			return _properties.GetPropertyOrDefault<T>(key);
+		}
+
+		public T GetPropertyOrOther<T>(string key, T otherValue)
+		{
+			return _properties.GetPropertyOrOther<T>(key, otherValue);
+		}
+
+		public T GetPropertyOrOther<T>(Enum key, T otherValue)
+		{
+			return _properties.GetPropertyOrOther<T>(key, otherValue);
+		}
+
+		public IEnumerable<string> GetPropertyKeys()
+		{
+			return _properties.GetPropertyKeys();
+		}
+
+		public bool HasProperty(string key)
+		{
+			return _properties.HasProperty(key);
+		}
+
+		public bool HasProperty(Enum key)
+		{
+			return _properties.HasProperty(key);
+		}
+
+		public object RemoveProperty(string key)
+		{
+			return _properties.RemoveProperty(key);
+		}
+
+		public object RemoveProperty(Enum key)
+		{
+			return _properties.RemoveProperty(key);
+		}
+
+		public void SetProperty<T>(string key, T value)
+		{
+			_properties.SetProperty(key, value);
+		}
+
+		public void SetProperty<T>(Enum key, T value)
+		{
+			_properties.SetProperty(key, value);
+		}
 
 		#endregion
 

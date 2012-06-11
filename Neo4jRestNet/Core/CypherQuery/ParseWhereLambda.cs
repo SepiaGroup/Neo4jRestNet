@@ -3,7 +3,7 @@ using System.Text;
 using System.Linq.Expressions;
 using Neo4jRestNet.ExpressionTreeParser;
 
-namespace Neo4jRestNet.Cypher
+namespace Neo4jRestNet.Core.CypherQuery
 {
 	public class ParseWhereLambda
 	{

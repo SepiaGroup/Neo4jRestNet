@@ -1,11 +1,12 @@
 ﻿using System;
-using System.Collections;
-using System.Text;
-using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Neo4jRestNet.Core;
 using Neo4jRestNet.Core.Exceptions;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Linq;
 
 namespace Neo4jRestNet.Test
 {

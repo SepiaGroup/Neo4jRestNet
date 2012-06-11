@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Neo4jRestNet.Cypher
+namespace Neo4jRestNet.Core.CypherQuery
 {
 	public static class CypherProperty
 	{

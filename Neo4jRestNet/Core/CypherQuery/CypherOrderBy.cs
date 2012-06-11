@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 
-namespace Neo4jRestNet.Cypher
+namespace Neo4jRestNet.Core.CypherQuery
 {
 	public class CypherOrderBy : ICypherObject
 	{
