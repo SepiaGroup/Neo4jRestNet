@@ -316,8 +316,8 @@ namespace Neo4jRestNet.Core
 		public Relationship CreateRelationship(Node startNode, Node endNode, string relationshipType, Properties properties)
 		{
 
-			var startFormat = IsBatchObject(endNode) ? "{{{0}}}/relationships" : "/node/{0}/relationships";
-			var endFormat = IsBatchObject(startNode) ? "{{{0}}}" : "/node/{0}";
+			var startFormat = IsBatchObject(startNode) ? "{{{0}}}/relationships" : "/node/{0}/relationships";
+			var endFormat = IsBatchObject(endNode) ? "{{{0}}}" : "/node/{0}";
 
 			var body = new JObject
 			           	{
@@ -454,8 +454,8 @@ namespace Neo4jRestNet.Core
 
 		public Relationship CreateRelationship(ConnectionElement connection, Node startNode, Node endNode, string name, Properties properties)
 		{
-			var startFormat = IsBatchObject(endNode) ? "{{{0}}}/relationships" : "/node/{0}/relationships";
-			var endFormat = IsBatchObject(startNode) ? "{{{0}}}" : "/node/{0}";
+			var startFormat = IsBatchObject(startNode) ? "{{{0}}}/relationships" : "/node/{0}/relationships";
+			var endFormat = IsBatchObject(endNode) ? "{{{0}}}" : "/node/{0}";
 
 			var body = new JObject
 			           	{

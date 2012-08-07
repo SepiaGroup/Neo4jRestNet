@@ -37,7 +37,7 @@ namespace Neo4jRestNet.Core
 				return (T)Convert.ChangeType(o, u);
 			}
 			
-			return (T)Convert.ChangeType(o, t);
+			return t.IsEnum ? (T)Enum.Parse(t, (string)o, true) : (T)Convert.ChangeType(o, t);
 		}
 
 		public T GetProperty<T>(string key)
@@ -197,7 +197,7 @@ namespace Neo4jRestNet.Core
 		public object RemoveProperty(string key)
 		{
 			// Return old value
-			object oldValue = _properties.Keys.Contains(key) ? _properties[key] : null;
+			var oldValue = _properties.Keys.Contains(key) ? _properties[key] : null;
 			// Remove from properties
 			_properties.Remove(key);
 
@@ -211,12 +211,19 @@ namespace Neo4jRestNet.Core
 
 		public void SetProperty<T>(string key, T value)
 		{
-			_properties[key] = value;
+			if (value is Enum)
+			{
+				_properties[key] = value.ToString();
+			}
+			else
+			{
+				_properties[key] = value;
+			}
 		}
 		
 		public void SetProperty<T>(Enum key, T value)
 		{
-			SetProperty(key.ToString(),value);
+			SetProperty(key.ToString(), value);
 		}
 
 		public static Properties ParseJson(string jsonProperties)
