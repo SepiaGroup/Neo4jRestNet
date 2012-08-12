@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Data;
 using Newtonsoft.Json.Linq;
@@ -14,7 +15,7 @@ namespace Neo4jRestNet.Core.CypherQuery
 	{
 		readonly List<Func<CypherStart, object>> _start = new List<Func<CypherStart, object>>();
 		readonly List<Func<CypherCreate, object>> _create = new List<Func<CypherCreate, object>>();
-		readonly List<Func<CypherRelate, object>> _relate = new List<Func<CypherRelate, object>>();
+		readonly List<Func<CypherCreateUnique, object>> _createUnique = new List<Func<CypherCreateUnique, object>>();
 		readonly List<Func<CypherDelete, object>> _delete = new List<Func<CypherDelete, object>>();
 		readonly List<Func<CypherSet, object>> _set = new List<Func<CypherSet, object>>();
 		readonly List<Func<CypherMatch, object>> _match = new List<Func<CypherMatch, object>>();
@@ -131,9 +132,9 @@ namespace Neo4jRestNet.Core.CypherQuery
 			_create.Add(create);
 		}
 
-		public void Relate(Func<CypherRelate, object> relate)
+		public void CreateUnique(Func<CypherCreateUnique, object> createUnique)
 		{
-			_relate.Add(relate);
+			_createUnique.Add(createUnique);
 		}
 
 		public void Delete(Func<CypherDelete, object> delete)
@@ -187,10 +188,8 @@ namespace Neo4jRestNet.Core.CypherQuery
 			{
 				var returnTypes = new List<Type>();
 
-				foreach (var r in _return)
+				foreach (var obj in _return.Select(r => (CypherReturn)r.Invoke(new CypherReturn())))
 				{
-					//  call GetReturnTypes somehow
-					var obj = (CypherReturn)r.Invoke(new CypherReturn());
 					returnTypes.AddRange(obj.GetReturnTypes);
 				}
 
@@ -203,8 +202,6 @@ namespace Neo4jRestNet.Core.CypherQuery
 			get
 			{
 				var sbToString = new StringBuilder();
-				var leftParen = string.Empty;
-				var rightParen = string.Empty;
 
 				string label;
 
@@ -223,17 +220,17 @@ namespace Neo4jRestNet.Core.CypherQuery
 					label = "CREATE";
 					foreach (var c in _create)
 					{
-						sbToString.AppendFormat("{1}{0}", c.Invoke(new CypherCreate()), label);
+						sbToString.AppendFormat(" {1}{0}", c.Invoke(new CypherCreate()), label);
 						label = ",";
 					}
 				}
 
-				if (_relate != null)
+				if (_createUnique != null)
 				{
-					label = "RELATE";
-					foreach (var r in _relate)
+					label = "CREATE UNIQUE";
+					foreach (var r in _createUnique)
 					{
-						sbToString.AppendFormat("{1}{0}", r.Invoke(new CypherRelate()), label);
+						sbToString.AppendFormat(" {1}{0}", r.Invoke(new CypherCreateUnique()), label);
 						label = ",";
 					}
 				}
@@ -251,8 +248,8 @@ namespace Neo4jRestNet.Core.CypherQuery
 				if (_where != null)
 				{
 					label = "WHERE";
-					leftParen = string.Empty;
-					rightParen = string.Empty;
+					var leftParen = string.Empty;
+					var rightParen = string.Empty;
 
 					foreach (var w in _where)
 					{
@@ -268,7 +265,7 @@ namespace Neo4jRestNet.Core.CypherQuery
 					label = "SET";
 					foreach (var s in _set)
 					{
-						sbToString.AppendFormat("{1}{0}", s.Invoke(new CypherSet()), label);
+						sbToString.AppendFormat(" {1}{0}", s.Invoke(new CypherSet()), label);
 						label = ",";
 					}
 				}
@@ -278,7 +275,7 @@ namespace Neo4jRestNet.Core.CypherQuery
 					label = "DELETE";
 					foreach (var d in _delete)
 					{
-						sbToString.AppendFormat("{1}{0}", d.Invoke(new CypherDelete()), label);
+						sbToString.AppendFormat(" {1}{0}", d.Invoke(new CypherDelete()), label);
 						label = ",";
 					}
 				} 

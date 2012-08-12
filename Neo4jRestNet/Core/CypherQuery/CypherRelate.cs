@@ -4,20 +4,20 @@ using System.Text;
 
 namespace Neo4jRestNet.Core.CypherQuery
 {
-	public class CypherRelate
+	public class CypherCreateUnique
 	{
 		private readonly StringBuilder _sb = new StringBuilder();
 
 		#region Node
 
-		public CypherRelate Node(string name)
+		public CypherCreateUnique Node(string name)
 		{
 			_sb.AppendFormat(" {0}", name);
 
 			return this;
 		}
 
-		public CypherRelate Node(string name, Properties properties)
+		public CypherCreateUnique Node(string name, Properties properties)
 		{
 			_sb.AppendFormat(" ({0} {1})", name, properties.ToString(false));
 
@@ -28,7 +28,7 @@ namespace Neo4jRestNet.Core.CypherQuery
 
 		#region To
 
-		public CypherRelate To(string relationship, Properties properties = null)
+		public CypherCreateUnique To(string relationship, Properties properties = null)
 		{
 			if (properties == null)
 			{
@@ -42,12 +42,12 @@ namespace Neo4jRestNet.Core.CypherQuery
 			return this;
 		}
 
-		public CypherRelate To(Enum relationship, Properties properties = null)
+		public CypherCreateUnique To(Enum relationship, Properties properties = null)
 		{
 			return To(relationship.ToString(), properties);
 		}
 
-		public CypherRelate To(string name, string relationship, Properties properties = null)
+		public CypherCreateUnique To(string name, string relationship, Properties properties = null)
 		{
 			if (properties == null)
 			{
@@ -61,7 +61,7 @@ namespace Neo4jRestNet.Core.CypherQuery
 			return this;
 		}
 
-		public CypherRelate To(string name, Enum relationship, Properties properties = null)
+		public CypherCreateUnique To(string name, Enum relationship, Properties properties = null)
 		{
 			return To(name, relationship.ToString(), properties);
 		}
@@ -70,7 +70,7 @@ namespace Neo4jRestNet.Core.CypherQuery
 
 		#region From
 
-		public CypherRelate From(string relationship, Properties properties = null)
+		public CypherCreateUnique From(string relationship, Properties properties = null)
 		{
 			if (properties == null)
 			{
@@ -84,12 +84,12 @@ namespace Neo4jRestNet.Core.CypherQuery
 			return this;
 		}
 
-		public CypherRelate From(Enum relationship, Properties properties = null)
+		public CypherCreateUnique From(Enum relationship, Properties properties = null)
 		{
 			return From(relationship.ToString(), properties);
 		}
 
-		public CypherRelate From(string name, string relationship, Properties properties = null)
+		public CypherCreateUnique From(string name, string relationship, Properties properties = null)
 		{
 			if (properties == null)
 			{
@@ -103,7 +103,7 @@ namespace Neo4jRestNet.Core.CypherQuery
 			return this;
 		}
 
-		public CypherRelate From(string name, Enum relationship, Properties properties = null)
+		public CypherCreateUnique From(string name, Enum relationship, Properties properties = null)
 		{
 			return From(name, relationship.ToString(), properties);
 		}
