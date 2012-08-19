@@ -52,6 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BatchStoreTest.cs" />
+    <Compile Include="CypherReturnTest.cs" />
     <Compile Include="CypherSetTest.cs" />
     <Compile Include="CypherDeleteTest.cs" />
     <Compile Include="CypherRelateTest.cs" />

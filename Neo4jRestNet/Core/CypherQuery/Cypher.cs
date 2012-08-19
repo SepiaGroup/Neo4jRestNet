@@ -62,10 +62,14 @@ namespace Neo4jRestNet.Core.CypherQuery
 					if (initColumns)
 					{
 						// NOTE: DataTable does NOT support nullable data types
-						dt.Columns.Add(jaColumns[colIndex].ToString(), returnTypes[colIndex]);
+						dt.Columns.Add(jaColumns[colIndex].ToString(), colIndex < returnTypes.Count ? returnTypes[colIndex] : typeof(object));
 					}
 
-					if (returnTypes[colIndex] == typeof(Node))
+					if (colIndex >= returnTypes.Count)
+					{
+						row.Add(jCol.Value<object>());
+					}
+					else if (returnTypes[colIndex] == typeof(Node))
 					{
 						row.Add(jCol.Type == JTokenType.Null ? null : RestNodeStore.CreateNodeFromJson((JObject)jCol));
 					}

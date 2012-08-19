@@ -234,6 +234,19 @@ namespace Neo4jRestNet.Core.CypherQuery
 
 		#endregion
 
+		#region AllElements
+
+		public CypherReturn AllElements()
+		{
+			_sb.Append("*");
+
+			_isStringEmpty = false;
+
+			return this;
+		}
+
+		#endregion
+
 		public IEnumerable<Type> GetReturnTypes
 		{
 			get { return ReturnTypes; }

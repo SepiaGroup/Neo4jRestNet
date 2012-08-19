@@ -22,7 +22,7 @@ namespace Neo4jRestNet.Test
 
 			var cypher = new Cypher();
 			cypher.Start(s => s.Node("node1", node1.Id).Node("node2", node2.Id, node3.Id));
-			cypher.Relate(l => l.Node("node1").To("r", "likes").Node("node2"));
+			cypher.CreateUnique(l => l.Node("node1").To("r", "likes").Node("node2"));
 
 			cypher.Return(r => r.Relationship("r"));
 
@@ -45,7 +45,7 @@ namespace Neo4jRestNet.Test
 
 			var cypher = new Cypher();
 			cypher.Start(s => s.Node("node1", node1.Id));
-			cypher.Relate(l => l.Node("node1").To("likes").Node("node2"));
+			cypher.CreateUnique(l => l.Node("node1").To("likes").Node("node2"));
 
 			cypher.Return(r => r.Node("node2"));
 
@@ -66,7 +66,7 @@ namespace Neo4jRestNet.Test
 
 			var cypher = new Cypher();
 			cypher.Start(s => s.Node("node1", node1.Id));
-			cypher.Relate(l => l.Node("node1").To("likes").Node("node2", p));
+			cypher.CreateUnique(l => l.Node("node1").To("likes").Node("node2", p));
 
 			cypher.Return(r => r.Node("node2"));
 
@@ -92,7 +92,7 @@ namespace Neo4jRestNet.Test
 			var cypher = new Cypher();
 			cypher.Start(s => s.Node("n1", node1.Id).Node("n2", node2.Id));
 
-			cypher.Relate(l => l.Node("n1").To("r", "like", p).Node("n2"));
+			cypher.CreateUnique(l => l.Node("n1").To("r", "like", p).Node("n2"));
 
 			cypher.Return(r => r.Relationship("r"));
 
