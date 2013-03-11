@@ -767,30 +767,41 @@ namespace Neo4jRestNet.Test
 
 			var value1 = UniqueValue();
 
+			var props = new Properties();
+			props.SetProperty("name", "jack");
+
+			var node = Node.CreateUniqueNode("nodes", "a", value1, IndexUniqueness.GetOrCreate, props);
+			
+			var batchNode = Node.CreateUniqueNode("nodes", "a", value1, IndexUniqueness.CreateOrFail, props, batch);
+
+			//Should fail because dup key in index
+			Assert.IsFalse(batch.Execute());
+
+		}
+
+		[TestMethod]
+		public void CreateUniqueNodeInIndex3()
+		{
+			var batch = new BatchStore();
+
+			var value1 = UniqueValue();
+
 			var props1 = new Properties();
 			props1.SetProperty("name", "jack");
 			
 			var props2 = new Properties();
 			props2.SetProperty("name", "frank");
 
-			//var batchNode1 = Node.CreateUniqueNode("nodes", "a", value1, IndexUniqueness.CreateOrFail, props1, batch);
-			//var batchNode2 = Node.CreateUniqueNode("nodes", "a", value1, IndexUniqueness.CreateOrFail, props2, batch);
+			var batchNode1 = Node.CreateUniqueNode("nodes", "a", value1, IndexUniqueness.CreateOrFail, props1, batch);
+			var batchNode2 = Node.CreateUniqueNode("nodes", "a", value1, IndexUniqueness.CreateOrFail, props2, batch);
 			
-			var batchNode1 = Node.CreateUniqueNode("nodes", "a", value1, IndexUniqueness.CreateOrFail, null, batch);
-			var batchNode2 = Node.CreateUniqueNode("nodes", "a", value1, IndexUniqueness.CreateOrFail, null, batch);
+			//var batchNode1 = Node.CreateUniqueNode("nodes", "a", value1, IndexUniqueness.CreateOrFail, null, batch);
+			//var batchNode2 = Node.CreateUniqueNode("nodes", "a", value1, IndexUniqueness.CreateOrFail, null, batch);
 
 
-			Assert.IsTrue(batch.Execute());
+			Assert.IsFalse(batch.Execute());
 
-			var restNode1 = batch.GetGraphObject(batchNode1);
-			var restNode2 = batch.GetGraphObject(batchNode2);
-
-			var nodes = Node.GetNode("nodes", "a", value1);
-
-			Assert.IsTrue(nodes.Count() == 1);
-			Assert.IsTrue(nodes.First() == restNode1);
-			Assert.IsTrue(restNode1 == restNode2);
-			Assert.IsTrue(restNode1.Properties.GetProperty<string>("name") == "jack");
+		
 		}
 	}
 }
