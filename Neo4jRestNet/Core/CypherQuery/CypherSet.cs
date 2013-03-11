@@ -20,7 +20,7 @@ namespace Neo4jRestNet.Core.CypherQuery
 																	sb.Length == 0 ? " " : ",",
 																	name,
 																	p.Key,
-																	JToken.FromObject(p.Value).ToString(Formatting.None, new IsoDateTimeConverter())
+																	p.Value == null ? "null" : JToken.FromObject(p.Value).ToString(Formatting.None, new IsoDateTimeConverter())
 																	))
 						);					
 

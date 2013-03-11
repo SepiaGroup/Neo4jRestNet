@@ -139,7 +139,7 @@ namespace Neo4jRestNet.Test
 
 			var n1 = Node.GetNode(node1.Id);
 
-			Assert.IsTrue(n1 == results.Rows[0].Field<Node>("node1"));
+			Assert.IsTrue(n1 == results.First().Field<Node>("node1"));
 
 			Assert.IsTrue(n1.GetPropertyOrOther("age", -1) == -1);
 			Assert.IsTrue(n1.GetPropertyOrOther("name", "deleted") == "deleted");
@@ -169,7 +169,7 @@ namespace Neo4jRestNet.Test
 
 			var n1 = Node.GetNode(node1.Id);
 
-			Assert.IsTrue(n1 == results.Rows[0].Field<Node>("node1"));
+			Assert.IsTrue(n1 == results.First().Field<Node>("node1"));
 
 			Assert.IsTrue(n1.GetPropertyOrOther("age", -1) == -1);
 			Assert.IsTrue(n1.GetPropertyOrOther("name", "deleted") == "deleted");
@@ -234,7 +234,7 @@ namespace Neo4jRestNet.Test
 
 			var r1 = Relationship.GetRelationship(rel1.Id);
 
-			Assert.IsTrue(r1 == results.Rows[0].Field<Relationship>("rel1"));
+			Assert.IsTrue(r1 == results.First().Field<Relationship>("rel1"));
 
 			Assert.IsTrue(r1.GetPropertyOrOther("age", -1) == -1);
 			Assert.IsTrue(r1.GetPropertyOrOther("name", "deleted") == "deleted");
@@ -268,7 +268,7 @@ namespace Neo4jRestNet.Test
 
 			var r1 = Relationship.GetRelationship(rel1.Id);
 
-			Assert.IsTrue(r1 == results.Rows[0].Field<Relationship>("rel1"));
+			Assert.IsTrue(r1 == results.First().Field<Relationship>("rel1"));
 
 			Assert.IsTrue(r1.GetPropertyOrOther("age", -1) == -1);
 			Assert.IsTrue(r1.GetPropertyOrOther("name", "deleted") == "deleted");

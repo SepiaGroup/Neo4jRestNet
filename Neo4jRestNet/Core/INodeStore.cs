@@ -13,7 +13,7 @@ namespace Neo4jRestNet.Core
 		IEnumerable<Node> GetNode(ConnectionElement connection, string indexName, string searchQuery);
 
 		Node CreateNode(ConnectionElement connection, Properties properties);
-		Node CreateUniqueNode(ConnectionElement connection, Properties properties, string indexName, string key, object value);
+		Node CreateUniqueNode(ConnectionElement connection, Properties properties, string indexName, string key, object value, IndexUniqueness uniqueness);
 
 		Node Initilize(ConnectionElement connection, long id, Properties properties);
 		Node Initilize(string selfUri, Properties properties);

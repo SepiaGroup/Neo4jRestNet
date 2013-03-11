@@ -26,7 +26,7 @@ namespace Neo4jRestNet.Test
 
 			var result = cypher.Execute();
 
-			Assert.IsTrue(result.Rows.Count == 1);
+			Assert.IsTrue(result.Count() == 1);
 
 			Assert.IsTrue(node == result.AsEnumerable().First().Field<Node>("node"));
 		}
@@ -45,7 +45,7 @@ namespace Neo4jRestNet.Test
 
 			var result = cypher.Execute();
 
-			Assert.IsTrue(result.Rows.Count == 1);
+			Assert.IsTrue(result.Count() == 1);
 
 			Assert.IsTrue(rel == result.AsEnumerable().First().Field<Relationship>("relationship"));
 		}
@@ -63,11 +63,11 @@ namespace Neo4jRestNet.Test
 
 			var result = cypher.Execute();
 
-			Assert.IsTrue(result.Rows.Count == 3);
+			Assert.IsTrue(result.Count() == 3);
 
-			Assert.IsTrue(node1 == result.Rows[0].Field<Node>("node"));
-			Assert.IsTrue(node2 == result.Rows[1].Field<Node>("node"));
-			Assert.IsTrue(node3 == result.Rows[2].Field<Node>("node"));
+			Assert.IsTrue(node1 == result.First().Field<Node>("node"));
+			Assert.IsTrue(node2 == result.ElementAt(1).Field<Node>("node"));
+			Assert.IsTrue(node3 == result.ElementAt(2).Field<Node>("node"));
 		}
 
 		//[TestMethod]
@@ -99,9 +99,9 @@ namespace Neo4jRestNet.Test
 
 			var result = cypher.Execute();
 
-			Assert.IsTrue(result.Rows.Count == 1);
+			Assert.IsTrue(result.Count() == 1);
 
-			Assert.IsTrue(node1 == result.Rows[0].Field<Node>("node"));
+			Assert.IsTrue(node1 == result.First().Field<Node>("node"));
 		}
 
 		[TestMethod]
@@ -122,9 +122,9 @@ namespace Neo4jRestNet.Test
 
 			var result = cypher.Execute();
 
-			Assert.IsTrue(result.Rows.Count == 1);
+			Assert.IsTrue(result.Count() == 1);
 
-			Assert.IsTrue(rel == result.Rows[0].Field<Relationship>("rel"));
+			Assert.IsTrue(rel == result.First().Field<Relationship>("rel"));
 		}
 
 		[TestMethod]
@@ -142,9 +142,9 @@ namespace Neo4jRestNet.Test
 
 			var result = cypher.Execute();
 
-			Assert.IsTrue(result.Rows.Count == 1);
+			Assert.IsTrue(result.Count() == 1);
 
-			Assert.IsTrue(node1 == result.Rows[0].Field<Node>("node"));
+			Assert.IsTrue(node1 == result.First().Field<Node>("node"));
 		}
 
 		[TestMethod]
@@ -165,9 +165,9 @@ namespace Neo4jRestNet.Test
 
 			var result = cypher.Execute();
 
-			Assert.IsTrue(result.Rows.Count == 1);
+			Assert.IsTrue(result.Count() == 1);
 
-			Assert.IsTrue(rel == result.Rows[0].Field<Relationship>("rel"));
+			Assert.IsTrue(rel == result.First().Field<Relationship>("rel"));
 		}
 
 		[TestMethod]
@@ -182,9 +182,9 @@ namespace Neo4jRestNet.Test
 
 			var result = cypher.Execute();
 
-			Assert.IsTrue(result.Rows.Count == 1);
-			Assert.IsTrue(node1 == result.Rows[0].Field<Node>("n1"));
-			Assert.IsTrue(node2 == result.Rows[0].Field<Node>("n2")); 
+			Assert.IsTrue(result.Count() == 1);
+			Assert.IsTrue(node1 == result.First().Field<Node>("n1"));
+			Assert.IsTrue(node2 == result.First().Field<Node>("n2")); 
 		}
 
 		[TestMethod]
@@ -202,9 +202,9 @@ namespace Neo4jRestNet.Test
 
 			var result = cypher.Execute();
 
-			Assert.IsTrue(result.Rows.Count == 1);
-			Assert.IsTrue(node1 == result.Rows[0].Field<Node>("n1"));
-			Assert.IsTrue(node2 == result.Rows[0].Field<Node>("n2"));
+			Assert.IsTrue(result.Count() == 1);
+			Assert.IsTrue(node1 == result.First().Field<Node>("n1"));
+			Assert.IsTrue(node2 == result.First().Field<Node>("n2"));
 		}
 
 		[TestMethod]
@@ -223,9 +223,9 @@ namespace Neo4jRestNet.Test
 
 			var result = cypher.Execute();
 
-			Assert.IsTrue(result.Rows.Count == 1);
-			Assert.IsTrue(rel1 == result.Rows[0].Field<Relationship>("r1"));
-			Assert.IsTrue(rel2 == result.Rows[0].Field<Relationship>("r2"));
+			Assert.IsTrue(result.Count() == 1);
+			Assert.IsTrue(rel1 == result.First().Field<Relationship>("r1"));
+			Assert.IsTrue(rel2 == result.First().Field<Relationship>("r2"));
 		}
 
 		[TestMethod]
@@ -247,9 +247,9 @@ namespace Neo4jRestNet.Test
 
 			var result = cypher.Execute();
 
-			Assert.IsTrue(result.Rows.Count == 1);
-			Assert.IsTrue(rel1 == result.Rows[0].Field<Relationship>("r1"));
-			Assert.IsTrue(rel2 == result.Rows[0].Field<Relationship>("r2"));
+			Assert.IsTrue(result.Count() == 1);
+			Assert.IsTrue(rel1 == result.First().Field<Relationship>("r1"));
+			Assert.IsTrue(rel2 == result.First().Field<Relationship>("r2"));
 		}
 	}
 }

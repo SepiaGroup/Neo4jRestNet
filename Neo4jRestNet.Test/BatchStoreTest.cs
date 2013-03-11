@@ -747,7 +747,7 @@ namespace Neo4jRestNet.Test
 			var props = new Properties();
 			props.SetProperty("name", "jack");
 
-			var batchNode = Node.CreateUniqueNode("nodes", "a", value1, props, batch);
+			var batchNode = Node.CreateUniqueNode("nodes", "a", value1, IndexUniqueness.CreateOrFail, props, batch);
 
 			Assert.IsTrue(batch.Execute());
 
@@ -773,8 +773,12 @@ namespace Neo4jRestNet.Test
 			var props2 = new Properties();
 			props2.SetProperty("name", "frank");
 
-			var batchNode1 = Node.CreateUniqueNode("nodes", "a", value1, props1, batch);
-			var batchNode2 = Node.CreateUniqueNode("nodes", "a", value1, props2, batch);
+			//var batchNode1 = Node.CreateUniqueNode("nodes", "a", value1, IndexUniqueness.CreateOrFail, props1, batch);
+			//var batchNode2 = Node.CreateUniqueNode("nodes", "a", value1, IndexUniqueness.CreateOrFail, props2, batch);
+			
+			var batchNode1 = Node.CreateUniqueNode("nodes", "a", value1, IndexUniqueness.CreateOrFail, null, batch);
+			var batchNode2 = Node.CreateUniqueNode("nodes", "a", value1, IndexUniqueness.CreateOrFail, null, batch);
+
 
 			Assert.IsTrue(batch.Execute());
 

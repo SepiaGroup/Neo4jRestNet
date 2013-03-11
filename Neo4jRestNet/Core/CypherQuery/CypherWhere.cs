@@ -66,14 +66,14 @@ namespace Neo4jRestNet.Core.CypherQuery
 
 		public CypherWhere RegEx(string regEx)
 		{
-			_sb.AppendFormat(" =~ /{0}/", regEx);
+			_sb.AppendFormat(" =~ '{0}'", regEx);
 
 			return this;
 		}
 
 		public CypherWhere RegEx(string regEx, bool caseInsensitive)
 		{
-			_sb.AppendFormat(" =~ /{0}{1}/", caseInsensitive ? "(?i)" : string.Empty, regEx);
+			_sb.AppendFormat(" =~ '{0}{1}'", caseInsensitive ? "(?i)" : string.Empty, regEx);
 
 			return this;
 		}

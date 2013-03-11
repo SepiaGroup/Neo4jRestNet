@@ -27,7 +27,7 @@ namespace Neo4jRestNet.Rest
 			return HttpRest.Get(string.Concat(dbUrl, "/node/", nodeId.ToString()), out response);
 		}
 
-		public static HttpStatusCode CreateUniqueNode(string dbUrl, string jsonProperties, string indexName, string key, object value, out string  response)
+		public static HttpStatusCode CreateUniqueNode(string dbUrl, string jsonProperties, string indexName, string key, object value, IndexUniqueness uniqueness, out string  response)
 		{
 			var jo = new JObject
 			         	{
@@ -36,7 +36,7 @@ namespace Neo4jRestNet.Rest
 							{"properties", JToken.Parse(string.IsNullOrWhiteSpace(jsonProperties) ? "{}" : jsonProperties)}
 			         	};
 
-			return HttpRest.Post(string.Concat(dbUrl, "/index/node/", indexName, "?unique"), jo.ToString(Formatting.None, new IsoDateTimeConverter()), out response);
+			return HttpRest.Post(string.Concat(dbUrl, "/index/node/", indexName, "?uniqueness=", uniqueness), jo.ToString(Formatting.None, new IsoDateTimeConverter()), out response);
 		}
 
 		public static HttpStatusCode SetPropertiesOnNode(string dbUrl, long nodeId, string jsonProperties)
@@ -87,7 +87,7 @@ namespace Neo4jRestNet.Rest
 			return HttpRest.Post(string.Concat(dbUrl, "/node/", startNodeId.ToString(), "/relationships"), jo.ToString(Formatting.None, new IsoDateTimeConverter()), out response);
 		}
 
-		public static HttpStatusCode CreateUniqueRelationship(string dbUrl, long startNodeId, long endNodeId, string name, string jsonProperties, string indexName, string key, object value, out string response)
+		public static HttpStatusCode CreateUniqueRelationship(string dbUrl, long startNodeId, long endNodeId, string name, string jsonProperties, string indexName, string key, object value, IndexUniqueness uniqueness, out string response)
 		{
 			var jo = new JObject
                          {
@@ -99,7 +99,7 @@ namespace Neo4jRestNet.Rest
                              {"type", name}
                          };
 
-			return HttpRest.Post(string.Concat(dbUrl, "/index/relationship/", indexName, "?unique"), jo.ToString(), out response);
+			return HttpRest.Post(string.Concat(dbUrl, "/index/relationship/", indexName, "?uniqueness=", uniqueness), jo.ToString(), out response);
 		}
 
 
@@ -304,62 +304,27 @@ namespace Neo4jRestNet.Rest
 			return HttpRest.Get(string.Concat(dbUrl, "/index/relationship/", indexName, "?query=", Uri.EscapeDataString(searchQuery)), out response);
 		}
 
-		public static HttpStatusCode Traverse(string dbUrl, long nodeId, Order order, Uniqueness uniqueness,
-											  IEnumerable<TraverseRelationship> relationships,
-											  PruneEvaluator pruneEvaluator, ReturnFilter returnFilter, int? maxDepth,
-											  ReturnType returnType, out string response)
-		{
-			var jo = new JObject
-                         {
-                             order == null ? Order.DepthFirst.ToJson() : order.ToJson(),
-                             uniqueness == null ? Uniqueness.NodePath.ToJson() : uniqueness.ToJson()
-                         };
 
-			var ja = new JArray();
-			foreach (var r in relationships)
-			{
-				ja.Add(r.ToJson());
-			}
-			jo.Add(new JProperty("relationships", ja));
+		//public static HttpStatusCode PathBetweenNodes(string dbUrl, long fromNodeId, long toNodeId,
+		//                                              IEnumerable<TraverseRelationship> relationships, int maxDepth,
+		//                                              PathAlgorithm algorithm, bool returnAllPaths, out string response)
+		//{
+		//    var jo = new JObject { { "to", string.Concat(dbUrl, "/node/", toNodeId.ToString()) } };
 
-			jo.Add(pruneEvaluator == null ? PruneEvaluator.None.ToJson() : pruneEvaluator.ToJson());
+		//    var ja = new JArray();
+		//    foreach (var r in relationships)
+		//    {
+		//        ja.Add(r.ToJson());
+		//    }
+		//    jo.Add(new JProperty("relationships", ja));
 
-			jo.Add(returnFilter == null ? ReturnFilter.AllButStartNode.ToJson() : returnFilter.ToJson());
+		//    jo.Add("max_depth", maxDepth);
 
-			if (maxDepth == null)
-			{
-				maxDepth = 1;
-			}
+		//    jo.Add("algorithm", algorithm.ToString());
 
-			jo.Add("max_depth", maxDepth.Value);
+		//    var commandPath = returnAllPaths ? "/paths" : "/path";
 
-			return
-				HttpRest.Post(
-					string.Concat(dbUrl, "/node/", nodeId, "/traverse/",
-								  returnType == null ? ReturnType.Node.ToString() : returnType.ToString()),
-					jo.ToString(Formatting.None, new IsoDateTimeConverter()), out response);
-		}
-
-		public static HttpStatusCode PathBetweenNodes(string dbUrl, long fromNodeId, long toNodeId,
-													  IEnumerable<TraverseRelationship> relationships, int maxDepth,
-													  PathAlgorithm algorithm, bool returnAllPaths, out string response)
-		{
-			var jo = new JObject { { "to", string.Concat(dbUrl, "/node/", toNodeId.ToString()) } };
-
-			var ja = new JArray();
-			foreach (var r in relationships)
-			{
-				ja.Add(r.ToJson());
-			}
-			jo.Add(new JProperty("relationships", ja));
-
-			jo.Add("max_depth", maxDepth);
-
-			jo.Add("algorithm", algorithm.ToString());
-
-			var commandPath = returnAllPaths ? "/paths" : "/path";
-
-			return HttpRest.Post(string.Concat(dbUrl, "/node/", fromNodeId, commandPath), jo.ToString(Formatting.None, new IsoDateTimeConverter()), out response);
-		}
+		//    return HttpRest.Post(string.Concat(dbUrl, "/node/", fromNodeId, commandPath), jo.ToString(Formatting.None, new IsoDateTimeConverter()), out response);
+		//}
 	}
 }

@@ -228,7 +228,7 @@ namespace Neo4jRestNet.Core
 			return (Node)_jobs[index].GraphObject;
 		}
 
-		public Node CreateUniqueNode(ConnectionElement connection, Properties properties, string indexName, string key, object value)
+		public Node CreateUniqueNode(ConnectionElement connection, Properties properties, string indexName, string key, object value, IndexUniqueness uniqueness)
 		{
 			var body = new JObject
 			           	{
@@ -241,7 +241,7 @@ namespace Neo4jRestNet.Core
 			_jobs.Add(new BatchJob
 			{
 				Method = HttpRest.Method.Post,
-				To = string.Format("/index/node/{0}?unique", indexName),
+				To = string.Format("/index/node/{0}?uniqueness={1}", indexName, uniqueness),
 				Id = index,
 				Body = body
 			});
@@ -482,7 +482,7 @@ namespace Neo4jRestNet.Core
 			return (Relationship)_jobs[index].GraphObject;
 		}
 
-		public Relationship CreateUniqueRelationship(ConnectionElement connection, Node startNode, Node endNode, string name, Properties properties, string indexName, string key, object value)
+		public Relationship CreateUniqueRelationship(ConnectionElement connection, Node startNode, Node endNode, string name, Properties properties, string indexName, string key, object value, IndexUniqueness uniqueness)
 		{
 			var startFormat = IsBatchObject(endNode) ? "{{{0}}}" : "/node/{0}";
 			var endFormat = IsBatchObject(startNode) ? "{{{0}}}" : "/node/{0}";
@@ -501,7 +501,7 @@ namespace Neo4jRestNet.Core
 			_jobs.Add(new BatchJob
 			{
 				Method = HttpRest.Method.Post,
-				To = string.Format("/index/relationship/{0}?unique", indexName),
+				To = string.Format("/index/relationship/{0}?uniqueness={1}", indexName, uniqueness),
 				Id = index,
 				Body = body
 			});

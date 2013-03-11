@@ -359,10 +359,10 @@ namespace Neo4jRestNet.Test
 		public void CreateUniqueNode()
 		{
 			var value = string.Concat("michael-", DateTime.Now.Millisecond);
-			var node1 = Node.CreateUniqueNode("people", "name", value);
+			var node1 = Node.CreateUniqueNode("people", "name", value, IndexUniqueness.CreateOrFail);
 			Assert.IsNotNull(node1);
 
-			var node2 = Node.CreateUniqueNode("people", "name", value);
+			var node2 = Node.CreateUniqueNode("people", "name", value, IndexUniqueness.GetOrCreate);
 			Assert.IsNull(node2);
 		}
 
@@ -393,10 +393,10 @@ namespace Neo4jRestNet.Test
 
 			var value = string.Concat("good-", DateTime.Now.Millisecond);
 
-			var relationship1 = Relationship.CreateUniqueRelationship(node1, node2, "knows", "rels", "friends", value);
+			var relationship1 = Relationship.CreateUniqueRelationship(node1, node2, "knows", "rels", "friends", value, IndexUniqueness.CreateOrFail);
 			Assert.IsNotNull(relationship1);
 
-			var relationship2 = Relationship.CreateUniqueRelationship(node1, node2, "knows", "rels", "friends", value);
+			var relationship2 = Relationship.CreateUniqueRelationship(node1, node2, "knows", "rels", "friends", value, IndexUniqueness.GetOrCreate);
 			Assert.IsNull(relationship2);
 		}
 

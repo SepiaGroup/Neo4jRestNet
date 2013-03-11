@@ -135,10 +135,10 @@ namespace Neo4jRestNet.Core
 			return ParseNodeJson(response).First();
 		}
 
-		public Node CreateUniqueNode(ConnectionElement connection, Properties properties, string indexName, string key, object value)
+		public Node CreateUniqueNode(ConnectionElement connection, Properties properties, string indexName, string key, object value, IndexUniqueness uniqueness)
 		{
 			string response;
-			var status = Neo4jRestApi.CreateUniqueNode(connection.DbUrl, properties.ToString(), indexName, key, value, out response);
+			var status = Neo4jRestApi.CreateUniqueNode(connection.DbUrl, properties.ToString(), indexName, key, value, uniqueness, out response);
 
 			if (status == HttpStatusCode.Created)
 			{

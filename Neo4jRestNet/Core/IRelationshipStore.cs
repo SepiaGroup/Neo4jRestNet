@@ -12,7 +12,7 @@ namespace Neo4jRestNet.Core
 		IEnumerable<Relationship> GetRelationship(ConnectionElement connection, string indexName, string searchQuery);
 
 		Relationship CreateRelationship(ConnectionElement connection, Node startNode, Node endNode, string name, Properties properties);
-		Relationship CreateUniqueRelationship(ConnectionElement connection, Node startNode, Node endNode, string name, Properties properties, string indexName, string key, object value);
+		Relationship CreateUniqueRelationship(ConnectionElement connection, Node startNode, Node endNode, string name, Properties properties, string indexName, string key, object value, IndexUniqueness uniqueness);
 
 		Relationship Initilize(ConnectionElement connection, long id, Properties properties);
 		Relationship Initilize(string selfUri, Properties properties);

@@ -6,7 +6,7 @@ using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Neo4jRestNet.Core;
 using Neo4jRestNet.Core.CypherQuery;
-
+using System.Data.Common;
 namespace Neo4jRestNet.Test
 {
 	[TestClass]
@@ -22,8 +22,8 @@ namespace Neo4jRestNet.Test
 
 			var result = cypher.Execute();
 
-			Assert.IsTrue(result.Rows.Count == 1);
-			Assert.IsTrue(result.Rows[0].Field<Node>("node") != null);
+			Assert.IsTrue(result.Count() == 1);
+			Assert.IsTrue(result.First().Field<Node>("node") != null);
 		}
 
 		[TestMethod]
@@ -41,9 +41,9 @@ namespace Neo4jRestNet.Test
 
 			var result = cypher.Execute();
 
-			Assert.IsTrue(result.Rows.Count == 1);
-			Assert.IsTrue(result.Rows[0].Field<Node>("node") != null);
-			var n = result.Rows[0].Field<Node>("node");
+			Assert.IsTrue(result.Count() == 1);
+			Assert.IsTrue(result.First().Field<Node>("node") != null);
+			var n = result.First().Field<Node>("node");
 			Assert.IsTrue(n.GetProperty<string>("name") == "jack");
 			Assert.IsTrue(n.GetProperty<int>("age") == 12);
 		}
@@ -63,9 +63,9 @@ namespace Neo4jRestNet.Test
 
 			var result = cypher.Execute();
 
-			Assert.IsTrue(result.Rows.Count == 1);
-			Assert.IsTrue(result.Rows[0].Field<Relationship>("r") != null);
-			var rel = result.Rows[0].Field<Relationship>("r");
+			Assert.IsTrue(result.Count() == 1);
+			Assert.IsTrue(result.First().Field<Relationship>("r") != null);
+			var rel = result.First().Field<Relationship>("r");
 			Assert.IsTrue(rel.StartNode == node1);
 			Assert.IsTrue(rel.EndNode == node2);
 		}
@@ -89,9 +89,9 @@ namespace Neo4jRestNet.Test
 
 			var result = cypher.Execute();
 
-			Assert.IsTrue(result.Rows.Count == 1);
-			Assert.IsTrue(result.Rows[0].Field<Relationship>("r") != null);
-			var rel = result.Rows[0].Field<Relationship>("r");
+			Assert.IsTrue(result.Count() == 1);
+			Assert.IsTrue(result.First().Field<Relationship>("r") != null);
+			var rel = result.First().Field<Relationship>("r");
 			Assert.IsTrue(rel.StartNode == node1);
 			Assert.IsTrue(rel.EndNode == node2);
 			Assert.IsTrue(rel.GetProperty<string>("name") == "jack");

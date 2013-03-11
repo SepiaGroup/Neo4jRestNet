@@ -6,11 +6,6 @@ using Neo4jRestNet.Configuration;
 
 namespace Neo4jRestNet.Core
 {
-	//public enum NodeProperty
-	//{
-	//    NodeType
-	//}
-
 	public class Node : IGraphObject, IEquatable<Node>
 	{
 		private static readonly ConnectionElement DefaultConnection = ConnectionManager.Connection();
@@ -64,18 +59,6 @@ namespace Neo4jRestNet.Core
 
 		#region CreateNode
 
-		//public static Node CreateNode(Properties properties = null, INodeStore nodeStore = null, ConnectionElement connection = null)
-		//{
-		//    return CreateNode((string)null, properties, nodeStore, connection);
-		//}
-
-		//public static Node CreateNode(Enum nodeType, Properties properties = null, INodeStore nodeStore = null, ConnectionElement connection = null)
-		//{
-		//    return CreateNode(nodeType.ToString(), properties, nodeStore, connection);
-		//}
-
-		//public static Node CreateNode(string nodeType, Properties properties = null, INodeStore nodeStore = null, ConnectionElement connection = null)
-
 		public static Node CreateNode()
 		{
 			return CreateNode(null, null, null);
@@ -98,8 +81,6 @@ namespace Neo4jRestNet.Core
 				properties = new Properties();
 			}
 			
-			//properties.SetProperty(NodeProperty.NodeType.ToString(), nodeType);
-			
 			if(nodeStore == null)
 			{
 				nodeStore = new RestNodeStore();
@@ -113,30 +94,18 @@ namespace Neo4jRestNet.Core
 			return nodeStore.CreateNode(connection, properties);
 		}
 
-		public static Node CreateUniqueNode(Enum indexName, Enum key, object value, Properties properties = null, INodeStore nodeStore = null, ConnectionElement connection = null)
+		public static Node CreateUniqueNode(Enum indexName, Enum key, object value, IndexUniqueness uniqueness, Properties properties = null, INodeStore nodeStore = null, ConnectionElement connection = null)
 		{
-			return CreateUniqueNode(indexName.ToString(), key.ToString(), value, properties, nodeStore, connection);
+			return CreateUniqueNode(indexName.ToString(), key.ToString(), value, uniqueness, properties, nodeStore, connection);
 		}
 
-		//public static Node CreateUniqueNode(Enum nodeType, Enum indexName, Enum key, object value, Properties properties = null, INodeStore nodeStore = null, ConnectionElement connection = null)
-		//{
-		//    return CreateUniqueNode(nodeType.ToString(), indexName.ToString(), key.ToString(), value, properties, nodeStore, connection);
-		//}
-		//public static Node CreateUniqueNode(string indexName, string key, object value, Properties properties = null, INodeStore nodeStore = null, ConnectionElement connection = null)
-		//{
-		//    return CreateUniqueNode(null, indexName, key, value, properties, nodeStore, connection);
-		//}
-
-//		public static Node CreateUniqueNode(string nodeType, string indexName, string key, object value, Properties properties = null, INodeStore nodeStore = null, ConnectionElement connection = null)
-		public static Node CreateUniqueNode(string indexName, string key, object value, Properties properties = null, INodeStore nodeStore = null, ConnectionElement connection = null)
+		public static Node CreateUniqueNode(string indexName, string key, object value, IndexUniqueness uniqueness, Properties properties = null, INodeStore nodeStore = null, ConnectionElement connection = null)
 		{
 			if (properties == null)
 			{
 				properties = new Properties();
 			}
 
-			//properties.SetProperty(NodeProperty.NodeType.ToString(), nodeType);
-			
 			if (nodeStore == null)
 			{
 				nodeStore = new RestNodeStore();
@@ -147,7 +116,7 @@ namespace Neo4jRestNet.Core
 				connection = DefaultConnection;
 			}
 
-			return nodeStore.CreateUniqueNode(connection, properties, indexName, key, value);
+			return nodeStore.CreateUniqueNode(connection, properties, indexName, key, value, uniqueness);
 		}
 
 		#endregion
@@ -508,18 +477,6 @@ namespace Neo4jRestNet.Core
 		#endregion
 
 		#endregion
-
-		//#region NodeType
-
-		//public string NodeType
-		//{
-		//    get
-		//    {
-		//        return _properties == null ? null : _properties.GetProperty<string>(NodeProperty.NodeType.ToString());
-		//    }
-		//}
-
-		//#endregion
 
 		#region Property Methods
 

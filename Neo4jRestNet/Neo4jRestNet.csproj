@@ -100,6 +100,7 @@
     <Compile Include="Core\Exceptions\BatchRemoveFromIndexNotSupported.cs" />
     <Compile Include="Core\Exceptions\RelationshipNotFound.cs" />
     <Compile Include="Core\Exceptions\NodeNotFound.cs" />
+    <Compile Include="Core\IndexUniqueness.cs" />
     <Compile Include="Core\RestRelationshipStore.cs" />
     <Compile Include="Core\IRelationshipStore.cs" />
     <Compile Include="Core\EncryptId.cs" />
@@ -143,9 +144,7 @@
     <Compile Include="Rest\ReturnType.cs" />
     <Compile Include="Rest\ReturnFilter.cs" />
     <Compile Include="Rest\PruneEvaluator.cs" />
-    <Compile Include="Rest\TraverseRelationship.cs" />
     <Compile Include="Rest\Order.cs" />
-    <Compile Include="Rest\Uniqueness.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">

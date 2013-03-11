@@ -25,12 +25,12 @@ namespace Neo4jRestNet.Core.CypherQuery
 		String _skip = string.Empty;
 		String _limit = string.Empty;
 
-		public DataTable Execute()
+		public IEnumerable<DataRow> Execute()
 		{
 			return Execute(ConnectionManager.Connection());
 		}
 
-		public DataTable Execute(ConnectionElement connection)
+		public IEnumerable<DataRow> Execute(ConnectionElement connection)
 		{
 			
 			var joScript = new JObject { { "query", Query } };
@@ -47,7 +47,7 @@ namespace Neo4jRestNet.Core.CypherQuery
 
 			if(jaData == null)
 			{
-				return dt;
+				return dt.AsEnumerable();
 			}
 
 			var initColumns = true;
@@ -123,7 +123,7 @@ namespace Neo4jRestNet.Core.CypherQuery
 				dt.Rows.Add(dtRow);
 			}
 
-			return dt;
+			return dt.AsEnumerable();
 		}
 
 		public void Start(Func<CypherStart, object> start)

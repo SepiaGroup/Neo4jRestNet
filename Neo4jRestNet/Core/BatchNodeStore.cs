@@ -42,9 +42,9 @@ namespace Neo4jRestNet.Core
 			throw new NotImplementedException();
 		}
 
-		public Node CreateUniqueNode(ConnectionElement connection, Properties properties, string indexName, string key, object value)
+		public Node CreateUniqueNode(ConnectionElement connection, Properties properties, string indexName, string key, object value, IndexUniqueness uniqueness)
 		{
-			return _batchStore.CreateUniqueNode(connection, properties, indexName, key, value);
+			return _batchStore.CreateUniqueNode(connection, properties, indexName, key, value, uniqueness);
 		}
 
 		public Node Initilize(ConnectionElement connection, long id, Properties properties)

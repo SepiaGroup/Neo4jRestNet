@@ -124,7 +124,10 @@ namespace Neo4jRestNet.Test
 				.Table("t", "UserNode", "LikeRel", "FriendNode")
 				.Append("{{it}}{{it.getProperty('{0}')}}{{it.getProperty('{1}')}} >> -1; t", RelationshipProperty.Date.ToString(), NodeProperty.FirstName.ToString());
 
-			Assert.IsTrue(script.ToString() == "t = new Table();g.V[['FirstName':'Jack','LastName':'Shaw']].filter{it.getProperty('UID') == 'jshaw'}.as('UserNode').outE('Likes').as('LikeRel').inV().as('FriendNode').table(t, ['UserNode','LikeRel','FriendNode']){it}{it.getProperty('Date')}{it.getProperty('FirstName')} >> -1; t");
+			//Assert.IsTrue(script.ToString() == "t = new Table();g.V[['FirstName':'Jack','LastName':'Shaw']].filter{it.getProperty('UID') == 'jshaw'}.as('UserNode').outE('Likes').as('LikeRel').inV().as('FriendNode').table(t, ['UserNode','LikeRel','FriendNode']){it}{it.getProperty('Date')}{it.getProperty('FirstName')} >> -1; t");
+
+			Assert.IsTrue(script.ToString() == "t = new Table();g.V[[p0]].filter{it.getProperty('UID') == 'jshaw'}.as(p1).outE(p2).as(p3).inV().as(p4).table(t, ['UserNode','LikeRel','FriendNode']){it}{it.getProperty('p5')}{it.getProperty('p6')} >> -1; t")
+			;
 		}
 
 	}

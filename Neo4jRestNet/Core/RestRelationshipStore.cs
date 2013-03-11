@@ -161,10 +161,10 @@ namespace Neo4jRestNet.Core
 			return ParseRelationshipJson(response).First();
 		}
 
-		public Relationship CreateUniqueRelationship(ConnectionElement connection, Node startNode, Node endNode, string name, Properties properties, string indexName, string key, object value)
+		public Relationship CreateUniqueRelationship(ConnectionElement connection, Node startNode, Node endNode, string name, Properties properties, string indexName, string key, object value, IndexUniqueness uniqueness)
 		{
 			string response;
-			var status = Neo4jRestApi.CreateUniqueRelationship(connection.DbUrl, startNode.Id, endNode.Id, name, properties.ToString(), indexName, key, value, out response);
+			var status = Neo4jRestApi.CreateUniqueRelationship(connection.DbUrl, startNode.Id, endNode.Id, name, properties.ToString(), indexName, key, value, uniqueness, out response);
 
 			if (status == HttpStatusCode.Created)
 			{

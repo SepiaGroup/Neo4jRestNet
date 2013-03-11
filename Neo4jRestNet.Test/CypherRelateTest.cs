@@ -28,9 +28,9 @@ namespace Neo4jRestNet.Test
 
 			var result = cypher.Execute();
 
-			Assert.IsTrue(result.Rows.Count == 2);
-			var r1 = result.Rows[0].Field<Relationship>("r");
-			var r2 = result.Rows[1].Field<Relationship>("r");
+			Assert.IsTrue(result.Count() == 2);
+			var r1 = result.First().Field<Relationship>("r");
+			var r2 = result.ElementAt(1).Field<Relationship>("r");
 
 			Assert.IsTrue(r1.StartNode == node1);
 			Assert.IsTrue(r1.EndNode == node2);
@@ -51,8 +51,8 @@ namespace Neo4jRestNet.Test
 
 			var result = cypher.Execute();
 
-			Assert.IsTrue(result.Rows.Count == 1);
-			Assert.IsTrue(result.Rows[0].Field<Node>("node2") != null);
+			Assert.IsTrue(result.Count() == 1);
+			Assert.IsTrue(result.First().Field<Node>("node2") != null);
 		}
 
 		[TestMethod]
@@ -72,9 +72,9 @@ namespace Neo4jRestNet.Test
 
 			var result = cypher.Execute();
 
-			Assert.IsTrue(result.Rows.Count == 1);
-			Assert.IsTrue(result.Rows[0].Field<Node>("node2") != null);
-			var n2 = result.Rows[0].Field<Node>("node2");
+			Assert.IsTrue(result.Count() == 1);
+			Assert.IsTrue(result.First().Field<Node>("node2") != null);
+			var n2 = result.First().Field<Node>("node2");
 			Assert.IsTrue(n2.GetProperty<string>("name") == "jack");
 			Assert.IsTrue(n2.GetProperty<int>("age") == 12);
 		}
@@ -98,9 +98,9 @@ namespace Neo4jRestNet.Test
 
 			var result = cypher.Execute();
 
-			Assert.IsTrue(result.Rows.Count == 1);
-			Assert.IsTrue(result.Rows[0].Field<Relationship>("r") != null);
-			var rel = result.Rows[0].Field<Relationship>("r");
+			Assert.IsTrue(result.Count() == 1);
+			Assert.IsTrue(result.First().Field<Relationship>("r") != null);
+			var rel = result.First().Field<Relationship>("r");
 			Assert.IsTrue(rel.StartNode == node1);
 			Assert.IsTrue(rel.EndNode == node2);
 			Assert.IsTrue(rel.GetProperty<string>("name") == "jack");

@@ -36,9 +36,9 @@ namespace Neo4jRestNet.Core
 			throw new NotImplementedException();
 		}
 
-		public Relationship CreateUniqueRelationship(ConnectionElement connection, Node startNode, Node endNode, string name, Properties properties, string indexName, string key, object value)
+		public Relationship CreateUniqueRelationship(ConnectionElement connection, Node startNode, Node endNode, string name, Properties properties, string indexName, string key, object value, IndexUniqueness uniqueness)
 		{
-			return _batchStore.CreateUniqueRelationship(connection, startNode, endNode, name, properties, indexName, key, value);
+			return _batchStore.CreateUniqueRelationship(connection, startNode, endNode, name, properties, indexName, key, value, uniqueness);
 		}
 
 		public Relationship Initilize(ConnectionElement connection, long id, Properties properties)

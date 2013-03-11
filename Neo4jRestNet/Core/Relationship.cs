@@ -109,12 +109,12 @@ namespace Neo4jRestNet.Core
 			return relationshipStore.CreateRelationship(connection, startNode, endNode, name, properties);
 		}
 
-		public static Relationship CreateUniqueRelationship(Node startNode, Node endNode, Enum name, Enum indexName, Enum key, object value, Properties properties = null, IRelationshipStore relationshipStore = null, ConnectionElement connection = null)
+		public static Relationship CreateUniqueRelationship(Node startNode, Node endNode, Enum name, Enum indexName, Enum key, object value, IndexUniqueness uniqueness, Properties properties = null, IRelationshipStore relationshipStore = null, ConnectionElement connection = null)
 		{
-			return CreateUniqueRelationship(startNode, endNode, name.ToString(), indexName.ToString(), key.ToString(), value, properties, relationshipStore, connection);
+			return CreateUniqueRelationship(startNode, endNode, name.ToString(), indexName.ToString(), key.ToString(), value, uniqueness, properties, relationshipStore, connection);
 		}
 
-		public static Relationship CreateUniqueRelationship(Node startNode, Node endNode, string name, string indexName, string key, object value, Properties properties = null, IRelationshipStore relationshipStore = null, ConnectionElement connection = null)
+		public static Relationship CreateUniqueRelationship(Node startNode, Node endNode, string name, string indexName, string key, object value, IndexUniqueness uniqueness, Properties properties = null, IRelationshipStore relationshipStore = null, ConnectionElement connection = null)
 		{
 			if (properties == null)
 			{
@@ -131,7 +131,7 @@ namespace Neo4jRestNet.Core
 				connection = DefaultConnection;
 			}
 
-			return relationshipStore.CreateUniqueRelationship(connection, startNode, endNode, name, properties, indexName, key, value);
+			return relationshipStore.CreateUniqueRelationship(connection, startNode, endNode, name, properties, indexName, key, value, uniqueness);
 		}
 
 		#endregion

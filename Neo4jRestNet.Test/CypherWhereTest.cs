@@ -34,9 +34,9 @@ namespace Neo4jRestNet.Test
 
 			var result = cypher.Execute();
 
-			Assert.IsTrue(result.Rows.Count == 2);
-			Assert.IsTrue(result.Rows[0].Field<Node>("node") == node1);
-			Assert.IsTrue(result.Rows[1].Field<Node>("node") == node2);
+			Assert.IsTrue(result.Count() == 2);
+			Assert.IsTrue(result.First().Field<Node>("node") == node1);
+			Assert.IsTrue(result.ElementAt(1).Field<Node>("node") == node2);
 		}
 
 
@@ -61,8 +61,8 @@ namespace Neo4jRestNet.Test
 
 			var result = cypher.Execute();
 
-			Assert.IsTrue(result.Rows.Count == 1);
-			Assert.IsTrue(result.Rows[0].Field<Node>("node") == node3);
+			Assert.IsTrue(result.Count() == 1);
+			Assert.IsTrue(result.First().Field<Node>("node") == node3);
 		}
 
 		[TestMethod]
@@ -89,8 +89,8 @@ namespace Neo4jRestNet.Test
 
 			var result = cypher.Execute();
 
-			Assert.IsTrue(result.Rows.Count == 1);
-			Assert.IsTrue(result.Rows[0].Field<Relationship>("rel") == rel2);
+			Assert.IsTrue(result.Count() == 1);
+			Assert.IsTrue(result.First().Field<Relationship>("rel") == rel2);
 		}
 	}
 }

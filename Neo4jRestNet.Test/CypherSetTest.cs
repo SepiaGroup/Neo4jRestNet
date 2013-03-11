@@ -30,7 +30,7 @@ namespace Neo4jRestNet.Test
 
 			var results = cypher.Execute();
 
-			var n1 = results.Rows[0].Field<Node>("node1");
+			var n1 = results.First().Field<Node>("node1");
 
 			Assert.IsTrue(n1.GetProperty<string>("name") == "jack");
 		}
@@ -56,7 +56,7 @@ namespace Neo4jRestNet.Test
 
 			var results = cypher.Execute();
 
-			var n1 = results.Rows[0].Field<Node>("node1");
+			var n1 = results.First().Field<Node>("node1");
 
 			Assert.IsTrue(n1.GetProperty<string>("name") == "jack");
 			Assert.IsTrue(n1.GetProperty<int>("age") == 12);
@@ -82,7 +82,7 @@ namespace Neo4jRestNet.Test
 
 			var results = cypher.Execute();
 
-			var r1 = results.Rows[0].Field<Relationship>("rel1");
+			var r1 = results.First().Field<Relationship>("rel1");
 
 			Assert.IsTrue(r1.GetProperty<string>("name") == "jack");
 		}
@@ -111,7 +111,7 @@ namespace Neo4jRestNet.Test
 
 			var results = cypher.Execute();
 
-			var r1 = results.Rows[0].Field<Relationship>("rel1");
+			var r1 = results.First().Field<Relationship>("rel1");
 
 			Assert.IsTrue(r1.GetProperty<string>("name") == "jack"); 
 			Assert.IsTrue(r1.GetProperty<int>("age") == 12);
