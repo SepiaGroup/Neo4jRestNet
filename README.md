@@ -2,38 +2,42 @@
 # .Net wrapper for the Neo4j REST server
 ## Configuration:
     <configuration>
-        <connectionStrings>
-            <add name="neo4j"  connectionString="http://localhost:7474/db/data/" />
-            <add name="neo4jGremlinExtension"  connectionString="/ext/GremlinPlugin/graphdb/execute_script/" />
-        </connectionStrings>
-
-        <appSettings>
-            <add key="EncryptIdKey" value="KeyForEncrypting"/>
-            <add key="EncryptIdIV" value="IVForEncrypting1"/>
-        </appSettings>
+        <configSections>
+    		<section name="neo4jRestNet" type="Neo4jRestNet.Configuration.ConnectionSettings, Neo4jRestNet" />
+    	</configSections>
+    
+    	<neo4jRestNet>
+    		<databases>
+    			<add name="neo4j" default="true" https="false" domain="localhost" port="7474" />
+    		</databases>
+    	</neo4jRestNet>
+    
+        <!-- Only needed if you are using the encryption class -->    
+    	<appSettings>
+    		<add key="EncryptIdKey" value="KeyForEncrypting"/>
+    		<add key="EncryptIdIV" value="IVForEncrypting1"/>
+    	</appSettings>
     </configuration>
 
 ## Examples:
 ### Get Root Node:
     Node RootNode = Node.GetRootNode();
-### Create a User Node with no Properties 
-    Node nodeUser = Node.CreateNode(NodeType.User);
+### Create a Node with no Properties 
+    Node node = Node.CreateNode();
 
-### Create a User Node with Properties
+### Create a Node with Properties
     Properties prop = new Properties();
     prop.SetProperty(NodeProperty.FirstName, "Joe");
     prop.SetProperty(NodeProperty.LastName, "Smith");
-    Node nodeUserWithName = Node.CreateNode(NodeType.User, prop);
+    Node nodeUserWithName = Node.CreateNode(prop);
 
 ### Create Relationships to Nodes
-    RootNode.CreateRelationshipTo(nodeUser, RelationshipType.Likes);
-    RootNode.CreateRelationshipTo(nodeUserWithName, RelationshipType.Likes);
+    RootNode.CreateRelationshipTo(nodeUserWithName, "Likes");
 
 ### Create Relationship with Properties
     Properties RelProp = new Properties();
-    RelProp.SetProperty(RelationshipProperty.Name, "MyRelationship");
     RelProp.SetProperty("CustomRelProp", "CustomPropValue");
-    nodeUserWithName.CreateRelationshipTo(nodeUser, RelationshipType.Knows, RelProp);
+    nodeUserWithName.CreateRelationshipTo(node, "Knows", RelProp);
 
 ## Gremlin 
 ### Get Like relationships from the Root Node
