@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Security.Policy;
 using Neo4jRestNet.Configuration;
 using Neo4jRestNet.Core.Exceptions;
 using Neo4jRestNet.Rest;
@@ -32,7 +33,7 @@ namespace Neo4jRestNet.Core
 		{
 			DbUrl = connection.DbUrl;
 			Id = id;
-			Self = string.Concat(connection, "/node/", Id);
+			Self = string.Concat(Connection.GetServiceRoot(DbUrl).Node, "/", Id);
 			OriginalNodeJson = nodeJson;
 		}
 
@@ -49,7 +50,7 @@ namespace Neo4jRestNet.Core
 		public Node GetRootNode(ConnectionElement connection)
 		{
 			string response;
-			var status = Neo4jRestApi.GetRoot(connection.DbUrl, out response);
+			var status = Neo4jRestApi.GetRoot(Connection.GetDatabaseEndpoint(connection.DbUrl).Data, out response);
 			if (status != HttpStatusCode.OK)
 			{
 				throw new Exception(string.Format("Error getting root node (http response:{0})", status));
@@ -322,7 +323,9 @@ namespace Neo4jRestNet.Core
 				throw new Exception(string.Format("Invalid Self id ({0})", self));
 			}
 
-			DbUrl = self.Substring(0, self.LastIndexOf("/node"));
+			var url = new Uri(self);
+			
+			DbUrl = string.Format("{0}://{1}", url.Scheme, url.Authority);
 
 			// Set Id & NodeId values
 			Id = nodeId;

@@ -74,7 +74,7 @@ namespace Neo4jRestNet.Core
 			}
 
 			string response;
-			var status = HttpRest.Post(string.Concat(connection.DbUrl, "/batch"), jsonJobs.ToString(Formatting.None, new IsoDateTimeConverter()), out response);
+			var status = HttpRest.Post(Connection.GetServiceRoot(connection.DbUrl).Batch, jsonJobs.ToString(Formatting.None, new IsoDateTimeConverter()), out response);
 
 			if (status != HttpStatusCode.OK)
 			{
@@ -124,8 +124,6 @@ namespace Neo4jRestNet.Core
 			foreach (var jobResponse in JArray.Parse(_jsonResponse))
 			{
 				var id = jobResponse["id"].Value<int>();
-				//var from = jobResponse["from"].Value<string>();
-				//var location = jobResponse["location"].Value<string>();
 
 				if (jobResponse["body"] == null)
 				{

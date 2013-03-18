@@ -84,10 +84,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CleanDbPlugin\CleanDbPlugin.cs" />
+    <Compile Include="Configuration\Connection.cs" />
     <Compile Include="Configuration\ConnectionCollection.cs" />
     <Compile Include="Configuration\ConnectionElement.cs" />
     <Compile Include="Configuration\ConnectionManager.cs" />
     <Compile Include="Configuration\ConnectionSettings.cs" />
+    <Compile Include="Configuration\ServiceRoot.cs" />
+    <Compile Include="Configuration\DatabaseEndpoint.cs" />
     <Compile Include="Core\BatchNodeStore.cs" />
     <Compile Include="Core\BatchRelationshipStore.cs" />
     <Compile Include="Core\BatchStore.cs" />
@@ -98,6 +101,8 @@
     <Compile Include="Core\Exceptions\BatchDeleteNotSupported.cs" />
     <Compile Include="Core\Exceptions\BatchGetRelationshipsNotSupported.cs" />
     <Compile Include="Core\Exceptions\BatchRemoveFromIndexNotSupported.cs" />
+    <Compile Include="Core\Exceptions\DatabaseEndpointNotFound.cs" />
+    <Compile Include="Core\Exceptions\ServiceRootNotFound.cs" />
     <Compile Include="Core\Exceptions\RelationshipNotFound.cs" />
     <Compile Include="Core\Exceptions\NodeNotFound.cs" />
     <Compile Include="Core\IndexUniqueness.cs" />

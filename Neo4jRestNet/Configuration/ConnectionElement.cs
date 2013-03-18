@@ -1,4 +1,10 @@
-﻿using System.Configuration;
+﻿using System;
+using System.Collections.Concurrent;
+using System.Configuration;
+using System.Net;
+using Neo4jRestNet.Core.Exceptions;
+using Neo4jRestNet.Rest;
+using Newtonsoft.Json;
 
 namespace Neo4jRestNet.Configuration
 {
@@ -8,7 +14,7 @@ namespace Neo4jRestNet.Configuration
 		{
 			get
 			{
-				return string.Format("{0}://{1}:{2}{3}", Https ? "https" : "http", Domain, Port, DataPath);
+				return string.Format("{0}://{1}:{2}", Https ? "https" : "http", Domain, Port);
 			}
 		}
 
@@ -16,7 +22,7 @@ namespace Neo4jRestNet.Configuration
 		{
 			get
 			{
-				return string.Concat(DbUrl, "/cypher");
+				return Connection.GetServiceRoot(DbUrl).Cypher;
 			}
 		}
 
@@ -24,7 +30,7 @@ namespace Neo4jRestNet.Configuration
 		{
 			get
 			{
-				return string.Concat(DbUrl, GremlinPath);
+				return Connection.GetServiceRoot(DbUrl).Gremlin; 
 			}
 		}
 
@@ -62,20 +68,5 @@ namespace Neo4jRestNet.Configuration
 			get { return (string)this["port"]; }
 			set { this["port"] = value; }
 		}
-
-		[ConfigurationProperty("dataPath", IsRequired = false, DefaultValue = "/db/data")]
-		public string DataPath
-		{
-			get { return (string)this["dataPath"]; }
-			set { this["dataPath"] = string.Concat('/', value.TrimStart('/').TrimEnd('/')); }
-		}
-
-		[ConfigurationProperty("gremlinPath", IsRequired = false, DefaultValue = "/ext/GremlinPlugin/graphdb/execute_script")]
-		public string GremlinPath
-		{
-			get { return (string)this["gremlinPath"]; }
-			set { this["gremlinPath"] = string.Concat('/', value.TrimStart('/').TrimEnd('/')); }
-		}
-
 	}
 }

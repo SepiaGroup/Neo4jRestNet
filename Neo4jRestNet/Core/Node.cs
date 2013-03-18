@@ -123,25 +123,12 @@ namespace Neo4jRestNet.Core
 
 		#region Initilize
 
-		//public static Node Initilize(Properties properties = null, INodeStore nodeStore = null, ConnectionElement connection = null)
-		//{
-		//    return Initilize((string)null, properties, nodeStore, connection);
-		//}
-
-		//public static Node Initilize(Enum nodeType, Properties properties = null, INodeStore nodeStore = null, ConnectionElement connection = null)
-		//{
-		//    return Initilize(nodeType.ToString(), properties, nodeStore, connection);
-		//}
-
-		//public static Node Initilize(string nodeType, Properties properties = null, INodeStore nodeStore = null, ConnectionElement connection = null)
 		public static Node Initilize(Properties properties = null, INodeStore nodeStore = null, ConnectionElement connection = null)
 		{
 			if (properties == null)
 			{
 				properties = new Properties();
 			}
-
-			//properties.SetProperty(NodeProperty.NodeType.ToString(), nodeType);
 
 			if (nodeStore == null)
 			{

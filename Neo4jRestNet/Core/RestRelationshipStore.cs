@@ -134,7 +134,7 @@ namespace Neo4jRestNet.Core
 		{
 			DbUrl = connection.DbUrl;
 			Id = id;
-			Self = string.Concat(DbUrl, "/relationship/", Id);
+			Self = string.Concat(Connection.GetServiceRoot(DbUrl).Relationship, "/", Id);
 			OriginalRelationshipJson = relationshipJson;
 		}
 
@@ -388,7 +388,9 @@ namespace Neo4jRestNet.Core
 				throw new Exception(string.Format("Invalid Self id ({0})", self));
 			}
 
-			DbUrl = self.Substring(0, self.LastIndexOf("/relationship"));
+			var url = new Uri(self);
+
+			DbUrl = string.Format("{0}://{1}", url.Scheme, url.Authority);
 
 			// Set Id & RelationshipId values
 			Id = relationshipId;

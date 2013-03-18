@@ -17,7 +17,7 @@ namespace Neo4jRestNet.Configuration
 
 		public static ConnectionElement Connection(string name)
 		{
-			return Connections.First(f => f.Name.Equals(name, StringComparison.CurrentCultureIgnoreCase)); 
+			return Connections.First(f => f.Name.Equals(name, StringComparison.OrdinalIgnoreCase)); 
 		}
 	}
 }
