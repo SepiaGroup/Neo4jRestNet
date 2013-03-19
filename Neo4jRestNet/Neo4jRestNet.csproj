@@ -145,11 +145,6 @@
     <Compile Include="Core\Relationship.cs" />
     <Compile Include="Rest\Neo4jRestApi.cs" />
     <Compile Include="Rest\HttpRest.cs" />
-    <Compile Include="Rest\PathAlgorithm.cs" />
-    <Compile Include="Rest\ReturnType.cs" />
-    <Compile Include="Rest\ReturnFilter.cs" />
-    <Compile Include="Rest\PruneEvaluator.cs" />
-    <Compile Include="Rest\Order.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
