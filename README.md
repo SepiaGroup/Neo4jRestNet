@@ -1,5 +1,9 @@
 # Neo4jRestNet
 # .Net wrapper for the Neo4j REST server
+
+# [Documentation](wiki/setup)
+# Quick Start
+
 ## Configuration:
     <configuration>
         <configSections>
