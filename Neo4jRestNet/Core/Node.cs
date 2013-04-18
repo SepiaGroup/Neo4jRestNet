@@ -532,6 +532,17 @@ namespace Neo4jRestNet.Core
 			return _properties.RemoveProperty(key);
 		}
 
+		public void SetProperty<T>(string key, T value)
+ 		{
+			_properties.SetProperty(key, value);
+ 		}
+ 
+		public void SetProperty<T>(Enum key, T value)
+ 		{
+			_properties.SetProperty(key, value);
+ 		}
+ 
+
 		#endregion
 
 		#region Static Property Methods
