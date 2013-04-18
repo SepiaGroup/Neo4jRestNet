@@ -367,25 +367,6 @@ namespace Neo4jRestNet.Test
 		}
 
 		[TestMethod]
-		public void AddNodeToIndexUnique()
-		{
-
-			var node1 = Node.CreateNode();
-
-			var node2 = Node.AddToIndex(node1, "people", "id", node1.Id, true);
-			Assert.IsNotNull(node2);
-
-			var node3 = node1.AddToIndex("people", "id", node1.Id, true);
-
-			Assert.IsNull(node3);
-
-			var node4 = node1.AddToIndex("people", "id", node1.Id);
-
-			Assert.IsNotNull(node4);
-		}
-
-
-		[TestMethod]
 		public void CreateUniqueRelationship()
 		{
 			var node1 = Node.CreateNode();
@@ -399,26 +380,7 @@ namespace Neo4jRestNet.Test
 			var relationship2 = Relationship.CreateUniqueRelationship(node1, node2, "knows", "rels", "friends", value, IndexUniqueness.GetOrCreate);
 			Assert.IsNull(relationship2);
 		}
-
-		[TestMethod]
-		public void AddRelationshipToIndexUnique()
-		{
-			var node1 = Node.CreateNode();
-			var node2 = Node.CreateNode();
-			var relationship1 = Relationship.CreateRelationship(node1, node2, "knows");
-
-			var relationship2 = relationship1.AddToIndex("rels", "id", relationship1.Id, true);
-			Assert.IsNotNull(relationship2);
-
-			var relationship3 = relationship1.AddToIndex("rels", "id", relationship1.Id, true);
-
-			Assert.IsNull(relationship3);
-
-			var relationship4 = relationship1.AddToIndex("rels", "id", relationship1.Id);
-
-			Assert.IsNotNull(relationship4);
-		}
-
+		
 		[TestMethod]
 		public void GetRelationships4()
 		{

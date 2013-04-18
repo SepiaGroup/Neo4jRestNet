@@ -68,6 +68,11 @@ namespace Neo4jRestNet.Core
 			throw new NotImplementedException();
 		}
 
+		public void SetProperty<T>(Node node, string key, T value)
+		{
+			_batchStore.SetProperty(node, key, value);
+		}
+
 		public void SaveProperties(Properties properties)
 		{
 			_batchStore.SaveProperties(this, properties);
@@ -83,9 +88,9 @@ namespace Neo4jRestNet.Core
 			throw new BatchGetRelationshipsNotSupportedException();
 		}
 
-		public Node AddToIndex(ConnectionElement connection, Node node, string indexName, string key, object value, bool unique = false)
+		public Node AddToIndex(ConnectionElement connection, Node node, string indexName, string key, object value)
 		{
-			return _batchStore.AddToIndex(connection, node, indexName, key, value, unique);
+			return _batchStore.AddToIndex(connection, node, indexName, key, value);
 		}
 
 		public bool RemoveFromIndex(ConnectionElement connection, Node node, string indexName)

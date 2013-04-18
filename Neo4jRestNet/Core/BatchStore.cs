@@ -18,6 +18,7 @@ namespace Neo4jRestNet.Core
 		public HttpRest.Method Method { get; set; }
 		public string To { get; set; }
 		public JObject Body { get; set; }
+		public object BodyValue { get; set; }
 		public object GraphObject { get; set; }
 		public long Id { get; set; }
 		public bool ReloadProperties { get; set; }
@@ -66,6 +67,10 @@ namespace Neo4jRestNet.Core
 				if (job.Body != null)
 				{
 					jsonJobDescription.Add("body", job.Body);
+				}
+				else if (job.BodyValue != null)
+				{
+					jsonJobDescription.Add("body", JToken.FromObject(job.BodyValue));
 				}
 
 				jsonJobs.Add(jsonJobDescription);
@@ -306,6 +311,22 @@ namespace Neo4jRestNet.Core
 			throw new NotImplementedException();
 		}
 
+		public void SetProperty<T>(string key, T value)
+		{
+			var index = _jobs.Count();
+			_jobs.Add(new BatchJob
+			{
+				Method = HttpRest.Method.Put,
+				To = string.Format("/node/{0}/properties", 1),
+				Id = index,
+			}); 
+		}
+
+		public void SetProperty<T>(Enum key, T value)
+		{
+			SetProperty(key.ToString(), value);
+		}
+
 		public void SaveProperties(Properties properties)
 		{
 			throw new NotImplementedException();
@@ -347,7 +368,7 @@ namespace Neo4jRestNet.Core
 			throw new NotImplementedException();
 		}
 
-		public Node AddToIndex(ConnectionElement connection, Node node, string indexName, string key, object value, bool unique = false)
+		public Node AddToIndex(ConnectionElement connection, Node node, string indexName, string key, object value)
 		{
 			var uriFormat = IsBatchObject(node) ? "{{{0}}}" : "/node/{0}";
 
@@ -362,7 +383,7 @@ namespace Neo4jRestNet.Core
 			_jobs.Add(new BatchJob
 			{
 				Method = HttpRest.Method.Post,
-				To = string.Format("/index/node/{0}{1}", indexName, unique ? "?unique" : string.Empty),
+				To = string.Format("/index/node/{0}", indexName),
 				Id = index,
 				Body = body
 			});
@@ -539,7 +560,7 @@ namespace Neo4jRestNet.Core
 			get { throw new NotImplementedException(); }
 		}
 
-		public Relationship AddToIndex(ConnectionElement connection, Relationship relationship, string indexName, string key, object value, bool unique = false)
+		public Relationship AddToIndex(ConnectionElement connection, Relationship relationship, string indexName, string key, object value)
 		{
 			var uriFormat = IsBatchObject(relationship) ? "{{{0}}}" : "/relationship/{0}";
 
@@ -554,7 +575,7 @@ namespace Neo4jRestNet.Core
 			_jobs.Add(new BatchJob
 			{
 				Method = HttpRest.Method.Post,
-				To = string.Format("/index/relationship/{0}{1}", indexName, unique ? "?unique" : string.Empty),
+				To = string.Format("/index/relationship/{0}", indexName),
 				Id = index,
 				Body = body
 			});
@@ -601,6 +622,23 @@ namespace Neo4jRestNet.Core
 		#endregion
 
 		#region Node Batch Methods
+
+		public void SetProperty<T>(Node node, string key, T value)
+		{
+			if (IsBatchObject(node))
+			{
+				throw new BatchSetPropertyNotSupportedException();
+			}
+
+			var index = _jobs.Count();
+			_jobs.Add(new BatchJob
+			{
+				Method = HttpRest.Method.Put,
+				To = string.Format("/node/{0}/properties/{1}", node.Id, key),
+				BodyValue = value,
+				Id = index,
+			});
+		}
 
 		public void SaveProperties(BatchNodeStore node, Properties properties)
 		{

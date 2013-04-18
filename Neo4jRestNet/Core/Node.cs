@@ -376,31 +376,31 @@ namespace Neo4jRestNet.Core
 
 		#region Member AddToIndex
 
-		public Node AddToIndex(Enum indexName, Enum key, Enum propertyName, bool unique = false)
+		public Node AddToIndex(Enum indexName, Enum key, Enum propertyName)
 		{
-			return AddToIndex(indexName.ToString(), key.ToString(), Properties.GetProperty(propertyName), unique);
+			return AddToIndex(indexName.ToString(), key.ToString(), Properties.GetProperty(propertyName));
 		}
 
-		public Node AddToIndex(Enum indexName, Enum key, object value, bool unique = false)
+		public Node AddToIndex(Enum indexName, Enum key, object value)
 		{
-			return AddToIndex(indexName.ToString(), key.ToString(), value, unique);
+			return AddToIndex(indexName.ToString(), key.ToString(), value);
 		}
 
-		public Node AddToIndex(string indexName, string key, object value, bool unique = false)
+		public Node AddToIndex(string indexName, string key, object value)
 		{
-			return _nodeGraphStore.AddToIndex(DefaultConnection, this, indexName, key, value, unique);
+			return _nodeGraphStore.AddToIndex(DefaultConnection, this, indexName, key, value);
 		}
 
 		#endregion
 
 		#region Static AddToIndex
 
-		public static Node AddToIndex(Node node, Enum indexName, Enum key, object value, bool unique = false, INodeStore nodeStore = null, ConnectionElement connection = null)
+		public static Node AddToIndex(Node node, Enum indexName, Enum key, object value, INodeStore nodeStore = null, ConnectionElement connection = null)
 		{
-			return AddToIndex(node, indexName.ToString(), key.ToString(), value, unique, nodeStore, connection);
+			return AddToIndex(node, indexName.ToString(), key.ToString(), value, nodeStore, connection);
 		}
 
-		public static Node AddToIndex(Node node, string indexName, string key, object value, bool unique = false, INodeStore nodeStore = null, ConnectionElement connection = null)
+		public static Node AddToIndex(Node node, string indexName, string key, object value, INodeStore nodeStore = null, ConnectionElement connection = null)
 		{
 			if (nodeStore == null)
 			{
@@ -412,7 +412,7 @@ namespace Neo4jRestNet.Core
 				connection = DefaultConnection;
 			}
 
-			return nodeStore.AddToIndex(connection, node, indexName, key, value, unique);
+			return nodeStore.AddToIndex(connection, node, indexName, key, value);
 		}
 
 		#endregion
@@ -532,14 +532,28 @@ namespace Neo4jRestNet.Core
 			return _properties.RemoveProperty(key);
 		}
 
-		public void SetProperty<T>(string key, T value)
+		#endregion
+
+		#region Static Property Methods
+
+		public static void SetProperty<T>(Node node, string key, T value, INodeStore nodeStore = null, ConnectionElement connection = null)
 		{
-			_properties.SetProperty(key, value);
+			if (nodeStore == null)
+			{
+				nodeStore = new RestNodeStore();
+			}
+
+			if (connection == null)
+			{
+				connection = DefaultConnection;
+			}
+
+			nodeStore.SetProperty(node, key, value);
 		}
 
-		public void SetProperty<T>(Enum key, T value)
+		public static void SetProperty<T>(Node node, Enum key, T value, INodeStore nodeStore = null, ConnectionElement connection = null)
 		{
-			_properties.SetProperty(key, value);
+			SetProperty(node, key.ToString(), value, nodeStore, connection);
 		}
 
 		#endregion

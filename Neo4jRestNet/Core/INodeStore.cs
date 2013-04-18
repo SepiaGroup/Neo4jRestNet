@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using Neo4jRestNet.Configuration;
 
@@ -22,12 +23,13 @@ namespace Neo4jRestNet.Core
 
 		Properties GetProperties();
 		void SaveProperties(Properties properties);
+		void SetProperty<T>(Node node, string key, T value);
 
 		Relationship CreateRelationship(Node startNode, Node endNode, string relationshipType, Properties properties);
 
 		IEnumerable<Relationship> GetRelationships(RelationshipDirection direction, IEnumerable<string> relationshipTypes);
 
-		Node AddToIndex(ConnectionElement connection, Node node, string indexName, string key, object value, bool unique = false);
+		Node AddToIndex(ConnectionElement connection, Node node, string indexName, string key, object value);
 		bool RemoveFromIndex(ConnectionElement connection, Node node, string indexName);
 		bool RemoveFromIndex(ConnectionElement connection, Node node, string indexName, string key);
 		bool RemoveFromIndex(ConnectionElement connection, Node node, string indexName, string key, object value);

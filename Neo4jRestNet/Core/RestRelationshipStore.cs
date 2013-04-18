@@ -254,21 +254,21 @@ namespace Neo4jRestNet.Core
 
 		#region Index
 
-		public Relationship AddToIndex(ConnectionElement connection, Relationship relationship, string indexName, string key, object value, bool unique = false)
+		public Relationship AddToIndex(ConnectionElement connection, Relationship relationship, string indexName, string key, object value)
 		{
 			string response;
-			var status = Neo4jRestApi.AddRelationshipToIndex(connection.DbUrl, relationship.Id, indexName, key, value, out response, unique);
+			var status = Neo4jRestApi.AddRelationshipToIndex(connection.DbUrl, relationship.Id, indexName, key, value, out response);
 
-			if (status == HttpStatusCode.Created)
+			if (status == HttpStatusCode.Created || status == HttpStatusCode.OK)
 			{
 				return ParseRelationshipJson(response).First();
 			}
 
-			// Add a relationship to an index but mapping already exists
-			if (unique && status == HttpStatusCode.OK)
-			{
-				return null;
-			}
+			//// Add a relationship to an index but mapping already exists
+			//if (unique && status == HttpStatusCode.OK)
+			//{
+			//	return null;
+			//}
 
 			throw new Exception(string.Format("Error adding relationship to index (http response:{0})", status));
 			

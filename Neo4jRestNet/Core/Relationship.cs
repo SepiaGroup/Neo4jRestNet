@@ -254,31 +254,31 @@ namespace Neo4jRestNet.Core
 
 		#region Member AddToIndex
 
-		public Relationship AddToIndex(Enum indexName, Enum key, Enum propertyName, bool unique = false)
+		public Relationship AddToIndex(Enum indexName, Enum key, Enum propertyName)
 		{
-			return AddToIndex(indexName.ToString(), key.ToString(), Properties.GetProperty(propertyName), unique);
+			return AddToIndex(indexName.ToString(), key.ToString(), Properties.GetProperty(propertyName));
 		}
 
-		public  Relationship AddToIndex(Enum indexName, Enum key, object value, bool unique = false)
+		public  Relationship AddToIndex(Enum indexName, Enum key, object value)
 		{
-			return AddToIndex(indexName.ToString(), key.ToString(), value, unique);
+			return AddToIndex(indexName.ToString(), key.ToString(), value);
 		}
 
-		public  Relationship AddToIndex(string indexName, string key, object value, bool unique = false)
+		public  Relationship AddToIndex(string indexName, string key, object value)
 		{
-			return _relationshipGraphStore.AddToIndex(DefaultConnection, this, indexName, key, value, unique);
+			return _relationshipGraphStore.AddToIndex(DefaultConnection, this, indexName, key, value);
 		}
 
 		#endregion
 
 		#region Static AddToIndex
 
-		public static Relationship AddToIndex(Relationship relationship, Enum indexName, Enum key, object value, bool unique = false, IRelationshipStore relationshipStore = null, ConnectionElement connection = null)
+		public static Relationship AddToIndex(Relationship relationship, Enum indexName, Enum key, object value, IRelationshipStore relationshipStore = null, ConnectionElement connection = null)
 		{
-			return AddToIndex(relationship, indexName.ToString(), key.ToString(), value, unique, relationshipStore, connection);
+			return AddToIndex(relationship, indexName.ToString(), key.ToString(), value, relationshipStore, connection);
 		}
 		
-		public static Relationship AddToIndex(Relationship relationship, string indexName, string key, object value, bool unique = false, IRelationshipStore relationshipStore = null, ConnectionElement connection = null)
+		public static Relationship AddToIndex(Relationship relationship, string indexName, string key, object value, IRelationshipStore relationshipStore = null, ConnectionElement connection = null)
 		{
 			if (relationshipStore == null)
 			{
@@ -290,7 +290,7 @@ namespace Neo4jRestNet.Core
 				connection = DefaultConnection;
 			}
 
-			return relationshipStore.AddToIndex(connection, relationship, indexName, key, value, unique);
+			return relationshipStore.AddToIndex(connection, relationship, indexName, key, value);
 		}
 
 		#endregion

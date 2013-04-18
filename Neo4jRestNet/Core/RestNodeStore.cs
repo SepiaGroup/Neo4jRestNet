@@ -188,21 +188,21 @@ namespace Neo4jRestNet.Core
 
 		#region Index
 
-		public Node AddToIndex(ConnectionElement connection, Node node, string indexName, string key, object value, bool unique = false)
+		public Node AddToIndex(ConnectionElement connection, Node node, string indexName, string key, object value)
 		{
 			string response;
-			var status = Neo4jRestApi.AddNodeToIndex(connection.DbUrl, node.Id, indexName, key, value, out response, unique);
+			var status = Neo4jRestApi.AddNodeToIndex(connection.DbUrl, node.Id, indexName, key, value, out response);
 
 			if (status == HttpStatusCode.Created)
 			{
 				return ParseNodeJson(response).First();
 			}
 
-			// Add a node to an index but mapping already exists
-			if(unique && status == HttpStatusCode.OK)
-			{
-				return null;  
-			}
+			//// Add a node to an index but mapping already exists
+			//if(unique && status == HttpStatusCode.OK)
+			//{
+			//	return null;  
+			//}
 
 			throw new Exception(string.Format("Error adding node to index (http response:{0})", status));
 		}
@@ -256,6 +256,16 @@ namespace Neo4jRestNet.Core
 			}
 
 			return Properties.ParseJson(response);
+		}
+
+		public void SetProperty<T>(Node node, string key, T value)
+		{
+			node.Properties.SetProperty(key,value);
+		}
+
+		public void SetProperty<T>(Properties properties, string key, T value)
+		{
+			properties.SetProperty(key, value);
 		}
 
 		public void SaveProperties(Properties properties)

@@ -84,9 +84,9 @@ namespace Neo4jRestNet.Core
 			get { throw new NotImplementedException(); }
 		}
 
-		public Relationship AddToIndex(ConnectionElement connection, Relationship relationship, string indexName, string key, object value, bool unique = false)
+		public Relationship AddToIndex(ConnectionElement connection, Relationship relationship, string indexName, string key, object value)
 		{
-			return _batchStore.AddToIndex(connection, relationship, indexName, key, value, unique);
+			return _batchStore.AddToIndex(connection, relationship, indexName, key, value);
 		}
 
 		public bool RemoveFromIndex(ConnectionElement connection, Relationship relationship, string indexName)

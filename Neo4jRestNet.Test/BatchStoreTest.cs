@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Neo4jRestNet.Core;
+using Neo4jRestNet.Core.CypherQuery;
 using Neo4jRestNet.Core.Exceptions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -694,50 +695,6 @@ namespace Neo4jRestNet.Test
 		}
 
 		[TestMethod]
-		public void AddNodeToIndexUnique1()
-		{
-			var batch = new BatchStore();
-
-			var batchNode = Node.CreateNode(batch);
-
-			var value1 = UniqueValue();
-
-			var batchUniqueNode = batchNode.AddToIndex("nodes", "a", value1, true);
-
-			Assert.IsTrue(batch.Execute());
-
-			var restNode = batch.GetGraphObject(batchUniqueNode);
-
-			var nodes = Node.GetNode("nodes", "a", value1);
-			Assert.IsTrue(nodes.Count() == 1);
-			Assert.IsTrue(nodes.First() == restNode);
-		}
-
-		[TestMethod]
-		public void AddNodeToIndexUnique2()
-		{
-			var batch = new BatchStore();
-
-			var batchNode1 = Node.CreateNode(batch);
-			var batchNode2 = Node.CreateNode(batch);
-
-			var value1 = UniqueValue();
-
-			var batchUniqueNode1 = batchNode1.AddToIndex("nodes", "a", value1, true);
-			var batchUniqueNode2 = batchNode2.AddToIndex("nodes", "a", value1, true);
-
-			Assert.IsTrue(batch.Execute());
-
-			var restNode1 = batch.GetGraphObject(batchUniqueNode1);
-			var restNode2 = batch.GetGraphObject(batchUniqueNode2);
-
-			var nodes = Node.GetNode("nodes", "a", value1);
-			Assert.IsTrue(nodes.Count() == 1);
-			Assert.IsTrue(nodes.First() == restNode1);
-			Assert.IsTrue(restNode1 == restNode2);
-		}
-
-		[TestMethod]
 		public void CreateUniqueNodeInIndex1()
 		{
 			var batch = new BatchStore();
@@ -802,6 +759,130 @@ namespace Neo4jRestNet.Test
 			Assert.IsFalse(batch.Execute());
 
 		
+		}
+
+		[TestMethod]
+		public void CreateUniqueNodeUpdateIndexValue()
+		{
+			var batch = new BatchStore();
+
+			var value1 = UniqueValue();
+
+			var props1 = new Properties();
+			props1.SetProperty("name", "jack");
+			props1.SetProperty("a", value1);
+
+			var batchNode1 = Node.CreateUniqueNode("nodes", "a", value1, IndexUniqueness.CreateOrFail, props1, batch);
+
+			var insertResult = batch.Execute();
+
+			Assert.IsTrue(insertResult);
+
+			var graphNode = batch.GetGraphObject(batchNode1);
+
+
+			// try to update unique index value.
+			batch = new BatchStore();
+			var value2 = UniqueValue();
+
+			// create node with new value - will fail if value already exists.
+			var fakeNode = Node.CreateUniqueNode("nodes", "a", value2, IndexUniqueness.CreateOrFail, null, batch);
+
+			// delete old node from index
+			Node.RemoveFromIndex(graphNode, "nodes", "a", null, batch);
+
+			// update properties on node in batch
+			Node.SetProperty(graphNode, "a", value2, batch);
+			Node.SetProperty(graphNode, "name", "tom", batch);
+			
+
+			// add node to index with new key/value for index
+			Node.AddToIndex(graphNode, "nodes", "a", value2, batch);
+
+			// execute batch
+			var updateResult = batch.Execute();
+			
+			Assert.IsTrue(updateResult);
+
+			fakeNode = batch.GetGraphObject(fakeNode);
+
+			// remove fake node 
+			fakeNode.RemoveFromIndex("nodes");
+			fakeNode.Delete();
+
+			//verify key is in index
+			var findNode = Node.GetNode("nodes", "a", value2);
+
+			Assert.IsTrue(findNode.Count() == 1);
+			Assert.IsTrue(findNode.First().GetProperty("a").ToString() == value2);
+
+
+			//verify old key is not in index
+			var missingNode = Node.GetNode("nodes", "a", value1);
+
+			Assert.IsFalse(missingNode.Any());
+		}
+
+		[TestMethod]
+		public void CreateUniqueNodeUpdateIndexValueDupFail()
+		{
+			var batch = new BatchStore();
+
+			var value1 = UniqueValue();
+
+			var props1 = new Properties();
+			props1.SetProperty("name", "jack");
+			props1.SetProperty("a", value1);
+
+			var batchNode1 = Node.CreateUniqueNode("nodes", "a", value1, IndexUniqueness.CreateOrFail, props1, batch);
+
+			var insertResult = batch.Execute();
+
+			Assert.IsTrue(insertResult);
+
+			var graphNode = batch.GetGraphObject(batchNode1);
+
+			// try to update unique index value.
+			batch = new BatchStore();
+			var value2 = UniqueValue();
+
+			// create node with new value - will fail because value already exists.
+			var fakeNode = Node.CreateUniqueNode("nodes", "a", value1, IndexUniqueness.CreateOrFail, null, batch);
+
+			// delete old node from index
+			Node.RemoveFromIndex(graphNode, "nodes", "a", null, batch);
+
+			// update properties on node
+			Node.SetProperty(graphNode, "a", value2,batch);
+			Node.SetProperty(graphNode, "name", "tom", batch);
+
+			// add node to index with new key/value for index
+			Node.AddToIndex(graphNode, "nodes", "a", value2, batch);
+
+			// execute batch
+			var updateResult = batch.Execute();
+
+			if (updateResult)
+			{
+				fakeNode = batch.GetGraphObject(fakeNode);
+				// remove fake node 
+				fakeNode.RemoveFromIndex("nodes");
+				fakeNode.Delete();
+			}
+
+			Assert.IsFalse(updateResult);
+
+			//verify old key is in index
+			var findNode = Node.GetNode("nodes", "a", value1);
+
+			Assert.IsTrue(findNode.Count() == 1);
+			Assert.IsTrue(findNode.First().GetProperty("a").ToString() == value1);
+
+
+			//verify new key is not in index
+			var missingNode = Node.GetNode("nodes", "a", value2);
+
+			Assert.IsFalse(missingNode.Any());
 		}
 	}
 }

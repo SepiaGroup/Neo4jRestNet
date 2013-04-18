@@ -206,14 +206,14 @@ namespace Neo4jRestNet.Rest
 			return HttpRest.Get(Connection.GetServiceRoot(dbUrl).RelationshipIndex, out response);
 		}
 
-		public static HttpStatusCode AddNodeToIndex(string dbUrl, long nodeId, string indexName, string key, object value, out string response, bool unique = false)
+		public static HttpStatusCode AddNodeToIndex(string dbUrl, long nodeId, string indexName, string key, object value, out string response)
 		{
 			var self = string.Concat(dbUrl, "/", nodeId.ToString());
 
-			return AddNodeToIndex(dbUrl, self, indexName, key, value, out response, unique);
+			return AddNodeToIndex(dbUrl, self, indexName, key, value, out response);
 		}
 
-		public static HttpStatusCode AddNodeToIndex(string dbUrl, string nodeSelf, string indexName, string key, object value, out string response, bool unique = false)
+		public static HttpStatusCode AddNodeToIndex(string dbUrl, string nodeSelf, string indexName, string key, object value, out string response)
 		{
 			var jo = new JObject
 			            {
@@ -222,16 +222,16 @@ namespace Neo4jRestNet.Rest
 							{ "uri", nodeSelf }
 			            };
 
-			return HttpRest.Post(string.Concat(Connection.GetServiceRoot(dbUrl).NodeIndex, "/", indexName, unique ? "?unique" : string.Empty), jo.ToString(Formatting.None, new IsoDateTimeConverter()), out response);
+			return HttpRest.Post(string.Concat(Connection.GetServiceRoot(dbUrl).NodeIndex, "/", indexName), jo.ToString(Formatting.None, new IsoDateTimeConverter()), out response);
 		}
 
-		public static HttpStatusCode AddRelationshipToIndex(string dbUrl, long relationshipId, string indexName, string key, object value, out string response, bool unique = false)
+		public static HttpStatusCode AddRelationshipToIndex(string dbUrl, long relationshipId, string indexName, string key, object value, out string response)
 		{
 			var self = string.Concat(dbUrl, "/", relationshipId.ToString());
-			return AddRelationshipToIndex(dbUrl, self, indexName, key, value, out response, unique);
+			return AddRelationshipToIndex(dbUrl, self, indexName, key, value, out response);
 		}
 
-		public static HttpStatusCode AddRelationshipToIndex(string dbUrl, string relationshipself, string indexName, string key, object value, out string response, bool unique = false)
+		public static HttpStatusCode AddRelationshipToIndex(string dbUrl, string relationshipself, string indexName, string key, object value, out string response)
 		{
 			var jo = new JObject
 			            {
@@ -240,7 +240,7 @@ namespace Neo4jRestNet.Rest
 							{ "uri", relationshipself }
 			            };
 
-			return HttpRest.Post(string.Concat(Connection.GetServiceRoot(dbUrl).RelationshipIndex, "/", indexName, unique ? "?unique" : string.Empty),
+			return HttpRest.Post(string.Concat(Connection.GetServiceRoot(dbUrl).RelationshipIndex, "/", indexName),
 								  jo.ToString(Formatting.None, new IsoDateTimeConverter()), out response);
 		}
 

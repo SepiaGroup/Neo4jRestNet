@@ -26,7 +26,7 @@ namespace Neo4jRestNet.Core
 		Node EndNode { get; }
 		string Type { get; }
 
-		Relationship AddToIndex(ConnectionElement connection, Relationship relationship, string indexName, string key, object value, bool unique = false);
+		Relationship AddToIndex(ConnectionElement connection, Relationship relationship, string indexName, string key, object value);
 		bool RemoveFromIndex(ConnectionElement connection, Relationship relationship, string indexName);
 		bool RemoveFromIndex(ConnectionElement connection, Relationship relationship, string indexName, string key);
 		bool RemoveFromIndex(ConnectionElement connection, Relationship relationship, string indexName, string key, object value);
